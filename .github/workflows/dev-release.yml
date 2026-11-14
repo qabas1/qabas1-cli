@@ -1,0 +1,154 @@
+name: Dev Release
+
+# Rolling prerelease on every push to the `dev` branch.
+# Tag is `dev-latest` (not `dev`) so it does not collide with the branch name.
+# Install: VERSION=dev sudo -E bash install.sh --cli-only
+# Assets remain named qabas_dev_* .
+on:
+  push:
+    branches: [dev]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dev-release
+  cancel-in-progress: true
+
+env:
+  NFPM_VERSION: "2.41.3"
+
+jobs:
+  linux:
+    name: Linux (verify + build)
+    runs-on: ${{ vars.SELF_HOSTED == 'true' && fromJSON('{"group":"ci","labels":["self-hosted","Linux","X64","ci"]}') || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure persistent Go cache dirs
+        run: |
+          CACHE_ROOT="${HOME}/.cache/qabasone-cli"
+          mkdir -p "${CACHE_ROOT}/go-build" "${CACHE_ROOT}/pkg/mod" .tools
+          echo "GOCACHE=${CACHE_ROOT}/go-build" >> "$GITHUB_ENV"
+          echo "GOMODCACHE=${CACHE_ROOT}/pkg/mod" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Cache Go build
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/qabasone-cli/go-build
+          key: ${{ runner.os }}-go-build-${{ hashFiles('go.sum') }}-${{ hashFiles('**/*.go') }}
+          restore-keys: |
+            ${{ runner.os }}-go-build-${{ hashFiles('go.sum') }}-
+            ${{ runner.os }}-go-build-
+
+      - name: Cache nfpm
+        uses: actions/cache@v4
+        with:
+          path: .tools/nfpm
+          key: nfpm-${{ env.NFPM_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Verify
+        run: |
+          go mod verify
+          go test -count=1 ./...
+          go vet ./...
+
+      - name: Build dev artifacts
+        env:
+          VERSION: dev
+          COMMIT: ${{ github.sha }}
+        run: bash scripts/dist.sh
+
+      - name: Validate bootstrap installers
+        run: |
+          bash -n install/install.sh
+          test -f dist/qabas_dev_linux_amd64.deb
+
+      - name: Upload Linux dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: qabas-dev-linux
+          path: |
+            dist/qabas_dev_linux_amd64
+            dist/qabas_dev_linux_arm64
+            dist/qabas_dev_linux_*.deb
+            dist/install.sh
+          retention-days: 1
+
+  release:
+    name: Publish dev-latest
+    needs: linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: qabas-dev-linux
+          path: dist
+
+      - name: SHA256SUMS
+        env:
+          VERSION: dev
+        run: bash scripts/checksums.sh
+
+      - name: Release notes
+        run: |
+          SHORT="${GITHUB_SHA:0:7}"
+          cat > "${RUNNER_TEMP}/dev-release-notes.md" <<EOF
+          ## qabas dev (rolling)
+
+          Built from \`dev\` @ [\`${SHORT}\`](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}).
+
+          ### Install (Linux)
+
+          On Debian/Ubuntu installs a \`.deb\` (\`sudo apt remove qabas\` to uninstall).
+
+          \`\`\`bash
+          export GITHUB_TOKEN="\$(gh auth token)"
+          VERSION=dev sudo -E bash install.sh --cli-only --token-file /path/to/token
+          \`\`\`
+
+          EOF
+
+      - name: Publish rolling dev release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dev-latest
+          target_commitish: ${{ github.sha }}
+          name: qabas dev (rolling)
+          prerelease: true
+          overwrite_files: true
+          make_latest: false
+          fail_on_unmatched_files: true
+          body_path: ${{ runner.temp }}/dev-release-notes.md
+          files: |
+            dist/qabas_dev_linux_amd64
+            dist/qabas_dev_linux_arm64
+            dist/qabas_dev_linux_amd64.deb
+            dist/qabas_dev_linux_arm64.deb
+            dist/SHA256SUMS
+            dist/install.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Remove previous Windows assets from dev-latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view dev-latest --json assets --jq '.assets[].name' |
+            while IFS= read -r asset; do
+              case "$asset" in
+                qabas_dev_windows_*.exe|qabas_dev_windows_*.msi|install.ps1)
+                  gh release delete-asset dev-latest "$asset" --yes
+                  ;;
+              esac
+            done

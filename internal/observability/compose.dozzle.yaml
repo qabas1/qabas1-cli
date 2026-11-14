@@ -1,0 +1,84 @@
+# Fast-path localhost log UI (Dozzle). Project: qabasone-logs
+#
+# No logs container touches the Docker socket directly: socket-proxy exposes a
+# read-only subset of the API (containers, networks, info, events; no POST/exec) on an
+# internal network that has no route outside the host.
+services:
+  socket-proxy:
+    image: ${QABAS_SOCKET_PROXY_IMAGE:-ghcr.io/tecnativa/docker-socket-proxy:0.3.0}
+    container_name: qabasone-socket-proxy
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    mem_limit: 64m
+    environment:
+      CONTAINERS: 1
+      INFO: 1
+      EVENTS: 1
+      PING: 1
+      VERSION: 1
+      POST: 0
+      EXEC: 0
+      IMAGES: 0
+      # Alloy's docker discovery reads network labels (GET only; POST stays off).
+      NETWORKS: 1
+      VOLUMES: 0
+      SYSTEM: 0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - socket
+
+  dozzle:
+    image: ghcr.io/qabasone/vendor/amir20/dozzle:v8.13.13
+    container_name: qabasone-dozzle
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    pids_limit: 256
+    mem_limit: 256m
+    depends_on:
+      - socket-proxy
+    volumes:
+      - dozzle_data:/data
+      - ./config/dozzle/users.yml:/data/users.yml:ro
+    ports:
+      - "127.0.0.1:${QABAS_LOGS_UI_PORT:-9999}:8080"
+    environment:
+      DOCKER_HOST: tcp://socket-proxy:2375
+      DOZZLE_HOSTNAME: qabasone
+      DOZZLE_AUTH_PROVIDER: simple
+      # Empty DOZZLE_FILTER shows all containers (--all). Default filters to product project.
+      DOZZLE_FILTER: ${DOZZLE_FILTER:-label=com.docker.compose.project=qabasone}
+    networks:
+      - ui
+      - socket
+    # No healthcheck: Dozzle image is distroless (no wget/shell). Use `qabas logs ui status`.
+
+volumes:
+  dozzle_data:
+
+networks:
+  # Published UI ports only.
+  ui:
+    name: qabasone-logs-ui
+  # Docker API proxy; internal: no egress, unreachable from the product stack.
+  socket:
+    name: qabasone-logs-socket
+    internal: true

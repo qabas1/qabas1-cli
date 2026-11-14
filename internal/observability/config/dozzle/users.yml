@@ -1,0 +1,7 @@
+# Placeholder replaced on `qabas logs ui up` with a bcrypt-hashed local admin.
+# Do not edit by hand unless you know the Dozzle users.yml format.
+users:
+  admin:
+    email: logs-ui@localhost
+    name: QabasOne Logs
+    password: "$2a$10$REPLACE_ON_MATERIALIZE_THEN_ENSURE"

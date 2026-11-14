@@ -1,0 +1,30 @@
+{
+  "FixedFileInfo": {
+    "FileVersion": { "Major": 0, "Minor": 0, "Patch": 0, "Build": 0 },
+    "ProductVersion": { "Major": 0, "Minor": 0, "Patch": 0, "Build": 0 },
+    "FileFlagsMask": "3f",
+    "FileFlags": "00",
+    "FileOS": "040004",
+    "FileType": "01",
+    "FileSubType": "00"
+  },
+  "StringFileInfo": {
+    "Comments": "https://qabas.one",
+    "CompanyName": "QabasOne",
+    "FileDescription": "QabasOne system administration CLI",
+    "FileVersion": "0.0.0",
+    "InternalName": "qabas",
+    "LegalCopyright": "Copyright (c) 2026 QabasOne. MIT License.",
+    "LegalTrademarks": "",
+    "OriginalFilename": "qabas.exe",
+    "PrivateBuild": "",
+    "ProductName": "QabasOne CLI",
+    "ProductVersion": "0.0.0",
+    "SpecialBuild": ""
+  },
+  "VarFileInfo": {
+    "Translation": { "LangID": "0409", "CharsetID": "04B0" }
+  },
+  "IconPath": "../../packaging/windows/assets/qabas.ico",
+  "ManifestPath": "qabas.exe.manifest"
+}

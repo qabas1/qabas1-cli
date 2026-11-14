@@ -1,0 +1,423 @@
+.\" Man page for qabas (QabasOne system administration CLI)
+.TH QABAS 1 "August 2026" "qabas" "User Commands"
+.SH NAME
+qabas \- QabasOne system administration CLI
+.SH SYNOPSIS
+.B qabas
+[\fIglobal-flags\fR]
+\fIcommand\fR
+[\fIargs\fR]
+.SH DESCRIPTION
+.B qabas
+is the official system administration CLI for QabasOne.
+It is the deployment engine: it installs, upgrades, downgrades, backs up,
+and operates the QabasOne product stack (API, App, and Dash).
+.PP
+Product releases are defined in the
+.B qabasone-deploy
+repository; this CLI does not hardcode a release catalog.
+.PP
+The Debian package installs only the
+.B qabas
+binary under
+.IR /usr/bin/qabas .
+Product configuration and state live under
+.I /etc/qabasone
+and
+.IR /var/lib/qabasone .
+.SH GLOBAL OPTIONS
+.TP
+.B \-\-dry\-run
+Print the plan without changing the system.
+.TP
+.B \-\-yes
+Assume yes for confirmation prompts.
+.TP
+.B \-\-non\-interactive
+Fail instead of prompting for input.
+.TP
+.B \-\-json
+Emit machine-readable JSON output.
+.TP
+.B \-\-quiet
+Suppress human-oriented output.
+.TP
+.BI \-\-channel " name"
+Select the release channel (default: stable).
+.SH COMMANDS
+.TP
+.B install [\fIversion\fR]
+Install QabasOne (latest stable by default).
+.TP
+.B uninstall
+Uninstall the qabas CLI package. QabasOne services, data, backups, and
+configuration are not removed.
+.TP
+.B deploy \fIversion\fR
+Deploy an exact QabasOne product release.
+.TP
+.B upgrade [\fIversion\fR]
+Upgrade to the latest compatible stable release.
+.TP
+.B downgrade \fIversion\fR
+Downgrade to an older release (blocked if unsafe).
+.TP
+.B rollback
+Return to the previous successfully deployed release.
+.TP
+.B release list|show|current|latest
+Inspect published and installed product releases.
+.TP
+.B backup create|list|verify|show
+Create and inspect local backups of persistent state.
+.TP
+.B restore \fIbackup\-id\fR
+Restore QabasOne from a backup.
+.TP
+.B status
+Show installed release and service health.
+.TP
+.B ps
+List QabasOne containers.
+.TP
+.B up [\fIservice\fR] [\fB-d\fR] [\fB--build\fR]
+Start all services, or one service. The \fB-d\fR flag keeps containers detached, and \fB--build\fR builds images before starting.
+.TP
+.B start [\fIservice\fR]
+Start all services, or one service.
+.TP
+.B down [\fIservice\fR]
+Stop and remove all QabasOne service containers, or one service container, while preserving data.
+.TP
+.B stop [\fIservice\fR]
+Stop all services, or one service.
+.TP
+.B restart [\fIservice\fR]
+Restart all services, or one service.
+.TP
+.B doctor
+Diagnose host, Docker, and installation health (includes logs UI status,
+memory, disk, Docker disk usage, and autopilot).
+.TP
+.B guide [\fItopic\fR] [\fB--name\fR \fIn\fR] [\fB--host\fR \fIip\fR] [\fB--writer\fR \fIn\fR] [\fB--no-detect\fR]
+Print step-by-step walkthroughs (install, replica, backup, schedule, pitr, dr,
+maintenance). Each step says where to run it and shows commands pre-filled from
+read-only detection of this machine (role, address, SSH host key, cluster
+nodes), marked done, todo, or blocked. Without a topic, prints the detected
+machine summary, suggested next topics, and the topic list.
+.TP
+.B logs [\fIservice\fR]
+Show service logs via Docker Compose.
+.TP
+.B logs ui up|down|status|open
+Start or stop a localhost realtime logs web UI (Dozzle). Optional
+.B --full
+adds Loki, Alloy, and Grafana for searchable history. Runs as Compose project
+.B qabasone-logs
+(separate from the product stack). Binds to 127.0.0.1 only with auth enabled
+by default; passwords live in
+.I /etc/qabasone/logs-ui.credentials
+\&. Full-stack containers define healthchecks;
+.B up --full
+waits until healthy. Loki is not published on the host. Dozzle and Alloy reach
+Docker only through a read-only socket proxy on an internal network; every
+logs UI container drops all capabilities and runs read-only. Alloy masks
+secrets before lines reach Loki, which keeps
+.B QABAS_LOGS_RETENTION
+(default 7d).
+.TP
+.B logs retention [\fB--apply\fR]
+Show how each log is bounded (qabas.log, history, container logs, Loki) and
+its current size.
+.B --apply
+rotates over-cap files now.
+.TP
+.B auth status|set|get|unset|login|logout
+Manage GitHub (private repos) and GHCR (container pull) credentials.
+Both are required before
+.B install
+/
+.BR deploy .
+.TP
+.B config show|get|set|validate
+Show or change local QabasOne configuration.
+.TP
+.B db migrate|seed
+Run database migrations or seed data through the installed Docker Compose project.
+.TP
+.B auth login|status|logout
+Save or inspect GitHub credentials for private QabasOne repos.
+.TP
+.B maintenance on|off|status
+Control maintenance mode. When enabled, the app and dashboard hosts serve a
+static maintenance page through
+.BR edge-nginx .
+The CLI discovers the edge layout from the environment or container mounts and
+only toggles files under
+.I html/
+and
+.IR includes/ ;
+it never rewrites operator-owned
+.B .conf
+files. Edge server blocks must already
+.B include /etc/nginx/includes/qabasone-maintenance.conf .
+Use
+.B \-\-for
+or
+.B \-\-until
+to show an expected return time.
+Use
+.B \-\-page
+or
+.B QABAS_MAINTENANCE_PAGE
+to supply a custom HTML template (supports
+.BR {{.Until}} );
+.B \-\-page
+overrides the environment variable.
+.TP
+.B autopilot run|enable|disable|status
+Unattended hourly self-maintenance, scheduled by
+.B install
+(opt out with
+.BR \-\-no\-autopilot ).
+Prunes dangling Docker images and old build cache, removes PITR WAL older
+than the oldest kept base backup, applies scheduled-backup retention early
+when disk is low (emergency minimum when critical), enables container log
+rotation, ends expired maintenance windows, and restarts unhealthy services
+(at most 3 times per service per day). Also rotates qabas.log and history
+and re-tightens permissions on config, secrets, backups, and logs. Never
+deletes volumes or non-scheduled backups. Runs from
+.B qabas-autopilot.timer
+on Linux and the Task Scheduler task
+.B QabasOne\eAutopilot
+on Windows.
+.TP
+.B secrets status
+Show each credential's age, file mode, and purpose; flags secrets older than
+180 days.
+.TP
+.B secrets rotate \fIname\fR|all... [\fB--force\fR] [\fB--no-backup\fR]
+Rotate postgres, redis, minio, jwt, 2fa, pepper, or logs-ui credentials. Takes
+a pre-rotate backup, enables maintenance, updates the database password and
+env files atomically, recreates services, and verifies health; on failure
+everything is rolled back.
+.B all
+covers the non-destructive set; 2fa and pepper need
+.BR --force .
+Writer only.
+.TP
+.B limits show|sync
+Show or regenerate
+.IR compose.qabas-limits.yaml :
+RAM-sized memory limits, pids limits, no-new-privileges, and dropped
+capabilities for each long-running service. Settings from the release compose
+are never overridden. Synced on every deploy.
+.TP
+.B history [\fB--all\fR]
+Show deployment and restore audit history.
+.B --all
+includes rotated archives.
+.TP
+.B sysinfo [\fB--watch\fR[=\fIinterval\fR]]
+Show machine resources: OS, kernel, uptime, CPU model, cores and load, memory
+and swap, free disk on the volumes holding QabasOne data, network addresses,
+and Docker usage, each graded ok, warn, or crit. Aliases:
+.BR machine ,
+.BR hostinfo .
+.TP
+.B version
+Print CLI and installed product versions.
+.TP
+.B update
+Update the qabas CLI from GitHub Releases.
+.PP
+Service lifecycle commands use the Docker Compose project
+.B qabasone
+and do not manage external reverse proxy containers such as
+.BR edge-nginx .
+.SH FILES
+.TP
+.I /etc/qabasone/
+Configuration, secrets, and compose environment files.
+.TP
+.I /etc/qabasone/github-token
+Saved GitHub PAT for private repo access (mode 0600).
+.TP
+.I /etc/qabasone/ghcr-token
+Saved GHCR PAT for
+.B docker login ghcr.io
+(mode 0600).
+.TP
+.I /etc/qabasone/ghcr-username
+GitHub username used with the GHCR token.
+.TP
+.I /var/lib/qabasone/
+State, deployments, releases, backups, compose files, and lock file.
+.TP
+.I /etc/qabasone/secrets.meta.json
+Creation and rotation times of each secret (mode 0600).
+.TP
+.I /var/log/qabasone/qabas.log
+One redacted line per command; rotated at 10 MiB, 5 gzip archives kept.
+.SH ENVIRONMENT
+.TP
+.B GITHUB_TOKEN
+.TQ
+.B GH_TOKEN
+GitHub PAT for private repos (overrides saved github token).
+.TP
+.B GHCR_TOKEN
+.TQ
+.B QABAS_GHCR_TOKEN
+PAT for
+.B ghcr.io
+pulls (overrides saved ghcr token; needs
+.BR read:packages ).
+.TP
+.B GHCR_USERNAME
+Docker login username for
+.B ghcr.io
+(overrides saved username).
+.TP
+.B QABAS_CONFIG_DIR
+Override the configuration directory (default:
+.IR /etc/qabasone ).
+.TP
+.B QABAS_STATE_DIR
+Override the state directory (default:
+.IR /var/lib/qabasone ).
+.TP
+.B QABAS_LOG_DIR
+Override the log directory (default:
+.IR /var/log/qabasone ).
+.TP
+.B QABAS_LOCK_PATH
+Override the lock file path.
+.TP
+.B QABAS_DEPLOY_REPO
+Override the deploy definitions repository.
+.TP
+.B QABAS_DEPLOY_REF
+Override the deploy definitions git ref.
+.TP
+.B QABAS_EDGE_NGINX_DIR
+Host nginx root containing
+.IR html/ ,
+.IR includes/ ,
+and
+.I conf.d/
+(overrides docker mount discovery).
+.TP
+.B QABAS_EDGE_NGINX_CONTAINER
+Edge nginx container name used for mount discovery and reload (default:
+.BR edge-nginx ).
+.TP
+.B QABAS_EDGE_NGINX_CONF
+Optional conf file or directory used only to verify that the maintenance
+include already exists. Never written by the CLI.
+.TP
+.B QABAS_MAINTENANCE_PAGE
+HTML template for the maintenance page. Overridden by
+.BR \-\-page .
+Supports
+.B {{.Until}}
+for the expected return time.
+.TP
+.B QABAS_LOGS_RETENTION
+Loki retention for the logs UI (e.g. 14d, 72h, 2w; default 7d).
+.TP
+.B QABAS_SOCKET_PROXY_IMAGE
+Image for the logs UI Docker socket proxy.
+.TP
+.B QABAS_LIMITS
+Set to
+.B off
+to stop generating the resource limits overlay.
+.TP
+.BI QABAS_LIMIT_ SERVICE
+Memory limit for one service (e.g.
+.BR QABAS_LIMIT_API=2g ;
+.B none
+removes it).
+.SH AUTH
+Install and deploy need GitHub (private repos) and GHCR (image pulls).
+One PAT with
+.B repo
++
+.B read:packages
+is enough:
+.PP
+.nf
+.RS
+export GITHUB_TOKEN="$(gh auth token)"
+sudo \-E qabas auth login
+sudo qabas auth status
+sudo qabas install
+.RE
+.fi
+.PP
+If
+.I ghcr\-token
+is unset,
+.B qabas
+falls back to the GitHub token.
+Before image pull it runs
+.B docker login ghcr.io
+using the resolved username and token.
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Generic failure.
+.TP
+.B 2
+Invalid input or configuration.
+.TP
+.B 3
+Compatibility failure.
+.TP
+.B 4
+Health-check failure.
+.TP
+.B 5
+Backup or restore failure.
+.TP
+.B 6
+Network or registry failure.
+.SH EXAMPLES
+Install the latest stable product release:
+.PP
+.nf
+.RS
+sudo qabas install
+.RE
+.fi
+.PP
+Deploy an exact product version:
+.PP
+.nf
+.RS
+sudo qabas deploy 2.8.0
+.RE
+.fi
+.PP
+Save credentials for subsequent sudo invocations:
+.PP
+.nf
+.RS
+export GITHUB_TOKEN="$(gh auth token)"
+sudo \-E qabas auth login
+.RE
+.fi
+.SH SEE ALSO
+Full documentation:
+.UR https://github.com/qabasone/qabasone-cli
+.UE
+.PP
+Install bootstrap:
+.UR https://install.qabas.one/install.sh
+.UE
+.SH AUTHOR
+QabasOne <ops@qabas.one>

@@ -1,0 +1,40 @@
+qabas top · hq-1 · QabasOne 1.4.2 (stable) · 2026-10-01 20:51:02 · every 2s                                             
+   0[|||||||                                         12.3%]     3[||                                               3.1%]
+   1[|                                                2.0%]     4[                                                 0.7%]
+   2[||                                               4.4%]     5[||||||||||||||||||||||||||||||||||||||||||||||||97.0%]
+ Mem[||||||||||||||||||||||||||||||||||||||||||||5.0G/8.0G]  Tasks: 275 thr, 1 running · 4 containers                   
+ Swp[|||||||||||||                               512M/2.0G]  Load average: 0.52 0.41 0.30 (8 cores)                     
+Disk[|||||||||||||||||||||      system,state 40% 120G free]  Uptime: 3 days, 04:00:00                                   
+Maintenance off · Lock free · Last backup 6h0m ago · Next backup in 3h0m · Autopilot ok, last 12m ago                   
+                                                                                                                        
+ 1 Services  4 running · sort: cpu                                                                                      
+SERVICE                      STATE      HEALTH      CPU%      MEM / LIMIT   MEM%  NET RX/TX /s    I/O R/W /s RST  UPTIME
+worker                       running    unhealthy   96.0      900M / 1.0G   87.9           0/0        0/1.0M   4      5m
+api                          running    healthy     12.5      256M / 1.0G   25.0     2.0K/4.0K           0/0   0    1d2h
+postgres                     running    healthy      3.1             1.0G   12.5           0/0           0/0   0    3d0h
+notifications-dispatcher     running    -            0.4            48.0M    0.6           0/0           0/0   0    3d0h
+                                                                                                                        
+ 2 Postgres                                                                                                             
+primary · conns [||       ] 23/100 · active 3 · TPS 152.3 · cache hit 99.2% · lock waits 0 · deadlocks 0                
+  WAL archive streaming (pg_receivewal), 0 B behind                                                                     
+    PID USER         STATE      WAIT                 TIME QUERY                                                         
+   4242 qabas        active     Lock:relation          7m UPDATE invoices SET note = '?' WHERE id = 7                   
+   4243 qabas        idle in t… -                     12s BEGIN                                                         
+                                                                                                                        
+ 3 Replicas  1 standby(s)                                                                                               
+NAME                                      ADDRESS          STATE        SYNC        LAG     BEHIND   SLOT WAL WAL STATUS
+dr1                                       10.8.0.2         streaming    async        0s    4.0 KiB   64.0 MiB reserved  
+                                                                                                                        
+ 4 Findings  1 critical · 3 warning                                                                                     
+CRIT service:worker qabasone-worker is unhealthy                                                                        
+WARN service:worker qabasone-worker restarted 4 times (possible restart loop)                                           
+WARN service:worker qabasone-worker at 96% CPU                                                                          
+WARN postgres:query pid 4242 running for 7m                                                                             
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+tab next pane • s/F6 sort • / filter • p pause • ? help • q quit                                                        

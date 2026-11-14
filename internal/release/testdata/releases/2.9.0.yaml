@@ -1,0 +1,39 @@
+schemaVersion: 1
+release:
+  version: "2.9.0"
+  channel: stable
+  releasedAt: "2026-09-01T00:00:00Z"
+components:
+  api:
+    version: "4.15.0"
+    commit: "aaa1111"
+    image: "ghcr.io/qabasone/qabasone-api:4.15.0"
+    digest: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+  app:
+    version: "3.9.0"
+    commit: "bbb2222"
+    image: "ghcr.io/qabasone/qabasone-app:3.9.0"
+    digest: "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  dash:
+    version: "5.7.0"
+    commit: "ccc3333"
+    image: "ghcr.io/qabasone/qabasone-dash:5.7.0"
+    digest: "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  siraj:
+    version: "1.0.0"
+    commit: "siraj001"
+    image: "ghcr.io/qabasone/qabasone-siraj_app:1.0.0"
+    digest: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+compatibility:
+  app:
+    api: ">=4.10.0 <5.0.0"
+  dash:
+    api: ">=4.13.0 <5.0.0"
+  siraj:
+    api: ">=4.13.0 <5.0.0"
+requirements:
+  qabasCli: ">=1.4.0"
+  docker: ">=27.0.0"
+database:
+  migrationStrategy: expand-contract
+  downgradeSupported: true

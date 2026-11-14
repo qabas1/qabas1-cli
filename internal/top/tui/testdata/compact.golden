@@ -1,0 +1,18 @@
+qabas top · hq-1 · QabasOne 1.4.2 (stable)                  
+  2026-10-01 20:51:02 · every 2s                            
+ CPU[||||||||||||||||||                               34.2%]
+ Mem[|||||||||||||||||||||||||||||||||||||||||||||5.0G/8.0G]
+ Swp[||||||||||||||                               512M/2.0G]
+Disk[||||||||||||||||||||||      system,state 40% 120G free]
+Tasks: 275 thr, 1 running · 4 containers                    
+  Load average: 0.52 0.41 0.30 (8 cores)                    
+  Uptime: 3 days, 04:00:00                                  
+Maintenance off · Lock free · Last backup 6h0m ago          
+  Next backup in 3h0m · Autopilot ok, last 12m ago          
+                                                            
+ 1 Services  4 running · sort: cpu                          
+SERVICE          STATE   HEALTH   CPU% MEM / LIMIT  MEM% RST
+worker           running unheal…  96.0 900M / 1.0G  87.9   4
+api              running healthy  12.5 256M / 1.0G  25.0   0
+… 2 more (↓ to scroll)                                      
+tab next pane • ? help • q quit                             

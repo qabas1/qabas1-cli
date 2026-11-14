@@ -1,0 +1,39 @@
+schemaVersion: 1
+release:
+  version: "2.7.0"
+  channel: stable
+  releasedAt: "2026-07-01T00:00:00Z"
+components:
+  api:
+    version: "4.10.0"
+    commit: "old0001"
+    image: "ghcr.io/qabasone/qabasone-api:4.10.0"
+    digest: "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+  app:
+    version: "3.7.0"
+    commit: "old0002"
+    image: "ghcr.io/qabasone/qabasone-app:3.7.0"
+    digest: "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+  dash:
+    version: "5.4.0"
+    commit: "old0003"
+    image: "ghcr.io/qabasone/qabasone-dash:5.4.0"
+    digest: "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+  siraj:
+    version: "1.0.0"
+    commit: "siraj001"
+    image: "ghcr.io/qabasone/qabasone-siraj_app:1.0.0"
+    digest: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+compatibility:
+  app:
+    api: ">=4.10.0 <5.0.0"
+  dash:
+    api: ">=4.10.0 <5.0.0"
+  siraj:
+    api: ">=4.10.0 <5.0.0"
+requirements:
+  qabasCli: ">=0.1.0"
+  docker: ">=27.0.0"
+database:
+  migrationStrategy: forward-only
+  downgradeSupported: false

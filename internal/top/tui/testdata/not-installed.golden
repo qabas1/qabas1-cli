@@ -1,0 +1,40 @@
+qabas top · hq-1 · QabasOne not installed · 2026-10-01 20:51:02 · every 2s                                              
+   0[|||||||                                         12.3%]     3[||                                               3.1%]
+   1[|                                                2.0%]     4[                                                 0.7%]
+   2[||                                               4.4%]     5[||||||||||||||||||||||||||||||||||||||||||||||||97.0%]
+ Mem[||||||||||||||||||||||||||||||||||||||||||||5.0G/8.0G]  Tasks: 275 thr, 1 running                                  
+ Swp[|||||||||||||                               512M/2.0G]  Load average: 0.52 0.41 0.30 (8 cores)                     
+Disk[|||||||||||||||||||||      system,state 40% 120G free]  Uptime: 3 days, 04:00:00                                   
+QabasOne is not installed on this machine · install: sudo qabas install                                                 
+                                                                                                                        
+ 1 Services  not installed                                                                                              
+QabasOne is not installed on this machine · install: sudo qabas install                                                 
+                                                                                                                        
+ 2 Postgres  not installed                                                                                              
+                                                                                                                        
+ 3 Replicas  not installed                                                                                              
+                                                                                                                        
+ 4 Findings  0 critical · 1 warning                                                                                     
+WARN qabasone QabasOne is not installed on this machine (sudo qabas install)                                            
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+tab next pane • s/F6 sort • / filter • p pause • ? help • q quit                                                        

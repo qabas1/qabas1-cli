@@ -1,0 +1,141 @@
+# Optional searchable history stack. Used with compose.dozzle.yaml via multi -f.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "20m"
+    max-file: "3"
+
+services:
+  loki:
+    image: ghcr.io/qabasone/vendor/grafana/loki:3.4.2
+    container_name: qabasone-loki
+    restart: unless-stopped
+    logging: *logging
+    # Image default user is non-root (10001).
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    pids_limit: 512
+    mem_limit: 1g
+    command: ["-config.file=/etc/loki/local-config.yaml", "-config.expand-env=true"]
+    environment:
+      QABAS_LOGS_RETENTION: ${QABAS_LOGS_RETENTION:-7d}
+    volumes:
+      - ./config/loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - backend
+    # No host ports — Loki is only reachable on the internal compose network.
+    expose:
+      - "3100"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+
+  alloy:
+    image: ghcr.io/qabasone/vendor/grafana/alloy:v1.7.5
+    container_name: qabasone-alloy
+    restart: unless-stopped
+    logging: *logging
+    # The image's alloy user; it owns /var/lib/alloy. No socket access needed (socket-proxy).
+    user: "473:473"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    pids_limit: 256
+    mem_limit: 512m
+    command:
+      - run
+      - /etc/alloy/config.alloy
+      - --storage.path=/var/lib/alloy/data
+      - --server.http.listen-addr=0.0.0.0:12345
+    volumes:
+      - ./config/alloy.alloy:/etc/alloy/config.alloy:ro
+      - alloy_data:/var/lib/alloy/data
+    depends_on:
+      loki:
+        condition: service_healthy
+      socket-proxy:
+        condition: service_started
+    networks:
+      - backend
+      - socket
+    healthcheck:
+      # The image has bash but no wget/curl.
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/12345 && printf 'GET /-/ready HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q ' 200 ' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+
+  grafana:
+    image: ghcr.io/qabasone/vendor/grafana/grafana:11.5.2
+    container_name: qabasone-grafana
+    restart: unless-stopped
+    logging: *logging
+    # Image default user is non-root (472).
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    pids_limit: 256
+    mem_limit: 512m
+    environment:
+      GF_SECURITY_ADMIN_USER: ${QABAS_GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${QABAS_GRAFANA_PASSWORD:?set QABAS_GRAFANA_PASSWORD}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_AUTH_BASIC_ENABLED: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_ALLOW_ORG_CREATE: "false"
+      GF_USERS_DEFAULT_THEME: dark
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_SECURITY_COOKIE_SECURE: "false"
+      GF_SECURITY_STRICT_TRANSPORT_SECURITY: "false"
+      GF_SERVER_ROOT_URL: http://127.0.0.1:${QABAS_GRAFANA_PORT:-3001}
+      GF_INSTALL_PLUGINS: ""
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_PLUGINS_PLUGIN_ADMIN_ENABLED: "false"
+      GF_LOG_MODE: console
+    volumes:
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:${QABAS_GRAFANA_PORT:-3001}:3000"
+    depends_on:
+      loki:
+        condition: service_healthy
+    networks:
+      - backend
+      - ui
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 30s
+
+volumes:
+  loki_data:
+  alloy_data:
+  grafana_data:
+
+networks:
+  # Loki/Alloy/Grafana traffic; internal: no egress and no published ports.
+  backend:
+    name: qabasone-logs-backend
+    internal: true

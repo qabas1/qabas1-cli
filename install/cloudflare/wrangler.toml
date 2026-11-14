@@ -1,0 +1,10 @@
+name = "install-qabas-one"
+main = "install-qabas-one-worker.js"
+compatibility_date = "2024-08-01"
+
+# Cloudflare dashboard → Worker → Domains & Routes → install.qabas.one
+# Private repo: npx wrangler secret put GITHUB_TOKEN
+
+[vars]
+REPO = "qabasone/qabasone-cli"
+INSTALL_REF = "main"

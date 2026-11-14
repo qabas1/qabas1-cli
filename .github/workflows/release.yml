@@ -1,0 +1,208 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semver without v prefix (dry-run build only; does not publish unless triggered from a tag push)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NFPM_VERSION: "2.41.3"
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ${{ vars.SELF_HOSTED == 'true' && fromJSON('{"group":"ci","labels":["self-hosted","Linux","X64","ci"]}') || 'ubuntu-latest' }}
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version
+        id: ver
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            TAG="${GITHUB_REF_NAME}"
+            echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure persistent Go cache dirs
+        run: |
+          CACHE_ROOT="${HOME}/.cache/qabasone-cli"
+          mkdir -p "${CACHE_ROOT}/go-build" "${CACHE_ROOT}/pkg/mod"
+          echo "GOCACHE=${CACHE_ROOT}/go-build" >> "$GITHUB_ENV"
+          echo "GOMODCACHE=${CACHE_ROOT}/pkg/mod" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Cache Go build
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/qabasone-cli/go-build
+          key: ${{ runner.os }}-go-build-${{ hashFiles('go.sum') }}-${{ hashFiles('**/*.go') }}
+          restore-keys: |
+            ${{ runner.os }}-go-build-${{ hashFiles('go.sum') }}-
+            ${{ runner.os }}-go-build-
+
+      - name: Verify modules
+        run: go mod verify
+
+      - name: Test
+        run: go test -count=1 ./...
+
+      - name: Vet
+        run: go vet ./...
+
+  build-linux:
+    name: Build Linux packages
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+    runs-on: ${{ vars.SELF_HOSTED == 'true' && fromJSON('{"group":"ci","labels":["self-hosted","Linux","X64","ci"]}') || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure persistent Go cache dirs
+        run: |
+          CACHE_ROOT="${HOME}/.cache/qabasone-cli"
+          mkdir -p "${CACHE_ROOT}/go-build" "${CACHE_ROOT}/pkg/mod" .tools
+          echo "GOCACHE=${CACHE_ROOT}/go-build" >> "$GITHUB_ENV"
+          echo "GOMODCACHE=${CACHE_ROOT}/pkg/mod" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Cache nfpm
+        uses: actions/cache@v4
+        with:
+          path: .tools/nfpm
+          key: nfpm-${{ env.NFPM_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Build Linux artifacts
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+          COMMIT: ${{ github.sha }}
+        run: bash scripts/dist.sh
+
+      - name: Validate bootstrap installer
+        run: |
+          bash -n install/install.sh
+          test -f "dist/qabas_${{ needs.verify.outputs.version }}_linux_amd64.deb"
+
+      - name: Upload Linux dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: qabas-linux
+          path: |
+            dist/qabas_*_linux_amd64
+            dist/qabas_*_linux_arm64
+            dist/qabas_*_linux_*.deb
+            dist/install.sh
+
+  package:
+    name: Checksums
+    needs: [verify, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Linux dist
+        uses: actions/download-artifact@v4
+        with:
+          name: qabas-linux
+          path: dist
+
+      - name: SHA256SUMS
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: bash scripts/checksums.sh
+
+      - name: Validate release assets
+        run: |
+          version="${{ needs.verify.outputs.version }}"
+          required=(
+            "dist/qabas_${version}_linux_amd64"
+            "dist/qabas_${version}_linux_arm64"
+            "dist/qabas_${version}_linux_amd64.deb"
+            "dist/qabas_${version}_linux_arm64.deb"
+            "dist/SHA256SUMS"
+            "dist/install.sh"
+          )
+          for file in "${required[@]}"; do
+            test -f "${file}" || { echo "missing required release asset: ${file}" >&2; exit 1; }
+          done
+          cat dist/SHA256SUMS
+
+      - name: Upload packaged dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: qabas-release-packaged
+          path: dist/*
+          retention-days: ${{ github.event_name == 'workflow_dispatch' && 3 || 30 }}
+
+  release:
+    name: GitHub Release
+    needs: [verify, package]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download packaged dist
+        uses: actions/download-artifact@v4
+        with:
+          name: qabas-release-packaged
+          path: dist
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: qabas ${{ needs.verify.outputs.version }}
+          fail_on_unmatched_files: true
+          body: |
+            ## qabas CLI ${{ needs.verify.outputs.version }}
+
+            QabasOne product releases live in `qabasone-deploy`. This repository ships the `qabas` CLI only.
+
+            ### Install (Linux)
+
+            On Debian/Ubuntu the bootstrap installs a `.deb` (uninstall with `sudo apt remove qabas`).
+
+            ```bash
+            curl -fsSL https://install.qabas.one/install.sh | sudo bash
+            ```
+
+            CLI only:
+
+            ```bash
+            curl -fsSL https://install.qabas.one/install.sh | sudo bash -s -- --cli-only
+            ```
+
+          files: |
+            dist/qabas_${{ needs.verify.outputs.version }}_linux_amd64
+            dist/qabas_${{ needs.verify.outputs.version }}_linux_arm64
+            dist/qabas_${{ needs.verify.outputs.version }}_linux_amd64.deb
+            dist/qabas_${{ needs.verify.outputs.version }}_linux_arm64.deb
+            dist/SHA256SUMS
+            dist/install.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

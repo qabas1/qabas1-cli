@@ -1,0 +1,81 @@
+// Collect Docker container logs for the qabasone Compose project and ship to Loki.
+// The Docker API is reached through the read-only socket-proxy, never the socket.
+discovery.docker "qabasone" {
+  host             = "tcp://socket-proxy:2375"
+  refresh_interval = "5s"
+
+  filter {
+    name   = "label"
+    values = ["com.docker.compose.project=qabasone"]
+  }
+}
+
+discovery.relabel "qabasone" {
+  targets = discovery.docker.qabasone.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_project"]
+    target_label  = "compose_project"
+  }
+}
+
+loki.source.docker "qabasone" {
+  host       = "tcp://socket-proxy:2375"
+  targets    = discovery.relabel.qabasone.output
+  forward_to = [loki.process.redact.receiver]
+  labels = {
+    job = "docker",
+  }
+}
+
+// Mask credentials before they are stored in Loki. stage.replace rewrites
+// each capture group with "***".
+loki.process "redact" {
+  forward_to = [loki.write.local.receiver]
+
+  // KEY=value / "key": "value" for secret-looking keys.
+  stage.replace {
+    expression = `(?i)(?:password|passwd|secret|token|api[_-]?key|private[_-]?key|pepper)["']?\s*[=:]\s*["']?([^\s"',&;]+)`
+    replace    = "***"
+  }
+
+  // Credentials inside URIs (scheme://user:pass@host).
+  stage.replace {
+    expression = `://[^:/\s@]+:([^@/\s]+)@`
+    replace    = "***"
+  }
+
+  // Authorization headers.
+  stage.replace {
+    expression = `(?i)\b(?:bearer|basic)\s+([A-Za-z0-9._~+/=-]{8,})`
+    replace    = "***"
+  }
+
+  // JWTs and GitHub tokens anywhere in the line.
+  stage.replace {
+    expression = `(eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,})`
+    replace    = "***"
+  }
+
+  stage.replace {
+    expression = `((?:gh[pousr]|github_pat)_[A-Za-z0-9_]{20,})`
+    replace    = "***"
+  }
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

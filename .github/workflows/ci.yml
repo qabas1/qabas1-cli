@@ -1,0 +1,169 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NFPM_VERSION: "2.41.3"
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ${{ vars.SELF_HOSTED == 'true' && fromJSON('{"group":"ci","labels":["self-hosted","Linux","X64","ci"]}') || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Verify modules
+        run: go mod verify
+
+      - name: Test
+        run: go test -count=1 ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Vet (windows)
+        run: GOOS=windows go vet ./...
+
+      - name: Build (windows)
+        run: GOOS=windows GOARCH=amd64 go build -o /dev/null ./cmd/qabas
+
+  build:
+    name: Build
+    needs: verify
+    runs-on: ${{ vars.SELF_HOSTED == 'true' && fromJSON('{"group":"ci","labels":["self-hosted","Linux","X64","ci"]}') || 'ubuntu-latest' }}
+    env:
+      VERSION: pr-${{ github.event.pull_request.number || github.run_number }}
+      COMMIT: ${{ github.sha }}
+      MODULE: github.com/qabasone/qabasone-cli
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+
+      - name: Cache nfpm
+        uses: actions/cache@v4
+        with:
+          path: .tools/nfpm
+          key: nfpm-${{ env.NFPM_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Build native binary
+        run: |
+          mkdir -p bin
+          go build -ldflags "-s -w -X ${MODULE}/internal/version.Version=${VERSION} -X ${MODULE}/internal/version.Commit=${COMMIT}" -o bin/qabas ./cmd/qabas
+
+      - name: Cross-compile and package (.deb)
+        run: bash scripts/dist.sh
+
+      - name: Validate bootstrap installers
+        run: |
+          bash -n install/install.sh
+          test -s install/install.ps1
+          grep -q 'Bootstrap the qabas CLI on Windows' install/install.ps1
+          grep -q 'USE_DEB' install/install.sh
+
+      - name: CLI smoke
+        run: |
+          ./bin/qabas version
+          ./bin/qabas --help
+          test -f "dist/qabas_${VERSION}_linux_amd64"
+          test -f "dist/qabas_${VERSION}_linux_arm64"
+          test -f "dist/qabas_${VERSION}_linux_amd64.deb"
+          test -f "dist/qabas_${VERSION}_linux_arm64.deb"
+          test -f dist/SHA256SUMS
+          test -f dist/install.sh
+          grep -q "qabas_${VERSION}_linux_amd64.deb" dist/SHA256SUMS
+          dpkg-deb -I "dist/qabas_${VERSION}_linux_amd64.deb" | grep -q Package
+          dpkg-deb -c "dist/qabas_${VERSION}_linux_amd64.deb" | grep -q 'usr/share/man/man1/qabas\.1\.gz'
+
+      - name: Upload PR build artifacts
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qabas-pr-${{ github.event.pull_request.number }}
+          path: |
+            dist/qabas_*_linux_amd64
+            dist/qabas_*_linux_arm64
+            dist/qabas_*_linux_*.deb
+            dist/SHA256SUMS
+            dist/install.sh
+          retention-days: 7
+
+  windows:
+    name: Windows package (unsigned)
+    needs: verify
+    runs-on: windows-latest
+    env:
+      VERSION: pr-${{ github.event.pull_request.number || github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+          cache-dependency-path: go.sum
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build exe and MSI
+        shell: pwsh
+        run: |
+          ./packaging/windows/build.ps1 -Version $env:VERSION -Commit $env:GITHUB_SHA
+          ./packaging/windows/build-msi.ps1 -Version $env:VERSION -WixVersion "5.0.2"
+
+      - name: Smoke test exe metadata
+        shell: pwsh
+        run: |
+          $exe = Get-Item "dist/qabas_${env:VERSION}_windows_amd64.exe"
+          $vi = $exe.VersionInfo
+          Write-Host "Company=$($vi.CompanyName) Product=$($vi.ProductName) File=$($vi.FileDescription)"
+          if ($vi.CompanyName -ne 'QabasOne') { throw "exe is missing version resource (CompanyName)" }
+          & $exe.FullName version
+          if ($LASTEXITCODE -ne 0) { throw "qabas version failed" }
+
+      - name: Install / uninstall MSI
+        shell: pwsh
+        run: |
+          $msi = (Resolve-Path "dist/qabas_${env:VERSION}_windows_amd64.msi").Path
+          $p = Start-Process msiexec.exe -ArgumentList @('/i', $msi, '/qn', '/norestart', '/l*v', "$env:RUNNER_TEMP\install.log") -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Get-Content "$env:RUNNER_TEMP\install.log" -Tail 50; throw "msiexec install exit $($p.ExitCode)" }
+          $bin = Join-Path $env:ProgramFiles 'qabas\qabas.exe'
+          if (-not (Test-Path $bin)) { throw "qabas.exe not installed at $bin" }
+          $machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
+          if ($machinePath -notlike '*\qabas*') { throw "install dir not added to machine PATH" }
+          $p = Start-Process msiexec.exe -ArgumentList @('/x', $msi, '/qn', '/norestart') -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "msiexec uninstall exit $($p.ExitCode)" }
+          if (Test-Path $bin) { throw "qabas.exe still present after uninstall" }
+
+      - name: Upload Windows PR artifacts
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qabas-pr-${{ github.event.pull_request.number }}-windows
+          path: |
+            dist/qabas_*_windows_*.exe
+            dist/qabas_*_windows_*.msi
+          retention-days: 7
