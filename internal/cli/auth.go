@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/hint"
-	"github.com/qabas1/qabasone-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/hint"
+	"github.com/qabas1/qabas1-cli/internal/release"
 	"github.com/spf13/cobra"
 )
 
@@ -95,7 +95,7 @@ func newAuthSetCmd(f *flags) *cobra.Command {
 %ProgramData%\QabasOne\etc on Windows) so install/deploy work without re-exporting env.
 
 github: PAT with repo read for private QabasOne GitHub repos
-ghcr:   PAT with read:packages for ghcr.io/qabasone/* images, plus --username
+ghcr:   PAT with read:packages for ghcr.io/qabas1/* images, plus --username
 
 Looks for a token in this order:
   1. --token / --token-file

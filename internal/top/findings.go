@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
 )
 
 // Thresholds that grade the live stack.

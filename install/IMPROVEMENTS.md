@@ -162,7 +162,7 @@ bash install.sh --token-file ~/.config/qabas/github-token --cli-only
 
 ### Token Requirements
 The GitHub token must have these scopes:
-- `repo`: Read access to private qabasone/qabasone-cli and qabasone/qabasone-deploy repositories
+- `repo`: Read access to private qabasone/qabas1-cli and qabasone/qabas1-deploy repositories
 - `read:packages`: Access to ghcr.io container images
 
 For organizations using SAML SSO, additional authorization is required at https://github.com/settings/tokens

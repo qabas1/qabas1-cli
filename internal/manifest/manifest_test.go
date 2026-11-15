@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
 )
 
 func fixture(t *testing.T, name string) []byte {
@@ -32,7 +32,7 @@ func TestParseAndCompat(t *testing.T) {
 	if err := rel.CheckCompatibility(); err != nil {
 		t.Fatal(err)
 	}
-	if got := rel.Components.API.DigestRef(); got != "ghcr.io/qabasone/qabasone-api@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" {
+	if got := rel.Components.API.DigestRef(); got != "ghcr.io/qabas1/qabas1-api@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" {
 		t.Fatalf("digest ref %s", got)
 	}
 }
@@ -82,7 +82,7 @@ func TestRejectLatestTag(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	rel.Components.API.Image = "ghcr.io/qabasone/qabasone-api:latest"
+	rel.Components.API.Image = "ghcr.io/qabas1/qabas1-api:latest"
 	if err := rel.Validate(); err == nil {
 		t.Fatal("expected :latest rejection")
 	}

@@ -1,6 +1,6 @@
 # install.qabas.one (Cloudflare Worker)
 
-Serves the `qabas` bootstrap script from `qabasone-cli` releases or `main`.
+Serves the `qabas` bootstrap script from `qabas1-cli` releases or `main`.
 
 ## Deploy
 
@@ -8,7 +8,7 @@ Serves the `qabas` bootstrap script from `qabasone-cli` releases or `main`.
 cd install/cloudflare
 npm install -g wrangler   # or npx wrangler
 npx wrangler deploy
-npx wrangler secret put GITHUB_TOKEN   # required while qabasone-cli is private
+npx wrangler secret put GITHUB_TOKEN   # required while qabas1-cli is private
 ```
 
 Attach custom domain **install.qabas.one** in the Cloudflare Worker dashboard.
@@ -26,6 +26,6 @@ Attach custom domain **install.qabas.one** in the Cloudflare Worker dashboard.
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `REPO` | `qabasone/qabasone-cli` | GitHub repo |
+| `REPO` | `qabasone/qabas1-cli` | GitHub repo |
 | `INSTALL_REF` | `main` | Branch for raw fallback |
 | `GITHUB_TOKEN` | (secret) | PAT with `contents:read` for private repos |

@@ -7,14 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/autopilot"
-	"github.com/qabas1/qabasone-cli/internal/backup"
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/deploy"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/autopilot"
+	"github.com/qabas1/qabas1-cli/internal/backup"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/deploy"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
 	"github.com/spf13/cobra"
 )
 
@@ -26,10 +26,10 @@ func newInstallCmd(f *flags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "install [version]",
 		Short: "Install QabasOne (latest stable by default)",
-		Long: `Install QabasOne from the release database (qabasone-deploy).
+		Long: `Install QabasOne from the release database (qabas1-deploy).
 
 With no version, installs the latest release on the selected channel (default: stable).
-Use "dev" (or --channel dev) to pull compose/templates from qabasone-deploy@dev and
+Use "dev" (or --channel dev) to pull compose/templates from qabas1-deploy@dev and
 install the last-pushed GHCR images for each product component.
 Requires GitHub + GHCR credentials (see: qabas auth login).`,
 		Example: `  # Install latest stable
@@ -84,9 +84,9 @@ func newDeployCmd(f *flags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "deploy <version|service> [image-version|tag|digest]",
 		Short: "Deploy an exact QabasOne product release",
-		Long: `Deploy a specific product release version (exact match from qabasone-deploy).
+		Long: `Deploy a specific product release version (exact match from qabas1-deploy).
 
-Special: "dev" fetches compose/templates from qabasone-deploy@dev and pins
+Special: "dev" fetches compose/templates from qabas1-deploy@dev and pins
 component images to the last-pushed GHCR package versions.
 
 Scoped: "deploy <service> --dev" refreshes one component from last-pushed GHCR.

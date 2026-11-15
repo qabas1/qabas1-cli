@@ -10,7 +10,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/qabas1/qabasone-cli/internal/top"
+	"github.com/qabas1/qabas1-cli/internal/top"
 )
 
 const (

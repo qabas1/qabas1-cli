@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 // Connector opens an executor for a registered node (Local for this machine).
@@ -28,7 +28,7 @@ type Engine struct {
 	// Self is this machine's node name.
 	Self    string
 	Connect Connector
-	// Fetch returns a qabasone-deploy compose file for the writer's release.
+	// Fetch returns a qabas1-deploy compose file for the writer's release.
 	Fetch func(name string) ([]byte, error)
 	// Images are the writer's pinned image references (same digests everywhere).
 	Images map[string]string

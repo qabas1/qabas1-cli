@@ -5,16 +5,16 @@ import (
 	"os"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/backup"
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/config"
-	"github.com/qabas1/qabasone-cli/internal/hint"
-	"github.com/qabas1/qabasone-cli/internal/host"
-	"github.com/qabas1/qabasone-cli/internal/observability"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/release"
-	"github.com/qabas1/qabasone-cli/internal/state"
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/backup"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/config"
+	"github.com/qabas1/qabas1-cli/internal/hint"
+	"github.com/qabas1/qabas1-cli/internal/host"
+	"github.com/qabas1/qabas1-cli/internal/observability"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
 )
 
 type Check struct {

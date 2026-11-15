@@ -3,7 +3,7 @@ package pitr
 import (
 	"context"
 
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
 )
 
 // Weekly base backup units installed by `qabas backup pitr enable`.

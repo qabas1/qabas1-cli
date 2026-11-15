@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
 )
 
 func TestPreflightRequiresQabasCLI(t *testing.T) {

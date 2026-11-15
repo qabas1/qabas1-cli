@@ -7,8 +7,8 @@ import (
 	"time"
 	_ "time/tzdata"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 	"gopkg.in/yaml.v3"
 )
 
@@ -101,7 +101,7 @@ func Default() Config {
 		Channel: "stable",
 		Backup:  Backup{Destination: "local", Schedule: DefaultSchedule()},
 		Deploy: Deploy{
-			Repo: envOr("QABAS_DEPLOY_REPO", "qabasone/qabasone-deploy"),
+			Repo: envOr("QABAS_DEPLOY_REPO", "qabasone/qabas1-deploy"),
 			Ref:  envOr("QABAS_DEPLOY_REF", "main"),
 		},
 	}

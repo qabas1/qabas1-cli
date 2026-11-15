@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/execx"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/execx"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 type Runtime struct {

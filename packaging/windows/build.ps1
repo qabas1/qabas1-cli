@@ -11,7 +11,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
-$Module = "github.com/qabas1/qabasone-cli"
+$Module = "github.com/qabas1/qabas1-cli"
 $GoVersionInfo = "github.com/josephspurrier/goversioninfo/cmd/goversioninfo@v1.4.1"
 
 $major = 0; $minor = 0; $patch = 0

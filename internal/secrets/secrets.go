@@ -9,14 +9,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/config"
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabas1-cli/internal/config"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/redact"
 )
 
 // TemplateFetcher loads an env template by filename from the deploy release
-// (compose/templates/<name> in qabasone-deploy).
+// (compose/templates/<name> in qabas1-deploy).
 type TemplateFetcher func(name string) ([]byte, error)
 
 type Bundle struct {
@@ -271,7 +271,7 @@ func (b Bundle) baseComplete() bool {
 }
 
 // envTemplates maps deploy-release template filenames to host destinations.
-// Source of truth: qabasone-deploy/compose/templates/*.example
+// Source of truth: qabas1-deploy/compose/templates/*.example
 var envTemplates = []struct {
 	name string
 	dest func(paths.Paths) string
@@ -289,7 +289,7 @@ var envTemplates = []struct {
 // password. Existing API/worker credentials change only after role setup.
 func WriteEnvFiles(p paths.Paths, b Bundle, domains config.Domains, fetch TemplateFetcher) error {
 	if fetch == nil {
-		return fmt.Errorf("env template fetcher is required (templates come from the qabasone-deploy release)")
+		return fmt.Errorf("env template fetcher is required (templates come from the qabas1-deploy release)")
 	}
 	for _, tmpl := range envTemplates {
 		dest := tmpl.dest(p)
@@ -405,7 +405,7 @@ func ensureJSReportCredentials(p paths.Paths, fetch TemplateFetcher) error {
 
 // RenderTemplate applies secret placeholders and domain host mapping to a
 // deploy-release env template. Placeholder contract matches
-// qabasone-deploy/scripts/prepare-e2e-env.py.
+// qabas1-deploy/scripts/prepare-e2e-env.py.
 func RenderTemplate(tmpl string, b Bundle, domains config.Domains, configDir string) string {
 	text := tmpl
 

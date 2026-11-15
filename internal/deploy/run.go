@@ -8,15 +8,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/config"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/history"
-	"github.com/qabas1/qabasone-cli/internal/host"
-	"github.com/qabas1/qabasone-cli/internal/interrupt"
-	"github.com/qabas1/qabasone-cli/internal/release"
-	"github.com/qabas1/qabasone-cli/internal/secrets"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/config"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/history"
+	"github.com/qabas1/qabas1-cli/internal/host"
+	"github.com/qabas1/qabas1-cli/internal/interrupt"
+	"github.com/qabas1/qabas1-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/secrets"
+	"github.com/qabas1/qabas1-cli/internal/state"
 )
 
 func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {

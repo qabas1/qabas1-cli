@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 	"gopkg.in/yaml.v3"
 )
 

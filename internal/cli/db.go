@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/output"
-	"github.com/qabas1/qabasone-cli/internal/release"
-	"github.com/qabas1/qabasone-cli/internal/secrets"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/output"
+	"github.com/qabas1/qabas1-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/secrets"
+	"github.com/qabas1/qabas1-cli/internal/state"
 	"github.com/spf13/cobra"
 )
 

@@ -8,8 +8,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 // Scheduled entry points installed by `qabas autopilot enable`.

@@ -19,9 +19,9 @@ DR promotion cannot claim template availability until a replication check is add
 
 ## Current gaps outside this CLI workspace
 
-- `qabasone-deploy/compose/compose.primary-replication.yaml` enables WAL streaming but does not configure `synchronous_standby_names` or force a synchronous commit policy.
-- `qabasone-cli/internal/minioctl/minioctl.go` creates replication without `--sync`; changing that flag alone would still leave a successful-`PUT` loss window.
-- `qabasone-api` uses `writer.json` to reject API mutations, but its lease check does not fence direct PostgreSQL or MinIO writers. When the writer-state file is not configured, `resolveWriterState` returns `holdsLease: true`; DR deployments must prohibit that fail-open path.
+- `qabas1-deploy/compose/compose.primary-replication.yaml` enables WAL streaming but does not configure `synchronous_standby_names` or force a synchronous commit policy.
+- `qabas1-cli/internal/minioctl/minioctl.go` creates replication without `--sync`; changing that flag alone would still leave a successful-`PUT` loss window.
+- `qabas1-api` uses `writer.json` to reject API mutations, but its lease check does not fence direct PostgreSQL or MinIO writers. When the writer-state file is not configured, `resolveWriterState` returns `holdsLease: true`; DR deployments must prohibit that fail-open path.
 - The current promotion path has no durable proof that a selected standby received every acknowledged PostgreSQL commit or every acknowledged object mutation.
 - The CLI durability hook is deliberately unbound in production. It must be backed by an end-to-end proof from the database, object store, and application before lease grants or writer transitions can succeed. A passing TCP probe or MinIO sentinel is insufficient.
 - A delayed watchdog, paused host, root-level direct access, storage failure, or unverified clock skew can defeat a lease-based claim unless the fencing design and failure assumptions address them explicitly.

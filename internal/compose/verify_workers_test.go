@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
 )
 
 func TestVerifyAPIWorkerEntrypointsOK(t *testing.T) {
@@ -21,7 +21,7 @@ func TestVerifyAPIWorkerEntrypointsOK(t *testing.T) {
 	rel := &manifest.Release{
 		Components: manifest.Components{
 			API: manifest.Component{
-				Image:  "ghcr.io/qabasone/qabasone-api:1.2.3",
+				Image:  "ghcr.io/qabas1/qabas1-api:1.2.3",
 				Digest: "sha256:abc",
 			},
 		},
@@ -34,7 +34,7 @@ func TestVerifyAPIWorkerEntrypointsOK(t *testing.T) {
 	}
 	for i, path := range RequiredAPIWorkerEntrypoints {
 		got := calls[i]
-		wantTail := []string{"run", "--rm", "--entrypoint", "test", "ghcr.io/qabasone/qabasone-api@sha256:abc", "-f", path}
+		wantTail := []string{"run", "--rm", "--entrypoint", "test", "ghcr.io/qabas1/qabas1-api@sha256:abc", "-f", path}
 		if len(got) < 2 || got[0] != "docker" {
 			t.Fatalf("call %d: %#v", i, got)
 		}
@@ -60,7 +60,7 @@ func TestVerifyAPIWorkerEntrypointsMissing(t *testing.T) {
 	rel := &manifest.Release{
 		Components: manifest.Components{
 			API: manifest.Component{
-				Image:  "ghcr.io/qabasone/qabasone-api:1.2.3",
+				Image:  "ghcr.io/qabas1/qabas1-api:1.2.3",
 				Digest: "sha256:abc",
 			},
 		},

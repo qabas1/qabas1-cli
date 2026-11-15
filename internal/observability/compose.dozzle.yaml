@@ -1,4 +1,4 @@
-# Fast-path localhost log UI (Dozzle). Project: qabasone-logs
+# Fast-path localhost log UI (Dozzle). Project: qabas1-logs
 #
 # No logs container touches the Docker socket directly: socket-proxy exposes a
 # read-only subset of the API (containers, networks, info, events; no POST/exec) on an
@@ -6,7 +6,7 @@
 services:
   socket-proxy:
     image: ${QABAS_SOCKET_PROXY_IMAGE:-ghcr.io/tecnativa/docker-socket-proxy:0.3.0}
-    container_name: qabasone-socket-proxy
+    container_name: qabas1-socket-proxy
     restart: unless-stopped
     logging:
       driver: json-file
@@ -36,8 +36,8 @@ services:
       - socket
 
   dozzle:
-    image: ghcr.io/qabasone/vendor/amir20/dozzle:v8.13.13
-    container_name: qabasone-dozzle
+    image: ghcr.io/qabas1/vendor/amir20/dozzle:v8.13.13
+    container_name: qabas1-dozzle
     restart: unless-stopped
     logging:
       driver: json-file
@@ -77,8 +77,8 @@ volumes:
 networks:
   # Published UI ports only.
   ui:
-    name: qabasone-logs-ui
+    name: qabas1-logs-ui
   # Docker API proxy; internal: no egress, unreachable from the product stack.
   socket:
-    name: qabasone-logs-socket
+    name: qabas1-logs-socket
     internal: true

@@ -13,7 +13,7 @@
  * Deploy: see install/cloudflare/README.md
  */
 
-const DEFAULT_REPO = "qabasone/qabasone-cli";
+const DEFAULT_REPO = "qabasone/qabas1-cli";
 const DEFAULT_REF = "main";
 const SCRIPT_PATH = "install/install.sh";
 const WINDOWS_SCRIPT_PATH = "install/install.ps1";
@@ -46,7 +46,7 @@ export default {
         "Uninstall: apt remove qabas (Linux .deb) / Apps & Features (Windows MSI).",
         "",
         "Private repos: export GITHUB_TOKEN before curl/iwr, or pass Authorization.",
-        "Docs: https://github.com/qabas1/qabasone-cli",
+        "Docs: https://github.com/qabas1/qabas1-cli",
         "",
       ].join("\n");
       return text(body, 200);
@@ -57,10 +57,10 @@ export default {
         [
           "gone — /qabasonectl was removed.",
           "",
-          "The CLI moved to qabasone-cli and is installed as `qabas`:",
+          "The CLI moved to qabas1-cli and is installed as `qabas`:",
           "  curl -fsSL https://install.qabas.one/install.sh | sudo bash -s -- --cli-only",
           "",
-          "Product manifests live in qabasone-deploy (not CLI releases).",
+          "Product manifests live in qabas1-deploy (not CLI releases).",
           "",
         ].join("\n"),
         410,

@@ -8,12 +8,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/lease"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
-	"github.com/qabas1/qabasone-cli/internal/pgctl"
-	"github.com/qabas1/qabasone-cli/internal/replica"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/lease"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/pgctl"
+	"github.com/qabas1/qabas1-cli/internal/replica"
 )
 
 // RenewResult reports one lease renewal round.
@@ -163,13 +163,13 @@ func (e *Engine) selfFence(ctx context.Context, res *RenewResult) error {
 		}
 		// Read-only defaults do not revoke existing sessions. Stopping the services
 		// fences current connections without creating a durable demotion marker.
-		if _, err := nodeexec.Output(ctx, x, "docker stop -t 2 qabasone-postgres qabasone-minio >/dev/null"); err != nil {
+		if _, err := nodeexec.Output(ctx, x, "docker stop -t 2 qabas1-postgres qabas1-minio >/dev/null"); err != nil {
 			problems = append(problems, fmt.Errorf("stop writer data services: %w", err))
 		}
 	} else if state == "" {
 		// An unknown Docker state is unsafe. Try to stop services, but never mark
 		// the data directory DEMOTED on a lease failure.
-		if _, err := nodeexec.Output(ctx, x, "docker stop -t 2 qabasone-postgres qabasone-minio >/dev/null"); err != nil {
+		if _, err := nodeexec.Output(ctx, x, "docker stop -t 2 qabas1-postgres qabas1-minio >/dev/null"); err != nil {
 			problems = append(problems, fmt.Errorf("stop writer data services: %w", err))
 		}
 	}

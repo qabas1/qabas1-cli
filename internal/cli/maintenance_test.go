@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/deploy"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/output"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/deploy"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/output"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/state"
 )
 
 func TestLayoutFromRoot(t *testing.T) {
@@ -141,7 +141,7 @@ func TestLayoutFromDockerMountsNginxRoot(t *testing.T) {
 }
 
 func TestConfHasMaintenanceInclude(t *testing.T) {
-	if !confHasMaintenanceInclude("include /etc/nginx/includes/qabasone-maintenance.conf;") {
+	if !confHasMaintenanceInclude("include /etc/nginx/includes/qabas1-maintenance.conf;") {
 		t.Fatal("specific include")
 	}
 	if !confHasMaintenanceInclude("include /etc/nginx/includes/*.conf;") {
@@ -167,7 +167,7 @@ func TestVerifyMaintenanceInclude(t *testing.T) {
 	}
 
 	conf := filepath.Join(confD, "30-qabas.one.conf")
-	body := "server {\n    server_name app.qabas.one;\n    include /etc/nginx/includes/qabasone-maintenance.conf;\n}\n"
+	body := "server {\n    server_name app.qabas.one;\n    include /etc/nginx/includes/qabas1-maintenance.conf;\n}\n"
 	if err := os.WriteFile(conf, []byte(body), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -196,7 +196,7 @@ func TestEnableDisableDoesNotPatchConf(t *testing.T) {
 		t.Fatal(err)
 	}
 	conf := filepath.Join(confD, "30-qabas.one.conf")
-	original := "server {\n    server_name app.qabas.one;\n    include /etc/nginx/includes/qabasone-maintenance.conf;\n    location = /healthz { return 200; }\n}\n"
+	original := "server {\n    server_name app.qabas.one;\n    include /etc/nginx/includes/qabas1-maintenance.conf;\n    location = /healthz { return 200; }\n}\n"
 	if err := os.WriteFile(conf, []byte(original), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -230,15 +230,15 @@ func TestEnableDisableDoesNotPatchConf(t *testing.T) {
 	if string(after) != original {
 		t.Fatalf("conf was modified:\n%s", after)
 	}
-	flag := filepath.Join(root, "html", "qabasone-maintenance.enabled")
+	flag := filepath.Join(root, "html", "qabas1-maintenance.enabled")
 	if _, err := os.Stat(flag); err != nil {
 		t.Fatal(err)
 	}
-	include := filepath.Join(root, "includes", "qabasone-maintenance.conf")
+	include := filepath.Join(root, "includes", "qabas1-maintenance.conf")
 	if _, err := os.Stat(include); err != nil {
 		t.Fatal(err)
 	}
-	page := filepath.Join(root, "html", "qabasone-maintenance.html")
+	page := filepath.Join(root, "html", "qabas1-maintenance.html")
 	if _, err := os.Stat(page); err != nil {
 		t.Fatal(err)
 	}
@@ -279,7 +279,7 @@ func TestEnableFailsWhenIncludeMissing(t *testing.T) {
 	if !strings.Contains(err.Error(), "do not include the maintenance snippet") {
 		t.Fatalf("got %v", err)
 	}
-	flag := filepath.Join(root, "html", "qabasone-maintenance.enabled")
+	flag := filepath.Join(root, "html", "qabas1-maintenance.enabled")
 	if _, err := os.Stat(flag); !os.IsNotExist(err) {
 		t.Fatal("should not write flag when include missing")
 	}
@@ -342,7 +342,7 @@ func TestEnableUsesCustomPage(t *testing.T) {
 		t.Fatal(err)
 	}
 	conf := filepath.Join(confD, "app.conf")
-	if err := os.WriteFile(conf, []byte("include /etc/nginx/includes/qabasone-maintenance.conf;\n"), 0o644); err != nil {
+	if err := os.WriteFile(conf, []byte("include /etc/nginx/includes/qabas1-maintenance.conf;\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	page := filepath.Join(root, "page.html")
@@ -364,14 +364,14 @@ func TestEnableUsesCustomPage(t *testing.T) {
 	if err := enableEdgeMaintenance(time.Now().Add(time.Hour), ""); err != nil {
 		t.Fatal(err)
 	}
-	out, err := os.ReadFile(filepath.Join(root, "html", "qabasone-maintenance.html"))
+	out, err := os.ReadFile(filepath.Join(root, "html", "qabas1-maintenance.html"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !strings.Contains(string(out), "<title>Custom</title>") {
 		t.Fatalf("got %s", out)
 	}
-	inc, err := os.ReadFile(filepath.Join(root, "includes", "qabasone-maintenance.conf"))
+	inc, err := os.ReadFile(filepath.Join(root, "includes", "qabas1-maintenance.conf"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -498,7 +498,7 @@ func automaticMaintenanceDeploy(t *testing.T) (*env, *deploy.Engine, *deploy.Pla
 	}
 	if err := os.WriteFile(
 		filepath.Join(confD, "app.conf"),
-		[]byte("include /etc/nginx/includes/qabasone-maintenance.conf;\n"),
+		[]byte("include /etc/nginx/includes/qabas1-maintenance.conf;\n"),
 		0o644,
 	); err != nil {
 		t.Fatal(err)
@@ -522,6 +522,6 @@ func automaticMaintenanceDeploy(t *testing.T) (*env, *deploy.Engine, *deploy.Pla
 	e := &env{Paths: p, Out: output.New(false, true)}
 	eng := &deploy.Engine{State: st}
 	plan := &deploy.Plan{Steps: []string{"switch"}}
-	flag := filepath.Join(root, "edge", "html", "qabasone-maintenance.enabled")
+	flag := filepath.Join(root, "edge", "html", "qabas1-maintenance.enabled")
 	return e, eng, plan, flag
 }

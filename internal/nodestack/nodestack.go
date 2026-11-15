@@ -1,5 +1,5 @@
 // Package nodestack knows how a QabasOne node's compose stack is laid out per DR role:
-// which qabasone-deploy overlays apply, which profiles are active, and where the
+// which qabas1-deploy overlays apply, which profiles are active, and where the
 // DR/Postgres inputs live. Every node (local or remote) uses the same Linux layout.
 package nodestack
 
@@ -34,10 +34,10 @@ const (
 )
 
 // Infra images used when a release does not pin them; keep in sync with the defaults
-// in qabasone-deploy compose/compose.yaml (vendored mirrors, no Docker Hub/quay auth).
+// in qabas1-deploy compose/compose.yaml (vendored mirrors, no Docker Hub/quay auth).
 const (
-	DefaultPostgresImage = "ghcr.io/qabasone/vendor/postgres/postgres:16-alpine"
-	DefaultMinioMcImage  = "ghcr.io/qabasone/vendor/quay.io/minio/mc:RELEASE.2025-04-16T18-13-26Z"
+	DefaultPostgresImage = "ghcr.io/qabas1/vendor/postgres/postgres:16-alpine"
+	DefaultMinioMcImage  = "ghcr.io/qabas1/vendor/quay.io/minio/mc:RELEASE.2025-04-16T18-13-26Z"
 )
 
 // Layout is the on-disk layout of a node.

@@ -9,8 +9,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
 
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
-	"github.com/qabas1/qabasone-cli/internal/top"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/top"
 )
 
 type styles struct {

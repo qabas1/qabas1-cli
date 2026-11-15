@@ -1,7 +1,7 @@
 # Apply GitHub branch protection rulesets for main and dev.
-# Requires: gh CLI authenticated with admin access to qabasone/qabasone-cli
+# Requires: gh CLI authenticated with admin access to qabasone/qabas1-cli
 $ErrorActionPreference = "Stop"
-$Repo = "qabasone/qabasone-cli"
+$Repo = "qabasone/qabas1-cli"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 
 function Get-RulesetId {

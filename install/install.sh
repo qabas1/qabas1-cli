@@ -9,16 +9,16 @@
 #
 # Private GitHub repos (do NOT use github.com/.../releases/download — returns 404):
 #   export GITHUB_TOKEN="$(gh auth token)"
-#   gh release download dev-latest -R qabasone/qabasone-cli -p install.sh -O /tmp/install.sh
+#   gh release download dev-latest -R qabasone/qabas1-cli -p install.sh -O /tmp/install.sh
 #   VERSION=dev sudo -E bash /tmp/install.sh --cli-only --force
 # Or API raw:
 #   curl -fsSL -H "Authorization: Bearer ${GITHUB_TOKEN}" \
 #     -H "Accept: application/vnd.github.raw" \
-#     "https://api.github.com/repos/qabasone/qabasone-cli/contents/install/install.sh?ref=dev" \
+#     "https://api.github.com/repos/qabasone/qabas1-cli/contents/install/install.sh?ref=dev" \
 #     | VERSION=dev sudo -E bash -s -- --cli-only --force
 set -euo pipefail
 
-REPO="${REPO:-qabasone/qabasone-cli}"
+REPO="${REPO:-qabasone/qabas1-cli}"
 VERSION="${VERSION:-latest}"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 GITHUB_API="${GITHUB_API:-https://api.github.com}"
@@ -104,8 +104,8 @@ EOF
     cat <<EOF
 
 GITHUB_TOKEN is set but GitHub still refused the request.
-Verify the token has read access to ${REPO} (and qabasone-deploy for product install),
-plus read:packages for ghcr.io/qabasone images (authorize org SSO if required).
+Verify the token has read access to ${REPO} (and qabas1-deploy for product install),
+plus read:packages for ghcr.io/qabas1 images (authorize org SSO if required).
 EOF
   fi
   exit 1

@@ -9,13 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/clilog"
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/history"
-	"github.com/qabas1/qabasone-cli/internal/observability"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/secrets"
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/clilog"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/history"
+	"github.com/qabas1/qabas1-cli/internal/observability"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/secrets"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
 )
 
 // Thresholds for log-size warnings.
@@ -249,7 +249,7 @@ func socketMounts(docker func(args ...string) (string, error)) []string {
 				continue
 			}
 			name := strings.TrimPrefix(fields[0], "/")
-			if name == "qabasone-socket-proxy" {
+			if name == "qabas1-socket-proxy" {
 				continue
 			}
 			for _, src := range fields[1:] {

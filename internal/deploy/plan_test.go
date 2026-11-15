@@ -10,13 +10,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/config"
-	"github.com/qabas1/qabasone-cli/internal/deploy"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
-	"github.com/qabas1/qabasone-cli/internal/output"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/release"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/config"
+	"github.com/qabas1/qabas1-cli/internal/deploy"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/output"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/state"
 )
 
 func catalog(t *testing.T) *release.Client {
@@ -55,7 +55,7 @@ func catalog(t *testing.T) *release.Client {
 		_, _ = w.Write(b)
 	}))
 	t.Cleanup(srv.Close)
-	c := release.New("qabasone/qabasone-deploy", "main")
+	c := release.New("qabasone/qabas1-deploy", "main")
 	c.HTTP = srv.Client()
 	c.APIBase = srv.URL
 	c.RawBase = srv.URL
@@ -199,10 +199,10 @@ func TestDeployDevUsesGHCR(t *testing.T) {
 			SchemaVersion: 1,
 			Release:       manifest.Meta{Version: "0.0.0-dev.1", Channel: "dev", ReleasedAt: "2026-01-01T00:00:00Z"},
 			Components: manifest.Components{
-				API:   manifest.Component{Version: "0.0.0-dev.1", Image: "ghcr.io/qabasone/qabasone-api:0.0.0-dev.1", Digest: "sha256:aaa"},
-				App:   manifest.Component{Version: "0.0.0-dev.1", Image: "ghcr.io/qabasone/qabasone-app:0.0.0-dev.1", Digest: "sha256:bbb"},
-				Dash:  manifest.Component{Version: "0.0.0-dev.1", Image: "ghcr.io/qabasone/qabasone-dash:0.0.0-dev.1", Digest: "sha256:ccc"},
-				Siraj: manifest.Component{Version: "0.0.0-dev.1", Image: "ghcr.io/qabasone/qabasone-siraj_app:0.0.0-dev.1", Digest: "sha256:ddd"},
+				API:   manifest.Component{Version: "0.0.0-dev.1", Image: "ghcr.io/qabas1/qabas1-api:0.0.0-dev.1", Digest: "sha256:aaa"},
+				App:   manifest.Component{Version: "0.0.0-dev.1", Image: "ghcr.io/qabas1/qabas1-app:0.0.0-dev.1", Digest: "sha256:bbb"},
+				Dash:  manifest.Component{Version: "0.0.0-dev.1", Image: "ghcr.io/qabas1/qabas1-dash:0.0.0-dev.1", Digest: "sha256:ccc"},
+				Siraj: manifest.Component{Version: "0.0.0-dev.1", Image: "ghcr.io/qabas1/qabas1-siraj_app:0.0.0-dev.1", Digest: "sha256:ddd"},
 			},
 			Infra: manifest.Infra{
 				Postgres: "postgres:16-alpine", Redis: "redis:7-alpine",
@@ -247,22 +247,22 @@ components:
   api:
     version: "1.0.0-dev.2"
     commit: "aaa1111"
-    image: "ghcr.io/qabasone/qabasone-api:1.0.0-dev.2"
+    image: "ghcr.io/qabas1/qabas1-api:1.0.0-dev.2"
     digest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   app:
     version: "1.0.0-dev.2"
     commit: "bbb2222"
-    image: "ghcr.io/qabasone/qabasone-app:1.0.0-dev.2"
+    image: "ghcr.io/qabas1/qabas1-app:1.0.0-dev.2"
     digest: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
   dash:
     version: "1.0.0-dev.2"
     commit: "ccc3333"
-    image: "ghcr.io/qabasone/qabasone-dash:1.0.0-dev.2"
+    image: "ghcr.io/qabas1/qabas1-dash:1.0.0-dev.2"
     digest: "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
   siraj:
     version: "1.0.0-dev.2"
     commit: "ddd4444"
-    image: "ghcr.io/qabasone/qabasone-siraj_app:1.0.0-dev.2"
+    image: "ghcr.io/qabas1/qabas1-siraj_app:1.0.0-dev.2"
     digest: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
 compatibility:
   app:
@@ -299,7 +299,7 @@ database:
 	t.Cleanup(srv.Close)
 
 	e := engine(t, "1.0.4", "")
-	e.Client = release.New("qabasone/qabasone-deploy", "main")
+	e.Client = release.New("qabasone/qabas1-deploy", "main")
 	e.Client.HTTP = srv.Client()
 	e.Client.APIBase = srv.URL
 	e.Client.RawBase = srv.URL
@@ -314,10 +314,10 @@ database:
 			SchemaVersion: 1,
 			Release:       manifest.Meta{Version: "0.0.0-dev.9", Channel: "dev", ReleasedAt: "2026-01-01T00:00:00Z"},
 			Components: manifest.Components{
-				API:   manifest.Component{Version: "0.0.0-dev.9", Image: "ghcr.io/qabasone/qabasone-api:0.0.0-dev.9", Digest: "sha256:111"},
-				App:   manifest.Component{Version: "0.0.0-dev.9", Image: "ghcr.io/qabasone/qabasone-app:0.0.0-dev.9", Digest: "sha256:222"},
-				Dash:  manifest.Component{Version: "0.0.0-dev.9", Image: "ghcr.io/qabasone/qabasone-dash:0.0.0-dev.9", Digest: "sha256:333"},
-				Siraj: manifest.Component{Version: "0.0.0-dev.9", Image: "ghcr.io/qabasone/qabasone-siraj_app:0.0.0-dev.9", Digest: "sha256:444"},
+				API:   manifest.Component{Version: "0.0.0-dev.9", Image: "ghcr.io/qabas1/qabas1-api:0.0.0-dev.9", Digest: "sha256:111"},
+				App:   manifest.Component{Version: "0.0.0-dev.9", Image: "ghcr.io/qabas1/qabas1-app:0.0.0-dev.9", Digest: "sha256:222"},
+				Dash:  manifest.Component{Version: "0.0.0-dev.9", Image: "ghcr.io/qabas1/qabas1-dash:0.0.0-dev.9", Digest: "sha256:333"},
+				Siraj: manifest.Component{Version: "0.0.0-dev.9", Image: "ghcr.io/qabas1/qabas1-siraj_app:0.0.0-dev.9", Digest: "sha256:444"},
 			},
 			Infra: manifest.Infra{
 				Postgres: "postgres:16-alpine", Redis: "redis:7-alpine",
@@ -352,7 +352,7 @@ database:
 	if plan.Target.Components.API.Digest != "sha256:111" {
 		t.Fatalf("api digest %q (catalog pins must be ignored)", plan.Target.Components.API.Digest)
 	}
-	if plan.Target.Components.API.Image != "ghcr.io/qabasone/qabasone-api:0.0.0-dev.9" {
+	if plan.Target.Components.API.Image != "ghcr.io/qabas1/qabas1-api:0.0.0-dev.9" {
 		t.Fatalf("api image %q (catalog pins must be ignored)", plan.Target.Components.API.Image)
 	}
 	if !strings.HasPrefix(plan.To, "1.0.5-dev.") {
@@ -381,19 +381,19 @@ release:
 components:
   api:
     version: "` + version + `"
-    image: "ghcr.io/qabasone/qabasone-api:` + version + `"
+    image: "ghcr.io/qabas1/qabas1-api:` + version + `"
     digest: "` + digests[0] + `"
   app:
     version: "` + version + `"
-    image: "ghcr.io/qabasone/qabasone-app:` + version + `"
+    image: "ghcr.io/qabas1/qabas1-app:` + version + `"
     digest: "` + digests[1] + `"
   dash:
     version: "` + version + `"
-    image: "ghcr.io/qabasone/qabasone-dash:` + version + `"
+    image: "ghcr.io/qabas1/qabas1-dash:` + version + `"
     digest: "` + digests[2] + `"
   siraj:
     version: "` + version + `"
-    image: "ghcr.io/qabasone/qabasone-siraj_app:` + version + `"
+    image: "ghcr.io/qabas1/qabas1-siraj_app:` + version + `"
     digest: "` + digests[3] + `"
 compatibility:
   app:
@@ -421,7 +421,7 @@ func TestScopedPinnedAPIDowngradeRequiresOverride(t *testing.T) {
 	e := engine(t, "2.8.0", "")
 	writeInstalledRelease(t, e, "2.8.0", [4]string{"sha256:oldapi", "sha256:oldapp", "sha256:olddash", "sha256:oldsiraj"})
 	e.ComponentResolver = func(_ *http.Client, _, _, _, _, _ string) (manifest.Component, error) {
-		return manifest.Component{Version: "2.7.0", Image: "ghcr.io/qabasone/qabasone-api:2.7.0", Digest: "sha256:newapi"}, nil
+		return manifest.Component{Version: "2.7.0", Image: "ghcr.io/qabas1/qabas1-api:2.7.0", Digest: "sha256:newapi"}, nil
 	}
 	_, err := e.BuildPlan(deploy.Options{Action: deploy.ActionDeploy, Service: "api", Spec: "2.7.0"})
 	if err == nil {
@@ -448,10 +448,10 @@ func TestDeployDevSameVersionNewDigestsRedeploys(t *testing.T) {
 			SchemaVersion: 1,
 			Release:       manifest.Meta{Version: "1.1", Channel: "dev", ReleasedAt: "2026-01-02T00:00:00Z"},
 			Components: manifest.Components{
-				API:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-api:1.1", Digest: "sha256:newapi"},
-				App:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-app:1.1", Digest: "sha256:newapp"},
-				Dash:  manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-dash:1.1", Digest: "sha256:newdash"},
-				Siraj: manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-siraj_app:1.1", Digest: "sha256:newsiraj"},
+				API:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-api:1.1", Digest: "sha256:newapi"},
+				App:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-app:1.1", Digest: "sha256:newapp"},
+				Dash:  manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-dash:1.1", Digest: "sha256:newdash"},
+				Siraj: manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-siraj_app:1.1", Digest: "sha256:newsiraj"},
 			},
 			Compatibility: manifest.Compatibility{
 				App:   manifest.APIRange{API: ">=0.0.0-0"},
@@ -488,10 +488,10 @@ func TestDeployDevSameVersionSameDigestsSkips(t *testing.T) {
 			SchemaVersion: 1,
 			Release:       manifest.Meta{Version: "1.1", Channel: "dev", ReleasedAt: "2026-01-02T00:00:00Z"},
 			Components: manifest.Components{
-				API:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-api:1.1", Digest: digests[0]},
-				App:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-app:1.1", Digest: digests[1]},
-				Dash:  manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-dash:1.1", Digest: digests[2]},
-				Siraj: manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-siraj_app:1.1", Digest: digests[3]},
+				API:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-api:1.1", Digest: digests[0]},
+				App:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-app:1.1", Digest: digests[1]},
+				Dash:  manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-dash:1.1", Digest: digests[2]},
+				Siraj: manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-siraj_app:1.1", Digest: digests[3]},
 			},
 			Compatibility: manifest.Compatibility{
 				App:   manifest.APIRange{API: ">=0.0.0-0"},
@@ -525,10 +525,10 @@ func TestDeployDevSelectivePullSkipsUnchangedInfra(t *testing.T) {
 			SchemaVersion: 1,
 			Release:       manifest.Meta{Version: "1.1", Channel: "dev", ReleasedAt: "2026-01-02T00:00:00Z"},
 			Components: manifest.Components{
-				API:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-api:1.1", Digest: "sha256:newapi"},
-				App:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-app:1.1", Digest: "sha256:newapp"},
-				Dash:  manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-dash:1.1", Digest: "sha256:newdash"},
-				Siraj: manifest.Component{Version: "1.1", Image: "ghcr.io/qabasone/qabasone-siraj_app:1.1", Digest: "sha256:newsiraj"},
+				API:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-api:1.1", Digest: "sha256:newapi"},
+				App:   manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-app:1.1", Digest: "sha256:newapp"},
+				Dash:  manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-dash:1.1", Digest: "sha256:newdash"},
+				Siraj: manifest.Component{Version: "1.1", Image: "ghcr.io/qabas1/qabas1-siraj_app:1.1", Digest: "sha256:newsiraj"},
 			},
 			Compatibility: manifest.Compatibility{
 				App:   manifest.APIRange{API: ">=0.0.0-0"},
@@ -576,7 +576,7 @@ func TestDeployScopedServiceMergesOneComponent(t *testing.T) {
 		}
 		return manifest.Component{
 			Version: "1.2",
-			Image:   "ghcr.io/qabasone/qabasone-api:1.2",
+			Image:   "ghcr.io/qabas1/qabas1-api:1.2",
 			Digest:  "sha256:newapi",
 		}, nil
 	}
@@ -621,7 +621,7 @@ func TestDeployScopedServiceSameDigestSkips(t *testing.T) {
 		_ = token
 		return manifest.Component{
 			Version: "1.1",
-			Image:   "ghcr.io/qabasone/qabasone-app:1.1",
+			Image:   "ghcr.io/qabas1/qabas1-app:1.1",
 			Digest:  digests[1],
 		}, nil
 	}

@@ -2,7 +2,7 @@
 
 package update
 
-import "github.com/qabas1/qabasone-cli/internal/exitcode"
+import "github.com/qabas1/qabas1-cli/internal/exitcode"
 
 func installedViaMSI() bool { return false }
 

@@ -37,8 +37,8 @@
     <Icon Id="QabasIcon" SourceFile="$(AssetsDir)\qabas.ico" />
     <Property Id="ARPPRODUCTICON" Value="QabasIcon" />
     <Property Id="ARPURLINFOABOUT" Value="https://qabas.one" />
-    <Property Id="ARPHELPLINK" Value="https://github.com/qabas1/qabasone-cli/issues" />
-    <Property Id="ARPURLUPDATEINFO" Value="https://github.com/qabas1/qabasone-cli/releases" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/qabas1/qabas1-cli/issues" />
+    <Property Id="ARPURLUPDATEINFO" Value="https://github.com/qabas1/qabas1-cli/releases" />
     <Property Id="ARPCONTACT" Value="QabasOne" />
     <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT"
               Value="QabasOne CLI was added to your PATH. Open a new terminal and run 'qabas --help' to get started." />

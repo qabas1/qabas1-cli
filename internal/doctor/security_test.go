@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/secrets"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/secrets"
 )
 
 func TestParsePublicPorts(t *testing.T) {
@@ -23,15 +23,15 @@ func fakeDocker(t *testing.T) func(args ...string) (string, error) {
 		joined := strings.Join(args, " ")
 		switch {
 		case strings.HasPrefix(joined, "ps --filter label=com.docker.compose.project=qabasone --format"):
-			return "qabasone-postgres\t0.0.0.0:5432->5432/tcp\nqabasone-edge\t0.0.0.0:443->443/tcp\n", nil
-		case strings.HasPrefix(joined, "ps -q --filter label=com.docker.compose.project=qabasone-logs"):
+			return "qabas1-postgres\t0.0.0.0:5432->5432/tcp\nqabasone-edge\t0.0.0.0:443->443/tcp\n", nil
+		case strings.HasPrefix(joined, "ps -q --filter label=com.docker.compose.project=qabas1-logs"):
 			return "aaa\nbbb\n", nil
 		case strings.HasPrefix(joined, "inspect"):
-			return "/qabasone-socket-proxy /var/run/docker.sock\n/qabasone-dozzle /var/lib/docker/volumes/x\n", nil
+			return "/qabas1-socket-proxy /var/run/docker.sock\n/qabas1-dozzle /var/lib/docker/volumes/x\n", nil
 		case strings.HasPrefix(joined, "ps -q"):
 			return "ccc\n", nil
 		case strings.HasPrefix(joined, "system df"):
-			return "qabasone-logs_loki_data 6.5GB\nother 1GB\n", nil
+			return "qabas1-logs_loki_data 6.5GB\nother 1GB\n", nil
 		}
 		return "", nil
 	}
@@ -68,7 +68,7 @@ func TestSecurityChecksFlagsRisks(t *testing.T) {
 	if !strings.Contains(byName["secret-age"].Detail, "postgres") || strings.Contains(byName["secret-age"].Detail, "redis") {
 		t.Errorf("secret-age detail = %q", byName["secret-age"].Detail)
 	}
-	if !strings.Contains(byName["exposure"].Detail, "qabasone-postgres:5432") || strings.Contains(byName["exposure"].Detail, "443") {
+	if !strings.Contains(byName["exposure"].Detail, "qabas1-postgres:5432") || strings.Contains(byName["exposure"].Detail, "443") {
 		t.Errorf("exposure detail = %q", byName["exposure"].Detail)
 	}
 }

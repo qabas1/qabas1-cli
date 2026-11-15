@@ -10,20 +10,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/config"
-	"github.com/qabas1/qabasone-cli/internal/dr"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/history"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
-	"github.com/qabas1/qabasone-cli/internal/release"
-	"github.com/qabas1/qabasone-cli/internal/replica"
-	"github.com/qabas1/qabasone-cli/internal/sshx"
-	"github.com/qabas1/qabasone-cli/internal/state"
-	"github.com/qabas1/qabasone-cli/internal/version"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/config"
+	"github.com/qabas1/qabas1-cli/internal/dr"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/history"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/replica"
+	"github.com/qabas1/qabas1-cli/internal/sshx"
+	"github.com/qabas1/qabas1-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/version"
 )
 
 // EnvSSHIdentity overrides the SSH private key used to reach replicas.
@@ -140,7 +140,7 @@ func (e *env) newReplicaEngine(c *cluster.Cluster, o engineOpts) (*replica.Engin
 			// Offline (disaster) path: every node carries the bundle it runs.
 			b, err := os.ReadFile(filepath.Join(composeDir, name))
 			if err != nil {
-				return nil, fmt.Errorf("%s: not in %s and qabasone-deploy unreachable", name, composeDir)
+				return nil, fmt.Errorf("%s: not in %s and qabas1-deploy unreachable", name, composeDir)
 			}
 			return b, nil
 		},

@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
-	"github.com/qabas1/qabasone-cli/internal/release"
-	"github.com/qabas1/qabasone-cli/internal/version"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/version"
 )
 
 func (e *Engine) BuildPlan(opt Options) (*Plan, error) {
@@ -44,7 +44,7 @@ func (e *Engine) BuildPlan(opt Options) (*Plan, error) {
 		}
 		target, err = e.loadTarget(to)
 	} else if wantsDev(opt.Spec, channel) {
-		// Compose/templates from qabasone-deploy@dev; images always from last-pushed GHCR.
+		// Compose/templates from qabas1-deploy@dev; images always from last-pushed GHCR.
 		e.Client = withDevCatalogRef(e.Client, e.Config.Deploy.Repo)
 		target, err = e.resolveDevTarget()
 	} else {

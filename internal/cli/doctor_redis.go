@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/output"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 
@@ -55,7 +55,7 @@ type redisAudit struct {
 // auditRedis scans key NAMES only (SCAN, never GET), plus memory settings.
 func auditRedis(ctx context.Context, x nodeexec.Executor) (redisAudit, error) {
 	a := redisAudit{Families: map[string]int{}}
-	keys, err := nodeexec.Output(ctx, x, `docker exec qabasone-redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli --no-auth-warning --scan --count 1000'`)
+	keys, err := nodeexec.Output(ctx, x, `docker exec qabas1-redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli --no-auth-warning --scan --count 1000'`)
 	if err != nil {
 		return a, err
 	}
@@ -67,7 +67,7 @@ func auditRedis(ctx context.Context, x nodeexec.Executor) (redisAudit, error) {
 		a.Total++
 		a.Families[redisKeyFamily(k)]++
 	}
-	info, _ := nodeexec.Output(ctx, x, `docker exec qabasone-redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli --no-auth-warning CONFIG GET maxmemory-policy; REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli --no-auth-warning INFO memory'`)
+	info, _ := nodeexec.Output(ctx, x, `docker exec qabas1-redis sh -c 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli --no-auth-warning CONFIG GET maxmemory-policy; REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli --no-auth-warning INFO memory'`)
 	lines := strings.Split(info, "\n")
 	for i, l := range lines {
 		l = strings.TrimSpace(l)

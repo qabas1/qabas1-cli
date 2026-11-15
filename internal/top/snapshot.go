@@ -5,7 +5,7 @@ package top
 import (
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
 )
 
 // Snapshot is one refresh of every source. A failing source sets its section's

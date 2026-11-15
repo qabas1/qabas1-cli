@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/qabas1/qabasone-cli/internal/config"
+	"github.com/qabas1/qabas1-cli/internal/config"
 	"github.com/spf13/cobra"
 )
 

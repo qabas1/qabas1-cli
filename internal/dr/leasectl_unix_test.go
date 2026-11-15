@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
 )
 
 func TestPeerProbeExecutesNestedShell(t *testing.T) {
 	d := t.TempDir()
 	docker := `#!/bin/sh
-test "$1" = exec && test "$2" = -i && test "$3" = qabasone-postgres || exit 41
+test "$1" = exec && test "$2" = -i && test "$3" = qabas1-postgres || exit 41
 shift 3
 exec "$@"
 `

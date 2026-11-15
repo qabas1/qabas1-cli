@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
 )
 
 func TestPromoteDevTargetAboveCurrentStable(t *testing.T) {

@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
 )
 
 // RequiredAPIWorkerEntrypoints are Node entry files that compose workers run from
-// the shared qabasone-api image. Missing any of these causes crash-loops after deploy.
+// the shared qabas1-api image. Missing any of these causes crash-loops after deploy.
 var RequiredAPIWorkerEntrypoints = []string{
 	"dist/modules/driver-app/operations.worker.cli.js",
 	"dist/modules/notifications/notifications.worker.cli.js",
@@ -18,7 +18,7 @@ var RequiredAPIWorkerEntrypoints = []string{
 }
 
 // VerifyAPIWorkerEntrypoints checks that the pulled API image contains the worker
-// CLI files referenced by qabasone-deploy compose services.
+// CLI files referenced by qabas1-deploy compose services.
 func (r *Runtime) VerifyAPIWorkerEntrypoints(rel *manifest.Release, env []string) error {
 	if rel == nil {
 		return exitcode.New(exitcode.InvalidInput, "release is required to verify API worker entrypoints")
@@ -48,7 +48,7 @@ func (r *Runtime) verifyImageHasFile(image, path string, env []string) error {
 			detail = err.Error()
 		}
 		return exitcode.NewHint(exitcode.Compatibility,
-			"rebuild and push qabasone-api so the image includes worker CLIs, then redeploy",
+			"rebuild and push qabas1-api so the image includes worker CLIs, then redeploy",
 			"API image %s is missing required worker entrypoint %s (%s)", image, path, detail)
 	}
 	return nil

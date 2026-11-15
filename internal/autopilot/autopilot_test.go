@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
 )
 
 var now = time.Date(2026, 10, 1, 12, 0, 0, 0, time.UTC)

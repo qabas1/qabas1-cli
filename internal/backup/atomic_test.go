@@ -10,10 +10,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/backup"
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/backup"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/state"
 )
 
 func TestCreateFailureRemovesStaging(t *testing.T) {

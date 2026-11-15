@@ -34,7 +34,7 @@ func TestEnsureEdgeNetworkRepairsOnlyMissingConnections(t *testing.T) {
 	if err := r.EnsureEdgeNetwork(nil); err != nil {
 		t.Fatal(err)
 	}
-	want := []string{"qabasone-app", "qabasone-dash", "qabasone-api", "qabasone-minio", "qabasone-siraj"}
+	want := []string{"qabas1-app", "qabas1-dash", "qabas1-api", "qabas1-minio", "qabas1-siraj"}
 	if !reflect.DeepEqual(connected, want) {
 		t.Fatalf("connected %v, want %v", connected, want)
 	}

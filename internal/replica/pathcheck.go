@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
 )
 
 // PathCheck tests the actual network namespace used by a writer service.
@@ -29,7 +29,7 @@ const PathGuidance = "check the writer's operator-owned inet fort forward chain 
 // default routes), rather than the host's route or a one-off mc container's route.
 func (e *Engine) CheckPaths(ctx context.Context, name string) []PathCheck {
 	n := e.Cluster.Node(name)
-	out := []PathCheck{{Node: name, Service: "postgres", Container: "qabasone-postgres"}, {Node: name, Service: "minio", Container: "qabasone-minio"}}
+	out := []PathCheck{{Node: name, Service: "postgres", Container: "qabas1-postgres"}, {Node: name, Service: "minio", Container: "qabas1-minio"}}
 	if n == nil || net.ParseIP(n.WGIP) == nil {
 		for i := range out {
 			out[i].Detail = "peer is missing a valid WireGuard IP"

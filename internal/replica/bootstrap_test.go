@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
 )
 
 // hookExec records every script in the embedded Fake and lets a test change results
@@ -326,7 +326,7 @@ func TestWriterGuardSupportsScaledAPIContainers(t *testing.T) {
 	w := &hookExec{Fake: fx.writer}
 	w.hook = func(script string) (nodeexec.Result, bool) {
 		if strings.Contains(script, "docker ps -a --format '{{.Names}}'") {
-			return nodeexec.Result{Stdout: "qabasone-api-1\nqabasone-api-2\n"}, true
+			return nodeexec.Result{Stdout: "qabas1-api-1\nqabasone-api-2\n"}, true
 		}
 		return nodeexec.Result{}, false
 	}
@@ -339,7 +339,7 @@ func TestWriterGuardSupportsScaledAPIContainers(t *testing.T) {
 	if err := fx.eng.WriterGuard(context.Background()); err != nil {
 		t.Fatalf("scaled healthy APIs should pass the writer guard: %v", err)
 	}
-	if !fx.writer.Ran("qabasone-api-1") || !fx.writer.Ran("qabasone-api-2") {
+	if !fx.writer.Ran("qabas1-api-1") || !fx.writer.Ran("qabas1-api-2") {
 		t.Fatalf("writer guard did not inspect all API containers: %v", fx.writer.Log)
 	}
 }
@@ -349,9 +349,9 @@ func TestWaitHealthyReportsScaledAPIContainerFailure(t *testing.T) {
 	w := &hookExec{Fake: fx.writer}
 	w.hook = func(script string) (nodeexec.Result, bool) {
 		if strings.Contains(script, "docker ps -a --format '{{.Names}}'") {
-			return nodeexec.Result{Stdout: "qabasone-api-1\nqabasone-api-2\n"}, true
+			return nodeexec.Result{Stdout: "qabas1-api-1\nqabasone-api-2\n"}, true
 		}
-		if strings.Contains(script, "docker inspect") && strings.Contains(script, "qabasone-api-2") {
+		if strings.Contains(script, "docker inspect") && strings.Contains(script, "qabas1-api-2") {
 			return nodeexec.Result{Stdout: "unhealthy"}, true
 		}
 		return nodeexec.Result{}, false
@@ -362,14 +362,14 @@ func TestWaitHealthyReportsScaledAPIContainerFailure(t *testing.T) {
 		}
 		return fx.replica, nil
 	}
-	err := fx.eng.WaitHealthy(context.Background(), "hq", "qabasone-api", time.Millisecond)
-	if err == nil || !strings.Contains(err.Error(), "qabasone-api-2=unhealthy") || !strings.Contains(err.Error(), "docker logs qabasone-api-2") {
+	err := fx.eng.WaitHealthy(context.Background(), "hq", "qabas1-api", time.Millisecond)
+	if err == nil || !strings.Contains(err.Error(), "qabas1-api-2=unhealthy") || !strings.Contains(err.Error(), "docker logs qabas1-api-2") {
 		t.Fatalf("scaled API failure should identify the failing container: %v", err)
 	}
 }
 
 func TestContainerProblems(t *testing.T) {
-	out := "qabasone-api|Up 1 minute (healthy)\nqabasone-minio-init|Exited (0) 2 minutes ago\nqabasone-app|Restarting (1) 3 seconds ago\nqabasone-dash|Up 1 minute (unhealthy)\nqabasone-siraj|Exited (137) 1 minute ago\n"
+	out := "qabas1-api|Up 1 minute (healthy)\nqabasone-minio-init|Exited (0) 2 minutes ago\nqabasone-app|Restarting (1) 3 seconds ago\nqabasone-dash|Up 1 minute (unhealthy)\nqabasone-siraj|Exited (137) 1 minute ago\n"
 	problems, seen := containerProblems(out)
 	if seen != 5 || len(problems) != 3 {
 		t.Fatalf("seen=%d problems=%v", seen, problems)

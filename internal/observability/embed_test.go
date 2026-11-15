@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 	"gopkg.in/yaml.v3"
 )
 
@@ -28,7 +28,7 @@ func TestMaterializeWritesComposeAndConfig(t *testing.T) {
 		filepath.Join(p.LogsUIDir(), "config", "loki-config.yaml"),
 		filepath.Join(p.LogsUIDir(), "config", "dozzle", "users.yml"),
 		filepath.Join(p.LogsUIDir(), "config", "grafana", "provisioning", "datasources", "loki.yaml"),
-		filepath.Join(p.LogsUIDir(), "config", "grafana", "provisioning", "dashboards", "json", "qabasone-logs.json"),
+		filepath.Join(p.LogsUIDir(), "config", "grafana", "provisioning", "dashboards", "json", "qabas1-logs.json"),
 	}
 	for _, f := range want {
 		if _, err := os.Stat(f); err != nil {
@@ -99,8 +99,8 @@ func TestResolveURLs(t *testing.T) {
 }
 
 func TestParsePsJSONDetectsFull(t *testing.T) {
-	raw := `{"Service":"dozzle","Name":"qabasone-dozzle","State":"running","Health":""}
-{"Service":"loki","Name":"qabasone-loki","State":"running","Health":""}
+	raw := `{"Service":"dozzle","Name":"qabas1-dozzle","State":"running","Health":""}
+{"Service":"loki","Name":"qabas1-loki","State":"running","Health":""}
 `
 	rows, full := parsePsJSON(raw)
 	if !full {
@@ -112,7 +112,7 @@ func TestParsePsJSONDetectsFull(t *testing.T) {
 }
 
 func TestParsePsJSONArray(t *testing.T) {
-	raw := `[{"Service":"dozzle","Name":"qabasone-dozzle","State":"running","Health":""}]`
+	raw := `[{"Service":"dozzle","Name":"qabas1-dozzle","State":"running","Health":""}]`
 	rows, full := parsePsJSON(raw)
 	if full {
 		t.Fatal("expected full=false")

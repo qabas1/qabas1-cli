@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/manifest"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 func TestRestartAPIWaitsForEachReplica(t *testing.T) {
@@ -46,11 +46,11 @@ func TestParseComposePsJSON(t *testing.T) {
 	raw := `[
 	  {
 	    "ID": "1234567890abcdef",
-	    "Name": "qabasone-api",
+	    "Name": "qabas1-api",
 	    "Service": "api",
 	    "State": "running",
 	    "Health": "healthy",
-	    "Image": "ghcr.io/qabasone/qabasone-api@sha256:abc"
+	    "Image": "ghcr.io/qabas1/qabas1-api@sha256:abc"
 	  }
 	]`
 
@@ -100,8 +100,8 @@ func TestEnvForInstalledReleaseUsesReplicaImagePins(t *testing.T) {
 }
 
 func TestParseComposePsJSONLines(t *testing.T) {
-	raw := `{"ID":"abcdef1234567890","Name":"qabasone-postgres","Service":"postgres","State":"running","Health":"healthy","Image":"postgres:16-alpine"}
-{"ID":"fedcba0987654321","Name":"qabasone-redis","Service":"redis","State":"running","Image":"redis:7-alpine"}`
+	raw := `{"ID":"abcdef1234567890","Name":"qabas1-postgres","Service":"postgres","State":"running","Health":"healthy","Image":"postgres:16-alpine"}
+{"ID":"fedcba0987654321","Name":"qabas1-redis","Service":"redis","State":"running","Image":"redis:7-alpine"}`
 
 	services, err := parseComposePsJSON(raw, "1.0.3")
 	if err != nil {
@@ -245,10 +245,10 @@ func TestSaveReleaseCopySerializesInMemoryRelease(t *testing.T) {
 			Channel: "dev",
 		},
 		Components: manifest.Components{
-			API:   manifest.Component{Version: "1.0.4-dev.1788323844", Image: "ghcr.io/qabasone/qabasone-api:dev", Digest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
-			App:   manifest.Component{Version: "1.0.4-dev.1788323844", Image: "ghcr.io/qabasone/qabasone-app:dev", Digest: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
-			Dash:  manifest.Component{Version: "1.0.4-dev.1788323844", Image: "ghcr.io/qabasone/qabasone-dash:dev", Digest: "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
-			Siraj: manifest.Component{Version: "1.0.4-dev.1788323844", Image: "ghcr.io/qabasone/qabasone-siraj_app:dev", Digest: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
+			API:   manifest.Component{Version: "1.0.4-dev.1788323844", Image: "ghcr.io/qabas1/qabas1-api:dev", Digest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+			App:   manifest.Component{Version: "1.0.4-dev.1788323844", Image: "ghcr.io/qabas1/qabas1-app:dev", Digest: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+			Dash:  manifest.Component{Version: "1.0.4-dev.1788323844", Image: "ghcr.io/qabas1/qabas1-dash:dev", Digest: "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"},
+			Siraj: manifest.Component{Version: "1.0.4-dev.1788323844", Image: "ghcr.io/qabas1/qabas1-siraj_app:dev", Digest: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"},
 		},
 		Compatibility: manifest.Compatibility{
 			App:   manifest.APIRange{API: ">=0.0.0-0"},
@@ -266,7 +266,7 @@ func TestSaveReleaseCopySerializesInMemoryRelease(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(raw), "qabasone-api") {
+	if !strings.Contains(string(raw), "qabas1-api") {
 		t.Fatalf("release copy did not include image metadata:\n%s", raw)
 	}
 	parsed, err := manifest.Parse(raw)

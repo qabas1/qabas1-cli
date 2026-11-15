@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"github.com/qabas1/qabasone-cli/internal/history"
-	"github.com/qabas1/qabasone-cli/internal/output"
+	"github.com/qabas1/qabas1-cli/internal/history"
+	"github.com/qabas1/qabas1-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 

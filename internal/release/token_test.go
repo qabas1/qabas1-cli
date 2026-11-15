@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/release"
 )
 
 func clearAuthEnv(t *testing.T) {

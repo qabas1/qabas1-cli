@@ -13,18 +13,18 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/state"
 	"github.com/spf13/cobra"
 )
 
 const (
 	defaultEdgeNginxDir       = "/srv/projects/edge/nginx"
 	defaultEdgeNginxContainer = "edge-nginx"
-	maintenanceIncludeURI     = "/etc/nginx/includes/qabasone-maintenance.conf"
-	maintenanceFlagURI        = "/usr/share/nginx/html/qabasone-maintenance.enabled"
-	maintenanceIncludeLine    = "include /etc/nginx/includes/qabasone-maintenance.conf"
+	maintenanceIncludeURI     = "/etc/nginx/includes/qabas1-maintenance.conf"
+	maintenanceFlagURI        = "/usr/share/nginx/html/qabas1-maintenance.enabled"
+	maintenanceIncludeLine    = "include /etc/nginx/includes/qabas1-maintenance.conf"
 	maintenanceIncludesGlob   = "include /etc/nginx/includes/*.conf"
 )
 
@@ -305,7 +305,7 @@ func enableEdgeMaintenance(until time.Time, pageFlag string) error {
 	if err := writeMaintenanceInclude(layout, until, html); err != nil {
 		return err
 	}
-	flag := filepath.Join(layout.HTMLDir, "qabasone-maintenance.enabled")
+	flag := filepath.Join(layout.HTMLDir, "qabas1-maintenance.enabled")
 	if err := os.MkdirAll(layout.HTMLDir, 0o755); err != nil {
 		return err
 	}
@@ -320,7 +320,7 @@ func disableEdgeMaintenance() error {
 	if err != nil {
 		return err
 	}
-	flag := filepath.Join(layout.HTMLDir, "qabasone-maintenance.enabled")
+	flag := filepath.Join(layout.HTMLDir, "qabas1-maintenance.enabled")
 	if err := os.Remove(flag); err != nil && !os.IsNotExist(err) {
 		return err
 	}
@@ -331,7 +331,7 @@ func writeMaintenancePage(layout edgeLayout, html string) error {
 	if err := os.MkdirAll(layout.HTMLDir, 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join(layout.HTMLDir, "qabasone-maintenance.html"), []byte(html), 0o644)
+	return os.WriteFile(filepath.Join(layout.HTMLDir, "qabas1-maintenance.html"), []byte(html), 0o644)
 }
 
 func writeMaintenanceInclude(layout edgeLayout, until time.Time, html string) error {
@@ -349,7 +349,7 @@ if (-f %s) {
     return 503 %s;
 }
 `, retryAfter, layout.FlagURI, strconv.Quote(compactHTML(html)))
-	return os.WriteFile(filepath.Join(layout.IncludesDir, "qabasone-maintenance.conf"), []byte(body), 0o644)
+	return os.WriteFile(filepath.Join(layout.IncludesDir, "qabas1-maintenance.conf"), []byte(body), 0o644)
 }
 
 type maintenancePageData struct {

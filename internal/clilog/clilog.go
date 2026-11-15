@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabas1-cli/internal/redact"
 )
 
 const (

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/minioctl"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/pgctl"
+	"github.com/qabas1/qabas1-cli/internal/minioctl"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/pgctl"
 )
 
 // Check is one verification result.
@@ -180,7 +180,7 @@ func (e *Engine) Verify(ctx context.Context, name string) Report {
 	out, _ := run(ctx, x, "docker ps --format '{{.Names}}' --filter status=running")
 	var running []string
 	for _, wk := range []string{"operations-worker", "notifications-worker", "printables-worker", "documents-worker", "audit-cleanup", "migrate"} {
-		if strings.Contains(out, "qabasone-"+wk) {
+		if strings.Contains(out, "qabas1-"+wk) {
 			running = append(running, wk)
 		}
 	}
@@ -193,7 +193,7 @@ func (e *Engine) Verify(ctx context.Context, name string) Report {
 	} else {
 		rep.add("containers.healthy", len(problems) == 0, "%d containers, problems: %v", seen, problems)
 	}
-	if err := e.WaitHealthy(ctx, w.Name, "qabasone-api", 60*time.Second); err != nil {
+	if err := e.WaitHealthy(ctx, w.Name, "qabas1-api", 60*time.Second); err != nil {
 		rep.add("writer.api", false, "%v", err)
 	} else {
 		rep.add("writer.api", true, "writer %s API healthy", w.Name)

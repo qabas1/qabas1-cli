@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/pgctl"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/pgctl"
 )
 
 // DefaultWALBudgetGB bounds WAL a replication slot may retain on the writer when no
@@ -30,7 +30,7 @@ func (e *Engine) WriterGuard(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	for _, c := range []string{pgctl.Container, "qabasone-api"} {
+	for _, c := range []string{pgctl.Container, "qabas1-api"} {
 		if err := e.WaitHealthy(ctx, w.Name, c, 30*time.Second); err != nil {
 			return fmt.Errorf("the writer is not healthy, refusing to change it: %w", err)
 		}
@@ -133,4 +133,4 @@ func containerProblems(out string) (problems []string, seen int) {
 	return problems, seen
 }
 
-const containersScript = "docker ps -a --filter name=^qabasone- --format '{{.Names}}|{{.Status}}'"
+const containersScript = "docker ps -a --filter name=^qabas1- --format '{{.Names}}|{{.Status}}'"

@@ -8,7 +8,7 @@ cd "${ROOT}"
 
 VERSION="${VERSION:-dev}"
 COMMIT="${COMMIT:-none}"
-MODULE="github.com/qabas1/qabasone-cli"
+MODULE="github.com/qabas1/qabas1-cli"
 LDFLAGS="-s -w -X ${MODULE}/internal/version.Version=${VERSION} -X ${MODULE}/internal/version.Commit=${COMMIT}"
 
 mkdir -p dist

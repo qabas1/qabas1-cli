@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/pgctl"
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/pgctl"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
 )
 
-const statsNDJSON = `{"BlockIO":"1.5MB / 20MB","CPUPerc":"12.50%","Container":"abc","ID":"abc","MemPerc":"25.00%","MemUsage":"256MiB / 1GiB","Name":"qabasone-api","NetIO":"1kB / 2kB","PIDs":"20"}
-{"BlockIO":"0B / 0B","CPUPerc":"0.10%","MemPerc":"1.00%","MemUsage":"10MiB / 1GiB","Name":"qabasone-redis","NetIO":"0B / 0B"}
+const statsNDJSON = `{"BlockIO":"1.5MB / 20MB","CPUPerc":"12.50%","Container":"abc","ID":"abc","MemPerc":"25.00%","MemUsage":"256MiB / 1GiB","Name":"qabas1-api","NetIO":"1kB / 2kB","PIDs":"20"}
+{"BlockIO":"0B / 0B","CPUPerc":"0.10%","MemPerc":"1.00%","MemUsage":"10MiB / 1GiB","Name":"qabas1-redis","NetIO":"0B / 0B"}
 not json
 `
 
@@ -23,7 +23,7 @@ func TestParseStats(t *testing.T) {
 	if len(got) != 2 {
 		t.Fatalf("want 2 rows, got %d", len(got))
 	}
-	api := got["qabasone-api"]
+	api := got["qabas1-api"]
 	if api.CPUPercent != 12.5 || api.MemPercent != 25 {
 		t.Fatalf("percent: %+v", api)
 	}
@@ -36,8 +36,8 @@ func TestParseStats(t *testing.T) {
 }
 
 func TestParseInspect(t *testing.T) {
-	got := parseInspect([]byte("/qabasone-api|4|2026-10-01T10:00:00.123456789Z\nbad line\n"))
-	r, ok := got["qabasone-api"]
+	got := parseInspect([]byte("/qabas1-api|4|2026-10-01T10:00:00.123456789Z\nbad line\n"))
+	r, ok := got["qabas1-api"]
 	if !ok || r.Restarts != 4 || r.StartedAt.Hour() != 10 {
 		t.Fatalf("got %+v", got)
 	}
@@ -58,14 +58,14 @@ func fakeDocker(stats, inspect string) func(context.Context, ...string) ([]byte,
 func TestCollectServicesMergesStatsAndSkipsStopped(t *testing.T) {
 	list := func(context.Context) ([]BaseService, error) {
 		return []BaseService{
-			{Service: "api", Name: "qabasone-api", State: "running", Health: "healthy"},
-			{Service: "worker", Name: "qabasone-worker", State: "exited"},
+			{Service: "api", Name: "qabas1-api", State: "running", Health: "healthy"},
+			{Service: "worker", Name: "qabas1-worker", State: "exited"},
 		}, nil
 	}
 	var asked []string
 	docker := func(ctx context.Context, args ...string) ([]byte, error) {
 		asked = append(asked, strings.Join(args, " "))
-		return fakeDocker(statsNDJSON, "/qabasone-api|1|2026-10-01T10:00:00Z")(ctx, args...)
+		return fakeDocker(statsNDJSON, "/qabas1-api|1|2026-10-01T10:00:00Z")(ctx, args...)
 	}
 	sec := collectServices(context.Background(), list, docker, nil, true)
 	if sec.Err != "" || len(sec.Rows) != 2 {
@@ -75,7 +75,7 @@ func TestCollectServicesMergesStatsAndSkipsStopped(t *testing.T) {
 		t.Fatalf("api not merged: %+v", sec.Rows[0])
 	}
 	for _, a := range asked {
-		if strings.Contains(a, "qabasone-worker") {
+		if strings.Contains(a, "qabas1-worker") {
 			t.Fatalf("stopped container queried: %s", a)
 		}
 	}
@@ -118,7 +118,7 @@ func TestCollectPostgres(t *testing.T) {
 	if strings.Contains(pg.Queries[0].Text, "secret customer") || !strings.Contains(pg.Queries[0].Text, "'?'") {
 		t.Fatalf("literal not masked: %q", pg.Queries[0].Text)
 	}
-	if !strings.Contains(x.Log[0], "docker exec -i qabasone-postgres") {
+	if !strings.Contains(x.Log[0], "docker exec -i qabas1-postgres") {
 		t.Fatalf("unexpected script: %s", x.Log[0])
 	}
 }
@@ -257,8 +257,8 @@ func TestCollectorRates(t *testing.T) {
 	now := time.Date(2026, 10, 1, 10, 0, 0, 0, time.UTC)
 	started := now.Add(-time.Hour)
 	stats := []string{
-		`{"Name":"qabasone-api","NetIO":"1kB / 2kB","BlockIO":"0B / 0B","MemUsage":"1MiB / 1GiB"}`,
-		`{"Name":"qabasone-api","NetIO":"3kB / 6kB","BlockIO":"10kB / 0B","MemUsage":"1MiB / 1GiB"}`,
+		`{"Name":"qabas1-api","NetIO":"1kB / 2kB","BlockIO":"0B / 0B","MemUsage":"1MiB / 1GiB"}`,
+		`{"Name":"qabas1-api","NetIO":"3kB / 6kB","BlockIO":"10kB / 0B","MemUsage":"1MiB / 1GiB"}`,
 	}
 	pgs := []string{
 		"o|f|1|100|1|0|1000|10|0|0|0|0|||off\n",
@@ -267,13 +267,13 @@ func TestCollectorRates(t *testing.T) {
 	i := 0
 	c := NewCollector(Sources{
 		Services: func(context.Context) ([]BaseService, error) {
-			return []BaseService{{Service: "api", Name: "qabasone-api", State: "running"}}, nil
+			return []BaseService{{Service: "api", Name: "qabas1-api", State: "running"}}, nil
 		},
 		Docker: func(_ context.Context, args ...string) ([]byte, error) {
 			if args[0] == "stats" {
 				return []byte(stats[i]), nil
 			}
-			return []byte("/qabasone-api|0|" + started.Format(time.RFC3339)), nil
+			return []byte("/qabas1-api|0|" + started.Format(time.RFC3339)), nil
 		},
 		PG:         &seqExecutor{outs: pgs, i: &i},
 		NoReplicas: true,
@@ -340,9 +340,9 @@ func TestEvaluate(t *testing.T) {
 			{Check: "memory", Level: sysinfo.LevelOK}, {Check: "disk:state", Level: sysinfo.LevelWarn, Detail: "low"},
 		}}},
 		Services: ServicesSection{Rows: []Service{
-			{Service: "api", Name: "qabasone-api", State: "running", Health: "unhealthy", Restarts: 5},
-			{Service: "web", Name: "qabasone-web", State: "restarting"},
-			{Service: "redis", Name: "qabasone-redis", State: "running", MemLimitBytes: 1, MemPercent: 95},
+			{Service: "api", Name: "qabas1-api", State: "running", Health: "unhealthy", Restarts: 5},
+			{Service: "web", Name: "qabas1-web", State: "restarting"},
+			{Service: "redis", Name: "qabas1-redis", State: "running", MemLimitBytes: 1, MemPercent: 95},
 		}},
 		Postgres: &PostgresSection{
 			Connections: 85, MaxConnections: 100, LockWaits: 2,
@@ -446,7 +446,7 @@ func TestEvaluateNotInstalled(t *testing.T) {
 
 func TestEvaluateHealthy(t *testing.T) {
 	s := Snapshot{
-		Services: ServicesSection{Rows: []Service{{Service: "api", Name: "qabasone-api", State: "running", Health: "healthy"}}},
+		Services: ServicesSection{Rows: []Service{{Service: "api", Name: "qabas1-api", State: "running", Health: "healthy"}}},
 		Postgres: &PostgresSection{Connections: 5, MaxConnections: 100},
 		Replicas: &ReplicasSection{Rows: []Replica{{Name: "dr1", State: "streaming", LagSeconds: 0.2}}},
 	}

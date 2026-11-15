@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
-	"github.com/qabas1/qabasone-cli/internal/pgctl"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/pgctl"
 )
 
 // AddOptions describes a replica to provision.
@@ -76,7 +76,7 @@ if docker compose version --short >/dev/null 2>&1; then echo "compose=$(docker c
 if command -v systemctl >/dev/null 2>&1; then echo "systemd=yes"; else echo "systemd=no"; fi
 d=/var/lib/docker; [ -d "$d" ] || d=/
 echo "diskfree_kb=$(df -Pk "$d" | awk 'NR==2{print $4}')"
-echo "stack=$(docker ps -a --filter name=^qabasone- --format '{{.Names}}' 2>/dev/null | tr '\n' ',')"
+echo "stack=$(docker ps -a --filter name=^qabas1- --format '{{.Names}}' 2>/dev/null | tr '\n' ',')"
 echo "pgvolume=$(docker volume ls -q --filter name=^` + PGVolume + `$ 2>/dev/null)"
 echo "qabas=$(command -v qabas 2>/dev/null)"
 `
@@ -357,7 +357,7 @@ func (e *Engine) Add(ctx context.Context, opt AddOptions) (*Report, error) {
 		}
 		cancel()
 		e.logf("    minio      waiting for health")
-		if err := e.WaitHealthy(ctx, name, "qabasone-minio", 2*time.Minute); err != nil {
+		if err := e.WaitHealthy(ctx, name, "qabas1-minio", 2*time.Minute); err != nil {
 			return fmt.Errorf("wait for MinIO on %s: %w", name, err)
 		}
 		e.logf("    policy     applying read-only app policy on %s", name)
@@ -614,7 +614,7 @@ func (e *Engine) StartStack(ctx context.Context, name string, opt StackOptions) 
 	if err := e.WaitHealthy(ctx, name, pgctl.Container, 3*time.Minute); err != nil {
 		return err
 	}
-	return e.WaitHealthy(ctx, name, "qabasone-api", 4*time.Minute)
+	return e.WaitHealthy(ctx, name, "qabas1-api", 4*time.Minute)
 }
 
 // WaitHealthy polls a container's health status (or running state without healthcheck).
@@ -630,7 +630,7 @@ func (e *Engine) WaitHealthy(ctx context.Context, name, container string, timeou
 	last := ""
 	logContainer := container
 	for {
-		if container == "qabasone-api" {
+		if container == "qabas1-api" {
 			containers, err := apiContainerNames(ctx, x, true)
 			if err != nil {
 				return fmt.Errorf("list API containers on %s: %w", name, err)
@@ -683,11 +683,11 @@ func apiContainerNames(ctx context.Context, x nodeexec.Executor, includeStopped 
 	}
 	var containers []string
 	for _, name := range strings.Fields(out) {
-		if name == "qabasone-api" {
+		if name == "qabas1-api" {
 			containers = append(containers, name)
 			continue
 		}
-		suffix, ok := strings.CutPrefix(name, "qabasone-api-")
+		suffix, ok := strings.CutPrefix(name, "qabas1-api-")
 		if ok && suffix != "" && strings.Trim(suffix, "0123456789") == "" {
 			containers = append(containers, name)
 		}

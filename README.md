@@ -4,11 +4,11 @@ Official system administration CLI for QabasOne.
 
 `qabas` is the **deployment engine**. It does not contain a hardcoded list of
 product releases. Complete QabasOne versions (API + App + Dash) are defined in
-[`qabasone-deploy`](https://github.com/qabas1/qabasone-deploy).
+[`qabas1-deploy`](https://github.com/qabas1/qabas1-deploy).
 
 ```text
-qabasone-cli     = deployment engine
-qabasone-deploy  = release database / deployment definitions
+qabas1-cli     = deployment engine
+qabas1-deploy  = release database / deployment definitions
 ```
 
 ## Install
@@ -48,7 +48,7 @@ Windows release assets are temporarily paused. QabasOne product deployment
 requires Linux; the Windows CLI build scripts remain available under
 `packaging/windows/` for local development.
 
-Manual packages are also attached to each [GitHub Release](https://github.com/qabas1/qabasone-cli/releases)
+Manual packages are also attached to each [GitHub Release](https://github.com/qabas1/qabas1-cli/releases)
 (`.deb` and raw Linux binaries).
 
 ### Private GitHub repos + GHCR (one-time auth)
@@ -160,14 +160,14 @@ git push -u origin HEAD:refs/heads/dev
 ### Product `dev` deploy (GHCR images + deploy compose)
 
 `qabas deploy dev` (or `install`/`upgrade` with channel `dev`) fetches compose and
-env templates from `qabasone/qabasone-deploy` on the **`dev`** branch, then pins
+env templates from `qabasone/qabas1-deploy` on the **`dev`** branch, then pins
 component images to the **last pushed** GHCR package version (GitHub Packages
 `updated_at`, including versions tagged only `sha-*`, `dev`, or `latest`) for:
 
-- `ghcr.io/qabasone/qabasone-api`
-- `ghcr.io/qabasone/qabasone-app`
-- `ghcr.io/qabasone/qabasone-dash`
-- `ghcr.io/qabasone/qabasone-siraj_app`
+- `ghcr.io/qabas1/qabas1-api`
+- `ghcr.io/qabas1/qabas1-app`
+- `ghcr.io/qabas1/qabas1-dash`
+- `ghcr.io/qabas1/qabas1-siraj_app`
 
 Image pins do not come from the deploy catalog YAML. Infra images (Postgres,
 Redis, MinIO, Gotenberg, jsreport) use the defaults from the fetched compose file.
@@ -294,7 +294,7 @@ replica must be configured separately.
 
 ### Localhost logs UI
 
-Realtime log viewing runs as a **separate** Compose project (`qabasone-logs`) so
+Realtime log viewing runs as a **separate** Compose project (`qabas1-logs`) so
 it never interferes with `qabas up` / `down`. Default is Dozzle only (fast).
 `--full` adds Loki + Grafana Alloy + Grafana for searchable history. Binds to
 `127.0.0.1` only. Auth is on by default; generated passwords are stored in
@@ -337,7 +337,7 @@ must already include the maintenance snippet (checked in once in the edge
 repo):
 
 ```nginx
-include /etc/nginx/includes/qabasone-maintenance.conf;
+include /etc/nginx/includes/qabas1-maintenance.conf;
 ```
 
 ```bash
@@ -449,7 +449,7 @@ qabas top --json --interval 10s       # stream one JSON snapshot per line
 qabas top --no-postgres --no-replicas # skip database queries
 ```
 
-Postgres and replica panes query the local `qabasone-postgres` container; on
+Postgres and replica panes query the local `qabas1-postgres` container; on
 Windows this needs a POSIX `sh` on `PATH` (for example Git Bash).
 
 `qabas status` shows a MACHINE section with used, available, total, and percent
@@ -596,7 +596,7 @@ qabas completion powershell | Out-String | Invoke-Expression
 ```
 
 Default channel is **stable**. `qabas install` and `qabas upgrade` with no
-version select the latest stable product release from `qabasone-deploy`.
+version select the latest stable product release from `qabas1-deploy`.
 
 ## Host layout
 
@@ -609,7 +609,7 @@ version select the latest stable product release from `qabasone-deploy`.
 Production secrets and compose env files (`.env`, `.env.api`, `.env.migrate`,
 `.env.worker`, `.env.app`, `.env.dash`, `secrets.env`) are generated **once**
 on first setup by rendering `compose/templates/*.example` from the configured
-`qabasone-deploy` release (not hardcoded in the CLI). Later `install` /
+`qabas1-deploy` release (not hardcoded in the CLI). Later `install` /
 `deploy` / `upgrade` / `db` commands never overwrite, append, or rewrite
 credential values — edit those files yourself if you need to change them.
 

@@ -7,17 +7,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
 )
 
-// Compose volume keys (see qabasone-deploy compose.yaml). Docker names them
+// Compose volume keys (see qabas1-deploy compose.yaml). Docker names them
 // "{project}_{key}" unless the volume declares an explicit name.
 const (
 	MinioVolumeKey    = "qabasone_minio_data"
-	MinioContainer    = "qabasone-minio"
+	MinioContainer    = "qabas1-minio"
 	MinioDataDir      = "/data"
 	JSReportVolumeKey = "qabasone_jsreport_data"
-	JSReportContainer = "qabasone-jsreport"
+	JSReportContainer = "qabas1-jsreport"
 	JSReportDataDir   = "/app/data"
 )
 

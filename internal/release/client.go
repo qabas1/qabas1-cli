@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/httpx"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/httpx"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 const defaultAPI = "https://api.github.com"
@@ -32,7 +32,7 @@ type Client struct {
 
 func New(repo, ref string) *Client {
 	if repo == "" {
-		repo = "qabasone/qabasone-deploy"
+		repo = "qabasone/qabas1-deploy"
 	}
 	if ref == "" {
 		ref = "main"
@@ -129,7 +129,7 @@ func (c *Client) FetchCompose() ([]byte, error) {
 	return c.fetchRaw("compose/compose.yaml")
 }
 
-// FetchComposeFile fetches a compose overlay (e.g. compose.replica-ro.yaml) from qabasone-deploy.
+// FetchComposeFile fetches a compose overlay (e.g. compose.replica-ro.yaml) from qabas1-deploy.
 func (c *Client) FetchComposeFile(name string) ([]byte, error) {
 	return c.fetchRaw("compose/" + name)
 }

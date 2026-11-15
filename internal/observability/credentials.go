@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/yaml.v3"
 )
@@ -148,7 +148,7 @@ func (r *Runtime) RotateCredentials(p paths.Paths) (Credentials, bool, error) {
 	}
 	if st.Full {
 		var stderr bytes.Buffer
-		err := r.docker().RunIO("docker", []string{"exec", "-i", "qabasone-grafana", "grafana", "cli", "admin", "reset-admin-password", "--password-from-stdin"},
+		err := r.docker().RunIO("docker", []string{"exec", "-i", "qabas1-grafana", "grafana", "cli", "admin", "reset-admin-password", "--password-from-stdin"},
 			os.Environ(), strings.NewReader(grafana+"\n"), io.Discard, &stderr)
 		if err != nil {
 			return cred, true, exitcode.New(exitcode.Generic, "reset Grafana admin password: %s", strings.TrimSpace(stderr.String()+" "+err.Error()))

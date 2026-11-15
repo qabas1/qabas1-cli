@@ -14,7 +14,7 @@ It is the deployment engine: it installs, upgrades, downgrades, backs up,
 and operates the QabasOne product stack (API, App, and Dash).
 .PP
 Product releases are defined in the
-.B qabasone-deploy
+.B qabas1-deploy
 repository; this CLI does not hardcode a release catalog.
 .PP
 The Debian package installs only the
@@ -113,7 +113,7 @@ Show service logs via Docker Compose.
 Start or stop a localhost realtime logs web UI (Dozzle). Optional
 .B --full
 adds Loki, Alloy, and Grafana for searchable history. Runs as Compose project
-.B qabasone-logs
+.B qabas1-logs
 (separate from the product stack). Binds to 127.0.0.1 only with auth enabled
 by default; passwords live in
 .I /etc/qabasone/logs-ui.credentials
@@ -160,7 +160,7 @@ and
 it never rewrites operator-owned
 .B .conf
 files. Edge server blocks must already
-.B include /etc/nginx/includes/qabasone-maintenance.conf .
+.B include /etc/nginx/includes/qabas1-maintenance.conf .
 Use
 .B \-\-for
 or
@@ -413,7 +413,7 @@ sudo \-E qabas auth login
 .fi
 .SH SEE ALSO
 Full documentation:
-.UR https://github.com/qabas1/qabasone-cli
+.UR https://github.com/qabas1/qabas1-cli
 .UE
 .PP
 Install bootstrap:

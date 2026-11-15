@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/config"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/config"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 func TestGetSetValidate(t *testing.T) {
@@ -34,7 +34,7 @@ func TestRedact(t *testing.T) {
 	m := config.RedactMap(map[string]string{
 		"channel":     "stable",
 		"jwt.secret":  "super-secret",
-		"deploy.repo": "qabasone/qabasone-deploy",
+		"deploy.repo": "qabasone/qabas1-deploy",
 	})
 	if m["jwt.secret"] != "********" {
 		t.Fatalf("secret %q", m["jwt.secret"])

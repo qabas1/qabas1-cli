@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- SignPath artifact configuration "windows-msi" (paste into the qabasone-cli project).
+<!-- SignPath artifact configuration "windows-msi" (paste into the qabas1-cli project).
      Input: GitHub artifact zip with the amd64 and arm64 MSIs built from already-signed exes. -->
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
   <zip-file>

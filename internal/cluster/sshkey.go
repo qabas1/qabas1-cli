@@ -11,7 +11,7 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 // SSHKeyComment tags the cluster key in authorized_keys so it can be replaced or

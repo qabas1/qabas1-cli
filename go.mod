@@ -1,4 +1,4 @@
-module github.com/qabas1/qabasone-cli
+module github.com/qabas1/qabas1-cli
 
 go 1.22
 

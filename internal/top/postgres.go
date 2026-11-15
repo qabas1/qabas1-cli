@@ -9,10 +9,10 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/pgctl"
-	"github.com/qabas1/qabasone-cli/internal/pitr"
-	"github.com/qabas1/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/pgctl"
+	"github.com/qabas1/qabas1-cli/internal/pitr"
+	"github.com/qabas1/qabas1-cli/internal/redact"
 )
 
 // MaxQueries is how many non-idle backends the Postgres pane keeps.

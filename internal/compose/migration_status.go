@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 // MigrationAttempt is one row in Prisma's database migration history.

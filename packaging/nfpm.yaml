@@ -11,7 +11,7 @@ description: |
   Official system administration CLI for QabasOne.
   Installs only the qabas binary; product data lives under /etc/qabasone and /var/lib/qabasone.
 vendor: QabasOne
-homepage: https://github.com/qabas1/qabasone-cli
+homepage: https://github.com/qabas1/qabas1-cli
 license: Proprietary
 contents:
   - src: ${BIN_SRC}

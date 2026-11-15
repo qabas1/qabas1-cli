@@ -7,22 +7,22 @@ components:
   api:
     version: "4.15.0"
     commit: "aaa1111"
-    image: "ghcr.io/qabasone/qabasone-api:4.15.0"
+    image: "ghcr.io/qabas1/qabas1-api:4.15.0"
     digest: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
   app:
     version: "3.9.0"
     commit: "bbb2222"
-    image: "ghcr.io/qabasone/qabasone-app:3.9.0"
+    image: "ghcr.io/qabas1/qabas1-app:3.9.0"
     digest: "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
   dash:
     version: "5.7.0"
     commit: "ccc3333"
-    image: "ghcr.io/qabasone/qabasone-dash:5.7.0"
+    image: "ghcr.io/qabas1/qabas1-dash:5.7.0"
     digest: "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
   siraj:
     version: "1.0.0"
     commit: "siraj001"
-    image: "ghcr.io/qabasone/qabasone-siraj_app:1.0.0"
+    image: "ghcr.io/qabas1/qabas1-siraj_app:1.0.0"
     digest: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
 compatibility:
   app:

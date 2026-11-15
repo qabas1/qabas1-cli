@@ -7,7 +7,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
 )
 
 // meterLabelW is the right-aligned label width of every meter ("   0", " Mem", "Disk").

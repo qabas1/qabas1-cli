@@ -1,9 +1,9 @@
 package cli
 
 import (
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/observability"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/observability"
+	"github.com/qabas1/qabas1-cli/internal/state"
 	"github.com/spf13/cobra"
 )
 
@@ -17,7 +17,7 @@ func newLogsCmd(f *flags) *cobra.Command {
 Use "qabas logs ui" to start a localhost web UI (Dozzle) for realtime viewing.
 Optional --full adds Loki + Grafana for searchable history.
 
-The logs UI runs as a separate Docker Compose project (qabasone-logs) and does
+The logs UI runs as a separate Docker Compose project (qabas1-logs) and does
 not affect qabas up/down of the product stack. It binds to 127.0.0.1 only and
 reads container logs through a read-only Docker API proxy on an internal network.
 
@@ -165,12 +165,12 @@ func newLogsUIDownCmd(f *flags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "down",
 		Short:   "Stop the localhost logs UI",
-		Long:    "Stop and remove qabasone-logs containers. Does not affect the product stack (qabasone).",
+		Long:    "Stop and remove qabas1-logs containers. Does not affect the product stack (qabasone).",
 		Example: "  qabas logs ui down\n  qabas logs ui down --wipe",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			e := load(f)
 			if f.DryRun {
-				e.Out.Println("would stop logs UI project qabasone-logs")
+				e.Out.Println("would stop logs UI project qabas1-logs")
 				return nil
 			}
 			if err := observability.NewRuntime().Down(e.Paths, wipe); err != nil {

@@ -11,20 +11,20 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/hint"
-	"github.com/qabas1/qabasone-cli/internal/httpx"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/hint"
+	"github.com/qabas1/qabas1-cli/internal/httpx"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
 )
 
 var ghcrBase = "https://ghcr.io"
 var githubAPIBase = "https://api.github.com"
 
 var devPackages = map[string]string{
-	"api":   "qabasone-api",
-	"app":   "qabasone-app",
-	"dash":  "qabasone-dash",
-	"siraj": "qabasone-siraj_app",
+	"api":   "qabas1-api",
+	"app":   "qabas1-app",
+	"dash":  "qabas1-dash",
+	"siraj": "qabas1-siraj_app",
 }
 
 // LatestDevFromGHCR builds an immutable dev release manifest from the last-pushed
@@ -73,7 +73,7 @@ func LatestDevFromGHCR(httpClient *http.Client, owner, username, token string) (
 			ReleasedAt: time.Now().UTC().Format(time.RFC3339),
 		},
 		Components: manifest.Components{API: api, App: app, Dash: dash, Siraj: siraj},
-		// Infra stays empty so compose.yaml defaults from qabasone-deploy@dev apply.
+		// Infra stays empty so compose.yaml defaults from qabas1-deploy@dev apply.
 		Compatibility: manifest.Compatibility{
 			App:   manifest.APIRange{API: ">=0.0.0-0"},
 			Dash:  manifest.APIRange{API: ">=0.0.0-0"},

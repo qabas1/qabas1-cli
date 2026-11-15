@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/backup"
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/output"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/pgctl"
-	"github.com/qabas1/qabasone-cli/internal/secrets"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/backup"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/output"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/pgctl"
+	"github.com/qabas1/qabas1-cli/internal/secrets"
+	"github.com/qabas1/qabas1-cli/internal/state"
 	"github.com/spf13/cobra"
 )
 

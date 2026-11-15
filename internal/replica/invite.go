@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/redact"
-	"github.com/qabas1/qabasone-cli/internal/wg"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/redact"
+	"github.com/qabas1/qabas1-cli/internal/wg"
 )
 
 // DefaultInviteTTL is how long a join script stays valid.

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 func rotateFixture(t *testing.T) (paths.Paths, Bundle) {

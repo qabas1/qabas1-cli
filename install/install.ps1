@@ -26,7 +26,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$Repo = if ($env:REPO) { $env:REPO } else { "qabasone/qabasone-cli" }
+$Repo = if ($env:REPO) { $env:REPO } else { "qabasone/qabas1-cli" }
 $Version = if ($env:VERSION) { $env:VERSION } else { "latest" }
 $InstallDir = if ($env:INSTALL_DIR) { $env:INSTALL_DIR } else { Join-Path $env:LOCALAPPDATA "Programs\qabas" }
 $GithubApi = if ($env:GITHUB_API) { $env:GITHUB_API } else { "https://api.github.com" }

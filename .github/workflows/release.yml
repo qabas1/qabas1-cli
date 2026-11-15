@@ -43,7 +43,7 @@ jobs:
 
       - name: Configure persistent Go cache dirs
         run: |
-          CACHE_ROOT="${HOME}/.cache/qabasone-cli"
+          CACHE_ROOT="${HOME}/.cache/qabas1-cli"
           mkdir -p "${CACHE_ROOT}/go-build" "${CACHE_ROOT}/pkg/mod"
           echo "GOCACHE=${CACHE_ROOT}/go-build" >> "$GITHUB_ENV"
           echo "GOMODCACHE=${CACHE_ROOT}/pkg/mod" >> "$GITHUB_ENV"
@@ -57,7 +57,7 @@ jobs:
       - name: Cache Go build
         uses: actions/cache@v4
         with:
-          path: ~/.cache/qabasone-cli/go-build
+          path: ~/.cache/qabas1-cli/go-build
           key: ${{ runner.os }}-go-build-${{ hashFiles('go.sum') }}-${{ hashFiles('**/*.go') }}
           restore-keys: |
             ${{ runner.os }}-go-build-${{ hashFiles('go.sum') }}-
@@ -82,7 +82,7 @@ jobs:
 
       - name: Configure persistent Go cache dirs
         run: |
-          CACHE_ROOT="${HOME}/.cache/qabasone-cli"
+          CACHE_ROOT="${HOME}/.cache/qabas1-cli"
           mkdir -p "${CACHE_ROOT}/go-build" "${CACHE_ROOT}/pkg/mod" .tools
           echo "GOCACHE=${CACHE_ROOT}/go-build" >> "$GITHUB_ENV"
           echo "GOMODCACHE=${CACHE_ROOT}/pkg/mod" >> "$GITHUB_ENV"
@@ -181,7 +181,7 @@ jobs:
           body: |
             ## qabas CLI ${{ needs.verify.outputs.version }}
 
-            QabasOne product releases live in `qabasone-deploy`. This repository ships the `qabas` CLI only.
+            QabasOne product releases live in `qabas1-deploy`. This repository ships the `qabas` CLI only.
 
             ### Install (Linux)
 

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
 )
 
 func mustVersions(t *testing.T, raw string) []packageVersion {
@@ -158,7 +158,7 @@ func TestLatestDevFromGHCRNormalizesNonSemverComponentVersions(t *testing.T) {
 	if rel.Components.API.Version != rel.Release.Version {
 		t.Fatalf("api version %q release %q", rel.Components.API.Version, rel.Release.Version)
 	}
-	if rel.Components.API.Image != "ghcr.io/qabasone/qabasone-api:dev-latest" {
+	if rel.Components.API.Image != "ghcr.io/qabas1/qabas1-api:dev-latest" {
 		t.Fatalf("api image %q", rel.Components.API.Image)
 	}
 	if err := rel.CheckCompatibility(); err != nil {
@@ -170,7 +170,7 @@ func TestLatestDevComponent(t *testing.T) {
 	digest := "sha256:" + strings.Repeat("b", 64)
 	payload := `[{"name":"` + digest + `","updated_at":"2026-09-11T12:00:00Z","metadata":{"container":{"tags":["1.2.0-dev.1","latest"]}}}]`
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.Contains(r.URL.Path, "/packages/container/qabasone-app/") {
+		if !strings.Contains(r.URL.Path, "/packages/container/qabas1-app/") {
 			http.NotFound(w, r)
 			return
 		}

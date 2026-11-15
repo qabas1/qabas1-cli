@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
 )
 
 const edgeNetwork = "edge-network"
@@ -20,7 +20,7 @@ func (r *Runtime) EnsureEdgeNetwork(env []string) error {
 			return exitcode.New(exitcode.Network, "create %s: %s", edgeNetwork, dockerError(createErr, &stderr))
 		}
 	}
-	for _, name := range []string{"qabasone-app", "qabasone-dash", "qabasone-api", "qabasone-minio", "qabasone-siraj", "edge-nginx"} {
+	for _, name := range []string{"qabas1-app", "qabas1-dash", "qabas1-api", "qabas1-minio", "qabas1-siraj", "edge-nginx"} {
 		var stdout, stderr bytes.Buffer
 		err := r.rawDocker(env, []string{"inspect", "--type", "container", "--format", "{{json .NetworkSettings.Networks}}", name}, &stdout, &stderr)
 		if err != nil {

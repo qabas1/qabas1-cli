@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/release"
 )
 
 func TestListAndLatest(t *testing.T) {
@@ -54,7 +54,7 @@ func TestListAndLatest(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	c := release.New("qabasone/qabasone-deploy", "main")
+	c := release.New("qabasone/qabas1-deploy", "main")
 	c.HTTP = srv.Client()
 	c.APIBase = srv.URL
 	c.RawBase = srv.URL
@@ -125,7 +125,7 @@ func TestLatestDevChannelMissing(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	c := release.New("qabasone/qabasone-deploy", "devref")
+	c := release.New("qabasone/qabas1-deploy", "devref")
 	c.HTTP = srv.Client()
 	c.APIBase = srv.URL
 	c.RawBase = srv.URL
@@ -152,22 +152,22 @@ components:
   api:
     version: "1.0.0-dev.1"
     commit: "aaa1111"
-    image: "ghcr.io/qabasone/qabasone-api:1.0.0-dev.1"
+    image: "ghcr.io/qabas1/qabas1-api:1.0.0-dev.1"
     digest: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
   app:
     version: "1.0.0-dev.1"
     commit: "bbb2222"
-    image: "ghcr.io/qabasone/qabasone-app:1.0.0-dev.1"
+    image: "ghcr.io/qabas1/qabas1-app:1.0.0-dev.1"
     digest: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
   dash:
     version: "1.0.0-dev.1"
     commit: "ccc3333"
-    image: "ghcr.io/qabasone/qabasone-dash:1.0.0-dev.1"
+    image: "ghcr.io/qabas1/qabas1-dash:1.0.0-dev.1"
     digest: "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
   siraj:
     version: "1.0.0-dev.1"
     commit: "ddd4444"
-    image: "ghcr.io/qabasone/qabasone-siraj_app:1.0.0-dev.1"
+    image: "ghcr.io/qabas1/qabas1-siraj_app:1.0.0-dev.1"
     digest: "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
 compatibility:
   app:
@@ -200,7 +200,7 @@ database:
 	}))
 	t.Cleanup(srv.Close)
 
-	c := release.New("qabasone/qabasone-deploy", "dev")
+	c := release.New("qabasone/qabas1-deploy", "dev")
 	c.HTTP = srv.Client()
 	c.APIBase = srv.URL
 	c.RawBase = srv.URL
@@ -220,7 +220,7 @@ func TestListPrivateRepoWithoutToken(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	c := release.New("qabasone/qabasone-deploy", "main")
+	c := release.New("qabasone/qabas1-deploy", "main")
 	c.HTTP = srv.Client()
 	c.APIBase = srv.URL
 	c.Token = "" // force unauthenticated path for this unit test

@@ -6,12 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 const (
-	ProjectName = "qabasone-logs"
+	ProjectName = "qabas1-logs"
 
 	EnvLogsUIPort   = "QABAS_LOGS_UI_PORT"
 	EnvGrafanaPort  = "QABAS_GRAFANA_PORT"
@@ -27,7 +27,7 @@ const (
 	// AlloyUID are root-owned and must be re-owned before it starts.
 	AlloyVolume = ProjectName + "_alloy_data"
 	// AlloyImage and AlloyUID must match the alloy service in compose.full.yaml.
-	AlloyImage = "ghcr.io/qabasone/vendor/grafana/alloy:v1.7.5"
+	AlloyImage = "ghcr.io/qabas1/vendor/grafana/alloy:v1.7.5"
 	AlloyUID   = "473:473"
 
 	DefaultLogsUIPort  = "9999"

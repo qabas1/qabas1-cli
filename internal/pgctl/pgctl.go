@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/redact"
 )
 
 const (
-	Container       = "qabasone-postgres"
+	Container       = "qabas1-postgres"
 	DataVolumeKey   = "qabasone_postgres_data"
 	DataDir         = "/var/lib/postgresql/data"
 	ReplicationRole = "qabas_replica"

@@ -11,15 +11,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/backup"
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/config"
-	"github.com/qabas1/qabasone-cli/internal/host"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/pitr"
-	"github.com/qabas1/qabasone-cli/internal/replica"
-	"github.com/qabas1/qabasone-cli/internal/state"
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/backup"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/config"
+	"github.com/qabas1/qabas1-cli/internal/host"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/pitr"
+	"github.com/qabas1/qabas1-cli/internal/replica"
+	"github.com/qabas1/qabas1-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -307,7 +307,7 @@ func qabasContainers() []string {
 	if _, err := exec.LookPath("docker"); err != nil {
 		return nil
 	}
-	out, err := exec.Command("docker", "ps", "-a", "--filter", "name=^qabasone-", "--format", "{{.Names}}").Output()
+	out, err := exec.Command("docker", "ps", "-a", "--filter", "name=^qabas1-", "--format", "{{.Names}}").Output()
 	if err != nil {
 		return nil
 	}

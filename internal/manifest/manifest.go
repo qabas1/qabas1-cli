@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
 	"gopkg.in/yaml.v3"
 )
 

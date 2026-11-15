@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
 )
 
 func TestParseAndCompareLSN(t *testing.T) {

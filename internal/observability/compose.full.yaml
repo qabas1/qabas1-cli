@@ -7,8 +7,8 @@ x-logging: &logging
 
 services:
   loki:
-    image: ghcr.io/qabasone/vendor/grafana/loki:3.4.2
-    container_name: qabasone-loki
+    image: ghcr.io/qabas1/vendor/grafana/loki:3.4.2
+    container_name: qabas1-loki
     restart: unless-stopped
     logging: *logging
     # Image default user is non-root (10001).
@@ -40,8 +40,8 @@ services:
       start_period: 30s
 
   alloy:
-    image: ghcr.io/qabasone/vendor/grafana/alloy:v1.7.5
-    container_name: qabasone-alloy
+    image: ghcr.io/qabas1/vendor/grafana/alloy:v1.7.5
+    container_name: qabas1-alloy
     restart: unless-stopped
     logging: *logging
     # The image's alloy user; it owns /var/lib/alloy. No socket access needed (socket-proxy).
@@ -80,8 +80,8 @@ services:
       start_period: 30s
 
   grafana:
-    image: ghcr.io/qabasone/vendor/grafana/grafana:11.5.2
-    container_name: qabasone-grafana
+    image: ghcr.io/qabas1/vendor/grafana/grafana:11.5.2
+    container_name: qabas1-grafana
     restart: unless-stopped
     logging: *logging
     # Image default user is non-root (472).
@@ -137,5 +137,5 @@ volumes:
 networks:
   # Loki/Alloy/Grafana traffic; internal: no egress and no published ports.
   backend:
-    name: qabasone-logs-backend
+    name: qabas1-logs-backend
     internal: true

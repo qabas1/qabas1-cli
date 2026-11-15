@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/lease"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/replica"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/lease"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/replica"
 )
 
 // ctxExec behaves like nodeexec.Local: it fails once ctx is done, and scripts that
@@ -72,7 +72,7 @@ func TestRenewFailsClosedOnHungPeerProbe(t *testing.T) {
 	if time.Since(start) > 2*time.Second {
 		t.Fatalf("renew took %v", time.Since(start))
 	}
-	if !strings.Contains(hq.Files[e.Layout("hq").WriterFile()], `"writerNode": "hq"`) || !hq.Ran("default_transaction_read_only = on") || !hq.Ran("docker stop -t 2 qabasone-postgres qabasone-minio") {
+	if !strings.Contains(hq.Files[e.Layout("hq").WriterFile()], `"writerNode": "hq"`) || !hq.Ran("default_transaction_read_only = on") || !hq.Ran("docker stop -t 2 qabas1-postgres qabas1-minio") {
 		t.Fatal("writer was not fenced")
 	}
 	if len(res.Warnings) == 0 {
@@ -168,7 +168,7 @@ func TestPeerProbeQuotesConninfoForContainerShell(t *testing.T) {
 	inner := `read -r PGPASSWORD; export PGPASSWORD; exec psql -X -At ` +
 		nodeexec.Quote("host=10.66.0.2 port=5432 dbname=postgres user=qabas_replica sslmode=require gssencmode=disable connect_timeout=2") +
 		` -c ` + nodeexec.Quote(`SELECT pg_is_in_recovery(), (SELECT system_identifier FROM pg_control_system())`)
-	want := `docker exec -i qabasone-postgres sh -c ` + nodeexec.Quote(inner)
+	want := `docker exec -i qabas1-postgres sh -c ` + nodeexec.Quote(inner)
 	if hq.Scripts[0] != want {
 		t.Fatalf("probe must pass the full conninfo and SQL as one shell argument:\n%s", hq.Scripts[0])
 	}

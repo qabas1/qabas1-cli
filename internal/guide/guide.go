@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/hint"
+	"github.com/qabas1/qabas1-cli/internal/hint"
 )
 
 // Where a section's commands are run.

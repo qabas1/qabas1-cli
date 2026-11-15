@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 // Options control how the logs UI stack is started.
@@ -31,7 +31,7 @@ type URLs struct {
 	Loki    string `json:"loki,omitempty"`
 }
 
-// Status describes the qabasone-logs Compose project.
+// Status describes the qabas1-logs Compose project.
 type Status struct {
 	Running  bool         `json:"running"`
 	Full     bool         `json:"full"`
@@ -47,7 +47,7 @@ type ServiceRow struct {
 	Health  string `json:"health,omitempty"`
 }
 
-// Runtime drives the separate qabasone-logs Compose project.
+// Runtime drives the separate qabas1-logs Compose project.
 type Runtime struct {
 	Compose *compose.Runtime
 }
@@ -91,7 +91,7 @@ func (r *Runtime) Up(p paths.Paths, opt Options) (URLs, Credentials, error) {
 	return ResolveURLs(opt), cred, nil
 }
 
-// Down stops the qabasone-logs project.
+// Down stops the qabas1-logs project.
 func (r *Runtime) Down(p paths.Paths, wipe bool) error {
 	rt := r.docker()
 	if !rt.Available() {

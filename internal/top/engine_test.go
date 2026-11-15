@@ -115,7 +115,7 @@ func TestCollectServicesUsesEngine(t *testing.T) {
 	var queries []string
 	e := fakeEngine(engineHandler(t, &queries))
 	list := func(context.Context) ([]BaseService, error) {
-		return []BaseService{{Service: "api", Name: "qabasone-api", State: "running"}}, nil
+		return []BaseService{{Service: "api", Name: "qabas1-api", State: "running"}}, nil
 	}
 	docker := func(context.Context, ...string) ([]byte, error) {
 		t.Fatal("CLI must not be used when the engine works")
@@ -150,7 +150,7 @@ func TestCollectorCPUFromTwoEngineSamples(t *testing.T) {
 	}))
 	c := NewCollector(Sources{
 		Services: func(context.Context) ([]BaseService, error) {
-			return []BaseService{{Service: "api", Name: "qabasone-api", State: "running"}}, nil
+			return []BaseService{{Service: "api", Name: "qabas1-api", State: "running"}}, nil
 		},
 		Engine:     e,
 		NoPostgres: true,
@@ -172,9 +172,9 @@ func TestCollectServicesFallsBackToCLI(t *testing.T) {
 		return nil, errors.New("socket gone")
 	})}}
 	list := func(context.Context) ([]BaseService, error) {
-		return []BaseService{{Service: "api", Name: "qabasone-api", State: "running"}}, nil
+		return []BaseService{{Service: "api", Name: "qabas1-api", State: "running"}}, nil
 	}
-	sec := collectServices(context.Background(), list, fakeDocker(statsNDJSON, "/qabasone-api|1|2026-10-01T10:00:00Z"), broken, true)
+	sec := collectServices(context.Background(), list, fakeDocker(statsNDJSON, "/qabas1-api|1|2026-10-01T10:00:00Z"), broken, true)
 	if sec.Source != SourceCLI || sec.Err != "" || sec.Rows[0].CPUPercent != 12.5 {
 		t.Fatalf("got %+v", sec)
 	}
@@ -203,8 +203,8 @@ func TestNewEngineOverUnixSocket(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	stats, info, err := e.Collect(context.Background(), []string{"qabasone-api"}, false)
-	if err != nil || stats["qabasone-api"].MemBytes != 800 || info["qabasone-api"].Restarts != 3 {
+	stats, info, err := e.Collect(context.Background(), []string{"qabas1-api"}, false)
+	if err != nil || stats["qabas1-api"].MemBytes != 800 || info["qabas1-api"].Restarts != 3 {
 		t.Fatalf("stats %+v info %+v err %v", stats, info, err)
 	}
 	if _, err := NewEngine(context.Background(), filepath.Join(dir, "missing.sock")); err == nil {

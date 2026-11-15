@@ -6,8 +6,8 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/execx"
-	"github.com/qabas1/qabasone-cli/internal/interrupt"
+	"github.com/qabas1/qabas1-cli/internal/execx"
+	"github.com/qabas1/qabas1-cli/internal/interrupt"
 )
 
 func TestCommandNewProcessGroupOnlyInCriticalSection(t *testing.T) {

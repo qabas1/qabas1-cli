@@ -147,7 +147,7 @@ func targetPrepSection(f Facts, v Vars) Section {
 			{Text: "No QabasOne stack on this machine (do not run `qabas install` here). " +
 				"If one exists, its data is discarded by `replica add --rebuild`, or remove it first.",
 				Status:   check(f, stackOK, stackWhy),
-				Commands: []string{"docker ps -a --filter name=^qabasone-"}},
+				Commands: []string{"docker ps -a --filter name=^qabas1-"}},
 			hostKey,
 		},
 	}

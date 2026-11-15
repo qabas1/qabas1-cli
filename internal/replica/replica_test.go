@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
 const (
@@ -59,7 +59,7 @@ func newFixture(t *testing.T, preflight string) *fixture {
 		OnOut("wg pubkey", testPub).
 		OnOut("uname -m", "x86_64").
 		OnOut("{{if .State.Health}}", "healthy").
-		OnOut("docker ps -a --format '{{.Names}}'", "qabasone-api\n")
+		OnOut("docker ps -a --format '{{.Names}}'", "qabas1-api\n")
 	r := nodeexec.NewFake("dr1").
 		OnOut("diskfree_kb", preflight).
 		On("CREATE TABLE qabas_verify_write_probe", nodeexec.Result{ExitCode: 1, Stderr: "ERROR:  cannot execute CREATE TABLE in a read-only transaction"}).
@@ -68,9 +68,9 @@ func newFixture(t *testing.T, preflight string) *fixture {
 		OnOut("wg pubkey", testPub).
 		OnOut("{{if .State.Health}}", "healthy").
 		OnOut("health/dr", healthJSON).
-		OnOut("docker ps -a --format '{{.Names}}'", "qabasone-api\n").
-		OnOut("docker ps --format", "qabasone-api\nqabasone-postgres\nqabasone-minio").
-		OnOut("{{.Names}}|{{.Status}}", "qabasone-api|Up 2 minutes (healthy)\nqabasone-postgres|Up 3 minutes (healthy)\nqabasone-minio-init|Exited (0) 3 minutes ago")
+		OnOut("docker ps -a --format '{{.Names}}'", "qabas1-api\n").
+		OnOut("docker ps --format", "qabas1-api\nqabasone-postgres\nqabasone-minio").
+		OnOut("{{.Names}}|{{.Status}}", "qabas1-api|Up 2 minutes (healthy)\nqabasone-postgres|Up 3 minutes (healthy)\nqabasone-minio-init|Exited (0) 3 minutes ago")
 
 	eng := &Engine{
 		Paths: p, Cluster: c, Self: "hq",
@@ -297,7 +297,7 @@ func TestWriteHBAUsesPostgresContainerGateway(t *testing.T) {
 			return nodeexec.Result{Stdout: "172.21.0.0/16"}, true
 		case strings.Contains(script, ".State.Running"):
 			return nodeexec.Result{Stdout: "true"}, true
-		case strings.Contains(script, "docker exec -i qabasone-postgres"):
+		case strings.Contains(script, "docker exec -i qabas1-postgres"):
 			queryCount++
 			if queryCount == 1 {
 				return nodeexec.Result{Stdout: "t"}, true
@@ -333,7 +333,7 @@ func TestLinkStorageFailsFastWhenSourceMinIONetworkIsBlocked(t *testing.T) {
 	fx.eng.Cluster.Upsert(cluster.Node{Name: "dr1", Role: cluster.RoleStandby, WGIP: "10.66.0.2"})
 	w := &hookExec{Fake: fx.writer}
 	w.hook = func(script string) (nodeexec.Result, bool) {
-		if strings.Contains(script, "qabasone-minio") && strings.Contains(script, "docker inspect") {
+		if strings.Contains(script, "qabas1-minio") && strings.Contains(script, "docker inspect") {
 			return nodeexec.Result{ExitCode: 1, Stderr: "connection timed out"}, true
 		}
 		return nodeexec.Result{}, false

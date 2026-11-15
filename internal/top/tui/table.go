@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/top"
+	"github.com/qabas1/qabas1-cli/internal/top"
 )
 
 // SortKey orders the services pane.

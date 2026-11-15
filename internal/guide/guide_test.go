@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/hint"
-	"github.com/qabas1/qabasone-cli/internal/host"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/hint"
+	"github.com/qabas1/qabas1-cli/internal/host"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/state"
 )
 
 func fakeProbes(self string) Probes {
@@ -153,7 +153,7 @@ func TestReplicaOnSingleWarnsAboutRebuild(t *testing.T) {
 
 func TestReplicaBlockedChecks(t *testing.T) {
 	f := fixture(RoleFresh)
-	f.OS, f.Systemd, f.Stack = "darwin", false, []string{"qabasone-api", "qabasone-app", "qabasone-dash", "qabasone-postgres"}
+	f.OS, f.Systemd, f.Stack = "darwin", false, []string{"qabas1-api", "qabas1-app", "qabas1-dash", "qabas1-postgres"}
 	out := render(t, "replica", f, Overrides{})
 	mustContain(t, out, "[!!] Linux with systemd", "detected: os=darwin", "4 qabasone containers present")
 }

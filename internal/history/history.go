@@ -9,9 +9,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/clilog"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabas1-cli/internal/clilog"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/redact"
 )
 
 // history.jsonl is rotated into history.jsonl.N.gz once it reaches either cap.

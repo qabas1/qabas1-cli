@@ -3,7 +3,7 @@ package release
 import (
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
 )
 
 // AuthStatus is a redacted snapshot of configured credentials.

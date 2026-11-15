@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
 )
 
 // SelectOptions controls which backups Select returns for deletion.

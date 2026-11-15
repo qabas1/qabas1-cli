@@ -14,8 +14,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/termenv"
 
-	"github.com/qabas1/qabasone-cli/internal/sysinfo"
-	"github.com/qabas1/qabasone-cli/internal/top"
+	"github.com/qabas1/qabas1-cli/internal/sysinfo"
+	"github.com/qabas1/qabas1-cli/internal/top"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")
@@ -110,15 +110,15 @@ func fixture() top.Snapshot {
 			Threads: 275, Running: 1,
 		},
 		Services: top.ServicesSection{Rows: []top.Service{
-			{Service: "api", Name: "qabasone-api", State: "running", Health: "healthy", CPUPercent: 12.5,
+			{Service: "api", Name: "qabas1-api", State: "running", Health: "healthy", CPUPercent: 12.5,
 				MemBytes: 256 << 20, MemLimitBytes: 1 << 30, MemPercent: 25, NetRxPerSec: 2048, NetTxPerSec: 4096,
 				StartedAt: now.Add(-26 * time.Hour)},
-			{Service: "worker", Name: "qabasone-worker", State: "running", Health: "unhealthy", CPUPercent: 96,
+			{Service: "worker", Name: "qabas1-worker", State: "running", Health: "unhealthy", CPUPercent: 96,
 				MemBytes: 900 << 20, MemLimitBytes: 1 << 30, MemPercent: 87.9, BlockWPerSec: 1 << 20, Restarts: 4,
 				StartedAt: now.Add(-5 * time.Minute)},
-			{Service: "postgres", Name: "qabasone-postgres", State: "running", Health: "healthy", CPUPercent: 3.1,
+			{Service: "postgres", Name: "qabas1-postgres", State: "running", Health: "healthy", CPUPercent: 3.1,
 				MemBytes: 1 << 30, MemPercent: 12.5, StartedAt: now.Add(-72 * time.Hour)},
-			{Service: "notifications-dispatcher", Name: "qabasone-notifications-dispatcher", State: "running", CPUPercent: 0.4,
+			{Service: "notifications-dispatcher", Name: "qabas1-notifications-dispatcher", State: "running", CPUPercent: 0.4,
 				MemBytes: 48 << 20, MemPercent: 0.6, StartedAt: now.Add(-72 * time.Hour)},
 		}, Source: top.SourceEngine},
 		Postgres: &top.PostgresSection{

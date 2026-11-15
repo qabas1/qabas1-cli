@@ -145,13 +145,13 @@ func TestVolumeKeyForContainer(t *testing.T) {
 	if got := volumeKeyForContainer(MinioContainer); got != MinioVolumeKey {
 		t.Fatalf("got %q", got)
 	}
-	if got := volumeKeyForContainer("qabasone-e2e-minio"); got != MinioVolumeKey {
+	if got := volumeKeyForContainer("qabas1-e2e-minio"); got != MinioVolumeKey {
 		t.Fatalf("suffix got %q", got)
 	}
 	if got := volumeKeyForContainer(JSReportContainer); got != JSReportVolumeKey {
 		t.Fatalf("jsreport volume got %q", got)
 	}
-	if got := volumeKeyForContainer("qabasone-postgres"); got != "" {
+	if got := volumeKeyForContainer("qabas1-postgres"); got != "" {
 		t.Fatalf("postgres should have no mapping, got %q", got)
 	}
 }

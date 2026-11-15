@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
 )
 
 func setupServiceControlNode(t *testing.T, role nodestack.Profile) {

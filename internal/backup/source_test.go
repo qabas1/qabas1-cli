@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/backup"
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/backup"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/paths"
 	"gopkg.in/yaml.v3"
 )
 
@@ -230,7 +230,7 @@ func writeQabasWrapper(t *testing.T, dir, id string, withS3 bool) backup.Meta {
 	}
 	meta := backup.Meta{
 		ID:       id,
-		Database: backup.Part{Included: true, File: archRel, Engine: backup.EngineVPG, Container: "qabasone-postgres"},
+		Database: backup.Part{Included: true, File: archRel, Engine: backup.EngineVPG, Container: "qabas1-postgres"},
 		S3:       backup.Part{Included: withS3},
 		Verified: true,
 	}

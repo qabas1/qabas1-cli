@@ -6,13 +6,13 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/qabas1/qabasone-cli/internal/config"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/manifest"
-	"github.com/qabas1/qabasone-cli/internal/output"
-	"github.com/qabas1/qabasone-cli/internal/release"
-	"github.com/qabas1/qabasone-cli/internal/state"
-	"github.com/qabas1/qabasone-cli/internal/update"
+	"github.com/qabas1/qabas1-cli/internal/config"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/output"
+	"github.com/qabas1/qabas1-cli/internal/release"
+	"github.com/qabas1/qabas1-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/update"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +20,7 @@ func newReleaseCmd(f *flags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "release",
 		Short: "Manage QabasOne product releases",
-		Long:  "List and inspect product releases published in qabasone-deploy.",
+		Long:  "List and inspect product releases published in qabas1-deploy.",
 		Example: `  qabas release list
   qabas release ls
   qabas release show 2.8.0

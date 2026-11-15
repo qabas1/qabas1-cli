@@ -15,15 +15,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
-	"github.com/qabas1/qabasone-cli/internal/pgctl"
-	"github.com/qabas1/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/pgctl"
+	"github.com/qabas1/qabas1-cli/internal/redact"
 )
 
 const (
 	Slot          = "qabas_wal_archive"
-	Container     = "qabasone-wal-archiver"
+	Container     = "qabas1-wal-archiver"
 	EnvFile       = ".env.pitr"
 	dataNetwork   = "qabasone_qabasone_data"
 	testContainer = "qabas-pitr-restore-test"

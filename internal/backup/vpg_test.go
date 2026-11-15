@@ -9,18 +9,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/backup"
-	"github.com/qabas1/qabasone-cli/internal/compose"
-	"github.com/qabas1/qabasone-cli/internal/exitcode"
-	"github.com/qabas1/qabasone-cli/internal/paths"
-	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabas1-cli/internal/backup"
+	"github.com/qabas1/qabas1-cli/internal/compose"
+	"github.com/qabas1/qabas1-cli/internal/exitcode"
+	"github.com/qabas1/qabas1-cli/internal/paths"
+	"github.com/qabas1/qabas1-cli/internal/state"
 	"gopkg.in/yaml.v3"
 )
 
 func TestBackupArgs(t *testing.T) {
 	args := backup.BackupArgsForTest(backup.BackupOpts{
 		OutputDir:            "/srv/backups/postgres",
-		Container:            "qabasone-postgres",
+		Container:            "qabas1-postgres",
 		Username:             "qabasone",
 		MaintenanceDB:        "qabasone",
 		Archive:              true,
@@ -28,7 +28,7 @@ func TestBackupArgs(t *testing.T) {
 	})
 	want := []string{
 		"backup", "/srv/backups/postgres",
-		"--container", "qabasone-postgres",
+		"--container", "qabas1-postgres",
 		"--username", "qabasone",
 		"--maintenance-db", "qabasone",
 		"--password-stdin",
@@ -41,11 +41,11 @@ func TestBackupArgs(t *testing.T) {
 }
 
 func TestRestoreArgsForce(t *testing.T) {
-	args := backup.RestoreArgsForTest("./backup.tar.gz", "qabasone-postgres", true)
+	args := backup.RestoreArgsForTest("./backup.tar.gz", "qabas1-postgres", true)
 	if !contains(args, "--force") {
 		t.Fatalf("expected --force in %#v", args)
 	}
-	argsNo := backup.RestoreArgsForTest("./backup.tar.gz", "qabasone-postgres", false)
+	argsNo := backup.RestoreArgsForTest("./backup.tar.gz", "qabas1-postgres", false)
 	if contains(argsNo, "--force") {
 		t.Fatalf("unexpected --force in %#v", argsNo)
 	}
@@ -64,7 +64,7 @@ func TestClientRequireMissing(t *testing.T) {
 	}
 	err := c.Backup(backup.BackupOpts{
 		OutputDir: "/tmp/out",
-		Container: "qabasone-postgres",
+		Container: "qabas1-postgres",
 		Username:  "qabasone",
 		Password:  "x",
 		Archive:   true,
@@ -289,7 +289,7 @@ func TestMetaRoundTripEngine(t *testing.T) {
 		ID:              "qb-20260903-120000",
 		QabasOneRelease: "1.0.0",
 		CreatedAt:       time.Date(2026, 9, 3, 12, 0, 0, 0, time.UTC),
-		Database:        backup.Part{Included: true, File: "postgres/x.tar.gz", Engine: backup.EngineVPG, Container: "qabasone-postgres"},
+		Database:        backup.Part{Included: true, File: "postgres/x.tar.gz", Engine: backup.EngineVPG, Container: "qabas1-postgres"},
 		S3:              backup.Part{Included: false},
 		Verified:        true,
 		Checksum:        "sha256:abc",
@@ -309,7 +309,7 @@ func TestMetaRoundTripEngine(t *testing.T) {
 	if err := yaml.Unmarshal(raw, &got); err != nil {
 		t.Fatal(err)
 	}
-	if got.Database.Engine != backup.EngineVPG || got.Database.File != "postgres/x.tar.gz" || got.Database.Container != "qabasone-postgres" {
+	if got.Database.Engine != backup.EngineVPG || got.Database.File != "postgres/x.tar.gz" || got.Database.Container != "qabas1-postgres" {
 		t.Fatalf("got %+v", got.Database)
 	}
 
@@ -338,7 +338,7 @@ func TestRestoreWithVPGCallsForce(t *testing.T) {
 	}
 	meta := backup.Meta{
 		ID:       id,
-		Database: backup.Part{Included: true, File: archRel, Engine: backup.EngineVPG, Container: "qabasone-postgres"},
+		Database: backup.Part{Included: true, File: archRel, Engine: backup.EngineVPG, Container: "qabas1-postgres"},
 		S3:       backup.Part{Included: false},
 		Verified: true,
 	}
@@ -374,7 +374,7 @@ func TestRestoreWithVPGCallsForce(t *testing.T) {
 	if len(gotArgs) < 2 || gotArgs[0] != "restore" {
 		t.Fatalf("args %#v", gotArgs)
 	}
-	if !contains(gotArgs, "--force") || !contains(gotArgs, "qabasone-postgres") {
+	if !contains(gotArgs, "--force") || !contains(gotArgs, "qabas1-postgres") {
 		t.Fatalf("args %#v", gotArgs)
 	}
 }

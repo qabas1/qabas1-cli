@@ -4,7 +4,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/qabas1/qabasone-cli/internal/execx"
+	"github.com/qabas1/qabas1-cli/internal/execx"
 )
 
 func TestCommandRunnable(t *testing.T) {

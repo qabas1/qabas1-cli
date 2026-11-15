@@ -12,11 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabas1/qabasone-cli/internal/cluster"
-	"github.com/qabas1/qabasone-cli/internal/minioctl"
-	"github.com/qabas1/qabasone-cli/internal/nodeexec"
-	"github.com/qabas1/qabasone-cli/internal/nodestack"
-	"github.com/qabas1/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabas1-cli/internal/cluster"
+	"github.com/qabas1/qabas1-cli/internal/minioctl"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
+	"github.com/qabas1/qabas1-cli/internal/redact"
 )
 
 const mcEnvFile = "/run/qabas/mc.env"
@@ -139,7 +139,7 @@ func (e *Engine) LinkStorage(ctx context.Context, src, dest string, priority int
 	e.logf("    replication checking MinIO path %s -> %s", src, dest)
 	pathCtx, cancel := context.WithTimeout(ctx, 6*time.Second)
 	path := checkContainerPath(pathCtx, source, PathCheck{
-		Node: src, Service: "minio", Container: "qabasone-minio",
+		Node: src, Service: "minio", Container: "qabas1-minio",
 		Destination: net.JoinHostPort(d.WGIP, "9000"),
 	}, d.WGIP, "9000")
 	cancel()
