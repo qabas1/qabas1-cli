@@ -28,7 +28,7 @@ func TestMaterializeWritesComposeAndConfig(t *testing.T) {
 		filepath.Join(p.LogsUIDir(), "config", "loki-config.yaml"),
 		filepath.Join(p.LogsUIDir(), "config", "dozzle", "users.yml"),
 		filepath.Join(p.LogsUIDir(), "config", "grafana", "provisioning", "datasources", "loki.yaml"),
-		filepath.Join(p.LogsUIDir(), "config", "grafana", "provisioning", "dashboards", "json", "qabas1-logs.json"),
+		filepath.Join(p.LogsUIDir(), "config", "grafana", "provisioning", "dashboards", "json", "qabasone-logs.json"),
 	}
 	for _, f := range want {
 		if _, err := os.Stat(f); err != nil {

@@ -25,9 +25,9 @@ NAME                                                                            
 dr1                                                                                                                       10.8.0.2         streaming    async        0s    4.0 KiB   64.0 MiB reserved  
                                                                                                                                                                                                         
  4 Findings  1 critical · 3 warning                                                                                                                                                                     
-CRIT service:worker qabas1-worker is unhealthy                                                                                                                                                        
-WARN service:worker qabas1-worker restarted 4 times (possible restart loop)                                                                                                                           
-WARN service:worker qabas1-worker at 96% CPU                                                                                                                                                          
+CRIT service:worker qabas1-worker is unhealthy                                                                                                                                                          
+WARN service:worker qabas1-worker restarted 4 times (possible restart loop)                                                                                                                             
+WARN service:worker qabas1-worker at 96% CPU                                                                                                                                                            
 WARN postgres:query pid 4242 running for 7m                                                                                                                                                             
                                                                                                                                                                                                         
                                                                                                                                                                                                         

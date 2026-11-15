@@ -158,7 +158,7 @@ func TestLatestDevFromGHCRNormalizesNonSemverComponentVersions(t *testing.T) {
 	if rel.Components.API.Version != rel.Release.Version {
 		t.Fatalf("api version %q release %q", rel.Components.API.Version, rel.Release.Version)
 	}
-	if rel.Components.API.Image != "ghcr.io/qabas1/qabas1-api:dev-latest" {
+	if rel.Components.API.Image != "ghcr.io/qabasone/qabas1-api:dev-latest" {
 		t.Fatalf("api image %q", rel.Components.API.Image)
 	}
 	if err := rel.CheckCompatibility(); err != nil {

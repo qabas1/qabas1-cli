@@ -249,11 +249,6 @@ func (s *server) handle(c net.Conn) {
 	if !ok {
 		return
 	}
-	if _, err := io.WriteString(c, "OK\n"); err != nil {
-		return
-	}
-	_ = c.SetDeadline(time.Time{})
-
 	s.mu.Lock()
 	if old := s.active[node]; old != nil {
 		_ = old.Close()
@@ -267,6 +262,10 @@ func (s *server) handle(c net.Conn) {
 		}
 		s.mu.Unlock()
 	}()
+	if _, err := io.WriteString(c, "OK\n"); err != nil {
+		return
+	}
+	_ = c.SetDeadline(time.Time{})
 
 	u, err := net.DialUDP("udp", nil, s.wg)
 	if err != nil {
