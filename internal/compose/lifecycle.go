@@ -85,8 +85,14 @@ func (r *Runtime) ScaleAPI(p paths.Paths, env []string, replicas int) error {
 }
 
 func (r *Runtime) APIContainerIDs(p paths.Paths, env []string) ([]string, error) {
+	return r.ServiceContainerIDs(p, env, "api")
+}
+
+// ServiceContainerIDs resolves running containers through Compose, avoiding
+// assumptions about container_name or operator-configured prefixes.
+func (r *Runtime) ServiceContainerIDs(p paths.Paths, env []string, service string) ([]string, error) {
 	var out, stderr bytes.Buffer
-	if err := r.dockerOut(p, env, []string{"ps", "-q", "api"}, &out, &stderr); err != nil {
+	if err := r.dockerOut(p, env, []string{"ps", "-q", service}, &out, &stderr); err != nil {
 		return nil, err
 	}
 	return strings.Fields(out.String()), nil

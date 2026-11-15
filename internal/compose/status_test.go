@@ -217,7 +217,7 @@ func TestComposeFileOverrideForBackup(t *testing.T) {
 	p := paths.Paths{ConfigDir: t.TempDir(), StateDir: t.TempDir()}
 	rt := &Runtime{
 		ComposeFileOverride: p.ComposeFileNext(),
-		LookPath: func(string) (string, error) { return "/usr/bin/docker", nil },
+		LookPath:            func(string) (string, error) { return "/usr/bin/docker", nil },
 		Run: func(_ string, args []string, _ []string, _, _ *bytes.Buffer) error {
 			calls = append(calls, append([]string(nil), args...))
 			return nil
@@ -257,6 +257,24 @@ func TestDownServiceStopsAndRemovesService(t *testing.T) {
 	}
 	if !reflect.DeepEqual(calls, want) {
 		t.Fatalf("compose calls mismatch\n got: %#v\nwant: %#v", calls, want)
+	}
+}
+
+func TestServiceContainerIDsUsesComposeService(t *testing.T) {
+	p := paths.Paths{ConfigDir: t.TempDir(), StateDir: t.TempDir()}
+	rt := &Runtime{
+		LookPath: func(string) (string, error) { return "/usr/bin/docker", nil },
+		Run: func(_ string, args []string, _ []string, stdout, _ *bytes.Buffer) error {
+			if !reflect.DeepEqual(args, []string{"compose", "--project-name", "qabasone", "-f", p.ComposeFile(), "ps", "-q", "gateway"}) {
+				t.Fatalf("docker args = %v", args)
+			}
+			stdout.WriteString("abc123\n")
+			return nil
+		},
+	}
+	ids, err := rt.ServiceContainerIDs(p, nil, "gateway")
+	if err != nil || !reflect.DeepEqual(ids, []string{"abc123"}) {
+		t.Fatalf("ids=%v err=%v", ids, err)
 	}
 }
 

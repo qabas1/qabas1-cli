@@ -106,7 +106,11 @@ func checkAPIRouting(e *env) error {
 	if _, err := os.Stat(filepath.Join(e.Paths.ComposeDir(), "compose.gateway.yaml")); err != nil {
 		return fmt.Errorf("run 'qabas gateway apply' before API scaling")
 	}
-	out, err := exec.Command("docker", "exec", gatewayContainer(e), "nginx", "-T", "-c", "/etc/qabas-gateway/nginx.conf").CombinedOutput()
+	id, err := installedGatewayContainerID(e)
+	if err != nil {
+		return err
+	}
+	out, err := exec.Command("docker", "exec", id, "nginx", "-T", "-c", "/etc/qabas-gateway/nginx.conf").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("cannot verify QabasOne gateway routing: %w", err)
 	}

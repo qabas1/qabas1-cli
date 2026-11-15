@@ -154,20 +154,28 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 		if err := e.Runtime.LoginGHCR(release.GHCRUsername(), release.GHCRToken()); err != nil {
 			return err
 		}
-		if scoped {
-			services := plan.PullServices
-			if len(services) == 0 {
-				services = compose.DeployComposeServices(plan.Service)
+		return retryPull(func() error {
+			if scoped {
+				services := plan.PullServices
+				if len(services) == 0 {
+					services = compose.DeployComposeServices(plan.Service)
+				}
+				return e.Runtime.PullServices(e.Paths, env, services...)
 			}
-			return e.Runtime.PullServices(e.Paths, env, services...)
-		}
-		if plan.PullAll {
-			return e.Runtime.PullFile(e.Paths, e.Paths.ComposeFileNext(), env)
-		}
-		if len(plan.PullServices) == 0 {
-			return nil
-		}
-		return e.Runtime.PullFileServices(e.Paths, e.Paths.ComposeFileNext(), env, plan.PullServices...)
+			if plan.PullAll {
+				return e.Runtime.PullFile(e.Paths, e.Paths.ComposeFileNext(), env)
+			}
+			if len(plan.PullServices) == 0 {
+				return nil
+			}
+			return e.Runtime.PullFileServices(e.Paths, e.Paths.ComposeFileNext(), env, plan.PullServices...)
+		}, func(attempt int, delay time.Duration) error {
+			e.Out.Warnf("image pull failed; retrying (%d/3) in %s. Docker retains completed layers", attempt+1, delay)
+			timer := time.NewTimer(delay)
+			defer timer.Stop()
+			<-timer.C
+			return interrupt.Check()
+		})
 	})
 	if err != nil {
 		return err
@@ -286,6 +294,24 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 		}
 		return nil
 	})
+}
+
+// Docker retains successfully downloaded layers between attempts. Retrying the
+// same Compose pull recovers from transient registry and network resets.
+func retryPull(pull func() error, wait func(int, time.Duration) error) error {
+	for attempt := 0; attempt < 3; attempt++ {
+		err := pull()
+		if err == nil {
+			return nil
+		}
+		if attempt == 2 {
+			return fmt.Errorf("image pull failed after 3 attempts: %w", err)
+		}
+		if err := wait(attempt, time.Duration(1<<attempt)*3*time.Second); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (e *Engine) abortIfInterrupted(opt Options, plan *Plan, backupID, afterPhase string) error {

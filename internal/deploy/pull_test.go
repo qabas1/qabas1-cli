@@ -1,12 +1,38 @@
 package deploy
 
 import (
+	"errors"
 	"reflect"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/qabas1/qabas1-cli/internal/compose"
 	"github.com/qabas1/qabas1-cli/internal/manifest"
 )
+
+func TestRetryPullResumesAfterTransientFailure(t *testing.T) {
+	attempts := 0
+	var delays []time.Duration
+	err := retryPull(func() error {
+		attempts++
+		if attempts < 3 {
+			return errors.New("connection reset by peer")
+		}
+		return nil
+	}, func(_ int, delay time.Duration) error { delays = append(delays, delay); return nil })
+	if err != nil || attempts != 3 || !reflect.DeepEqual(delays, []time.Duration{3 * time.Second, 6 * time.Second}) {
+		t.Fatalf("err=%v attempts=%d delays=%v", err, attempts, delays)
+	}
+}
+
+func TestRetryPullStopsAfterBound(t *testing.T) {
+	attempts := 0
+	err := retryPull(func() error { attempts++; return errors.New("connection reset by peer") }, func(int, time.Duration) error { return nil })
+	if attempts != 3 || err == nil || !strings.Contains(err.Error(), "after 3 attempts") {
+		t.Fatalf("err=%v attempts=%d", err, attempts)
+	}
+}
 
 func baseRelease(api, app, dash, siraj string) *manifest.Release {
 	return &manifest.Release{

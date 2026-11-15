@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/qabas1/qabas1-cli/internal/compose"
 	"github.com/qabas1/qabas1-cli/internal/config"
 	"github.com/qabas1/qabas1-cli/internal/nodestack"
 	"github.com/qabas1/qabas1-cli/internal/release"
@@ -17,13 +18,23 @@ import (
 
 func gatewayDir(e *env) string { return filepath.Join(e.Paths.ConfigDir, "gateway") }
 
-func gatewayContainer(e *env) string {
-	b, _ := os.ReadFile(e.Paths.EnvCompose())
-	prefix := nodestack.ParseEnv(b)["QABAS_CONTAINER_PREFIX"]
-	if prefix == "" {
-		prefix = "qabasone"
+func gatewayContainerID(e *env, serviceEnv []string) (string, error) {
+	ids, err := newRuntime().ServiceContainerIDs(e.Paths, serviceEnv, "gateway")
+	if err != nil {
+		return "", err
 	}
-	return prefix + "-gateway"
+	if len(ids) != 1 {
+		return "", fmt.Errorf("gateway: expected one running Compose container, found %d", len(ids))
+	}
+	return ids[0], nil
+}
+
+func installedGatewayContainerID(e *env) (string, error) {
+	st, err := state.Load(e.Paths)
+	if err != nil {
+		return "", err
+	}
+	return gatewayContainerID(e, compose.EnvForInstalledRelease(e.Paths, st.CurrentRelease))
 }
 
 func gatewayConfig(domains config.Domains, trade string) (string, error) {
@@ -204,11 +215,15 @@ func applyGateway(e *env) error {
 	} else if err := rt.UpService(e.Paths, serviceEnv, "gateway", false, true); err != nil {
 		return err
 	}
-	out, err := exec.Command("docker", "exec", gatewayContainer(e), "nginx", "-t", "-c", "/etc/qabas-gateway/nginx.conf").CombinedOutput()
+	id, err := gatewayContainerID(e, serviceEnv)
+	if err != nil {
+		return err
+	}
+	out, err := exec.Command("docker", "exec", id, "nginx", "-t", "-c", "/etc/qabas-gateway/nginx.conf").CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("gateway config: %w: %s", err, out)
 	}
-	_, err = exec.Command("docker", "exec", gatewayContainer(e), "nginx", "-c", "/etc/qabas-gateway/nginx.conf", "-s", "reload").CombinedOutput()
+	_, err = exec.Command("docker", "exec", id, "nginx", "-c", "/etc/qabas-gateway/nginx.conf", "-s", "reload").CombinedOutput()
 	return err
 }
 
