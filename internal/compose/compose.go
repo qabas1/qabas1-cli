@@ -16,6 +16,9 @@ import (
 )
 
 type Runtime struct {
+	// ComposeFileOverride is used by pre-deploy backup when the installed
+	// compose file is missing but a replacement has been validated and staged.
+	ComposeFileOverride string
 	LookPath func(string) (string, error)
 	Run      func(name string, args []string, env []string, stdout, stderr *bytes.Buffer) error
 	RunIO    func(name string, args []string, env []string, stdin io.Reader, stdout io.Writer, stderr io.Writer) error
@@ -153,7 +156,14 @@ func EnvForInstalledReleaseChecked(p paths.Paths, version string) ([]string, err
 const ProjectName = "qabasone"
 
 func (r *Runtime) composeArgs(p paths.Paths, extra ...string) []string {
-	return r.composeArgsFile(p, p.ComposeFile(), extra...)
+	return r.composeArgsFile(p, r.composeFile(p), extra...)
+}
+
+func (r *Runtime) composeFile(p paths.Paths) string {
+	if r.ComposeFileOverride != "" {
+		return r.ComposeFileOverride
+	}
+	return p.ComposeFile()
 }
 
 func (r *Runtime) composeArgsFile(p paths.Paths, composeFile string, extra ...string) []string {
@@ -184,7 +194,7 @@ func (r *Runtime) docker(p paths.Paths, env []string, extra ...string) error {
 }
 
 func (r *Runtime) dockerOut(p paths.Paths, env []string, extra []string, stdout, stderr *bytes.Buffer) error {
-	return r.dockerOutFile(p, p.ComposeFile(), env, extra, stdout, stderr)
+	return r.dockerOutFile(p, r.composeFile(p), env, extra, stdout, stderr)
 }
 
 func (r *Runtime) dockerOutFile(p paths.Paths, composeFile string, env []string, extra []string, stdout, stderr *bytes.Buffer) error {

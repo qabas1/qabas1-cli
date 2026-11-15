@@ -212,6 +212,30 @@ func TestPullFileServicesBuildsComposeArgs(t *testing.T) {
 	}
 }
 
+func TestComposeFileOverrideForBackup(t *testing.T) {
+	var calls [][]string
+	p := paths.Paths{ConfigDir: t.TempDir(), StateDir: t.TempDir()}
+	rt := &Runtime{
+		ComposeFileOverride: p.ComposeFileNext(),
+		LookPath: func(string) (string, error) { return "/usr/bin/docker", nil },
+		Run: func(_ string, args []string, _ []string, _, _ *bytes.Buffer) error {
+			calls = append(calls, append([]string(nil), args...))
+			return nil
+		},
+	}
+	if err := rt.EnsureServiceCreated(p, nil, "postgres"); err != nil {
+		t.Fatal(err)
+	}
+	if err := rt.Start(p, nil, "postgres"); err != nil {
+		t.Fatal(err)
+	}
+	for _, args := range calls {
+		if len(args) < 5 || args[4] != p.ComposeFileNext() {
+			t.Fatalf("backup must use staged compose: %v", args)
+		}
+	}
+}
+
 func TestDownServiceStopsAndRemovesService(t *testing.T) {
 	var calls [][]string
 	rt := &Runtime{

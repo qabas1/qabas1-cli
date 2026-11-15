@@ -298,6 +298,9 @@ func runDeploy(f *flags, opt deploy.Options) error {
 		}
 		backupFn := func() (string, error) {
 			rt := compose.NewRuntime()
+			if _, err := os.Stat(e.Paths.ComposeFile()); os.IsNotExist(err) && plan.Service == "" {
+				rt.ComposeFileOverride = e.Paths.ComposeFileNext()
+			}
 			var rel *manifest.Release
 			if plan.Target != nil {
 				rel = plan.Target
