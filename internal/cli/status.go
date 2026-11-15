@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -241,6 +242,15 @@ func newPsCmd(f *flags) *cobra.Command {
 			e := load(f)
 			st, err := state.Load(e.Paths)
 			if err != nil {
+				return err
+			}
+			if _, err := os.Stat(e.Paths.ComposeFile()); os.IsNotExist(err) && !st.Installed() {
+				if f.JSON {
+					return e.Out.Encode(map[string]any{"installed": false, "services": []any{}})
+				}
+				fmt.Fprintln(cmd.OutOrStdout(), "QabasOne is not installed; no Compose services to show.")
+				return nil
+			} else if err != nil {
 				return err
 			}
 			env := compose.EnvForInstalledRelease(e.Paths, st.CurrentRelease)
