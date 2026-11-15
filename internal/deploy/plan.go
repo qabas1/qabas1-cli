@@ -403,7 +403,7 @@ func (e *Engine) resolveDevTarget() (*manifest.Release, error) {
 	if e.Client != nil {
 		httpClient = e.Client.HTTP
 	}
-	rel, err := resolve(httpClient, "qabasone", release.GHCRUsername(), release.GHCRToken())
+	rel, err := resolve(httpClient, e.registryOwner(), release.GHCRUsername(), release.GHCRToken())
 	if err != nil {
 		return nil, err
 	}
@@ -420,7 +420,7 @@ func (e *Engine) resolveDevComponent(service string) (manifest.Component, error)
 	if e.Client != nil {
 		httpClient = e.Client.HTTP
 	}
-	return resolve(httpClient, "qabasone", service, release.GHCRUsername(), release.GHCRToken())
+	return resolve(httpClient, e.registryOwner(), service, release.GHCRUsername(), release.GHCRToken())
 }
 
 func (e *Engine) resolveComponent(service, spec string) (manifest.Component, error) {
@@ -432,7 +432,19 @@ func (e *Engine) resolveComponent(service, spec string) (manifest.Component, err
 	if e.Client != nil {
 		client = e.Client.HTTP
 	}
-	return resolve(client, "qabasone", service, spec, release.GHCRUsername(), release.GHCRToken())
+	return resolve(client, e.registryOwner(), service, spec, release.GHCRUsername(), release.GHCRToken())
+}
+
+func (e *Engine) registryOwner() string {
+	if owner := strings.TrimSpace(os.Getenv("QABAS_GHCR_OWNER")); owner != "" {
+		return owner
+	}
+	if e.Client != nil {
+		if owner, _, ok := strings.Cut(e.Client.Repo, "/"); ok && owner != "" {
+			return owner
+		}
+	}
+	return "qabas1"
 }
 
 func promoteDevTarget(target *manifest.Release, current string, now time.Time) {

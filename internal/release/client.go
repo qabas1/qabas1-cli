@@ -32,7 +32,7 @@ type Client struct {
 
 func New(repo, ref string) *Client {
 	if repo == "" {
-		repo = "qabasone/qabas1-deploy"
+		repo = "qabas1/qabas1-deploy"
 	}
 	if ref == "" {
 		ref = "main"

@@ -38,7 +38,7 @@ func (r *Runtime) LoginGHCR(username, token string) error {
 	if err := login(ghcrRegistry, username, token); err != nil {
 		return exitcode.New(exitcode.Network,
 			"docker login %s failed: %v\n\n"+
-				"Ensure the token has read:packages and is authorized for the qabasone org (SSO).\n"+
+				"Ensure the token has read:packages and is authorized for the GHCR organization (SSO).\n"+
 				"Reconfigure: sudo -E qabas auth login",
 			ghcrRegistry, err)
 	}

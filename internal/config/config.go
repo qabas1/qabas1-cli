@@ -101,7 +101,7 @@ func Default() Config {
 		Channel: "stable",
 		Backup:  Backup{Destination: "local", Schedule: DefaultSchedule()},
 		Deploy: Deploy{
-			Repo: envOr("QABAS_DEPLOY_REPO", "qabasone/qabas1-deploy"),
+			Repo: envOr("QABAS_DEPLOY_REPO", "qabas1/qabas1-deploy"),
 			Ref:  envOr("QABAS_DEPLOY_REF", "main"),
 		},
 	}
@@ -124,6 +124,11 @@ func Load(p paths.Paths) (Config, error) {
 	}
 	if v := os.Getenv("QABAS_DEPLOY_REF"); v != "" {
 		cfg.Deploy.Ref = v
+	}
+	// Repair the old default persisted by earlier CLI versions. Explicit custom
+	// repositories remain untouched.
+	if cfg.Deploy.Repo == "qabasone/qabas1-deploy" {
+		cfg.Deploy.Repo = "qabas1/qabas1-deploy"
 	}
 	return cfg, nil
 }

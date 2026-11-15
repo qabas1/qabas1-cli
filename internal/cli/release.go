@@ -4,15 +4,21 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
+	"strings"
 
+	"github.com/qabas1/qabas1-cli/internal/autopilot"
+	"github.com/qabas1/qabas1-cli/internal/backup"
+	"github.com/qabas1/qabas1-cli/internal/compose"
 	"github.com/qabas1/qabas1-cli/internal/config"
 	"github.com/qabas1/qabas1-cli/internal/exitcode"
 	"github.com/qabas1/qabas1-cli/internal/manifest"
+	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/observability"
 	"github.com/qabas1/qabas1-cli/internal/output"
 	"github.com/qabas1/qabas1-cli/internal/release"
 	"github.com/qabas1/qabas1-cli/internal/state"
-	"github.com/qabas1/qabas1-cli/internal/update"
 	"github.com/spf13/cobra"
 )
 
@@ -163,7 +169,11 @@ func newReleaseLatestCmd(f *flags) *cobra.Command {
 			client := release.New(cfg.Deploy.Repo, cfg.Deploy.Ref)
 			var rel *manifest.Release
 			if ch == "dev" {
-				rel, err = release.LatestDevFromGHCR(client.HTTP, "qabasone", release.GHCRUsername(), release.GHCRToken())
+				owner, _, _ := strings.Cut(client.Repo, "/")
+				if v := os.Getenv("QABAS_GHCR_OWNER"); v != "" {
+					owner = v
+				}
+				rel, err = release.LatestDevFromGHCR(client.HTTP, owner, release.GHCRUsername(), release.GHCRToken())
 			} else {
 				rel, err = client.Latest(ch)
 			}
@@ -182,44 +192,100 @@ func newReleaseLatestCmd(f *flags) *cobra.Command {
 func newUninstallCmd(f *flags) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "uninstall",
-		Short:   "Uninstall the qabas CLI package",
-		Long:    "Uninstall the qabas CLI package from the host. This does not remove QabasOne services, data, backups, or configuration.",
+		Short:   "Completely remove the installed QabasOne system",
+		Long:    "Stop and remove QabasOne containers, named volumes, schedules, configuration, secrets, state, backups, and logs. The qabas CLI remains installed. This permanently deletes local product data.",
 		Example: `  sudo qabas uninstall`,
+		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if runtime.GOOS == "windows" {
-				how, err := update.UninstallInstructions()
-				if err != nil {
-					return exitcode.Wrap(exitcode.Generic, err)
-				}
-				e := load(f)
-				e.Out.Println("qabas does not remove itself on Windows. To uninstall the CLI, run (elevated PowerShell for MSI installs):")
-				e.Out.Println("  " + how)
-				e.Out.Println("QabasOne services, data, backups, and configuration under " + e.Paths.ConfigDir + " are left in place.")
-				return nil
-			}
 			if runtime.GOOS != "linux" {
-				return exitcode.NewHint(exitcode.InvalidInput,
-					"remove the qabas package using your operating system package manager",
-					"automatic package uninstall is only supported on Linux")
+				return exitcode.New(exitcode.InvalidInput, "system uninstall is currently supported on Linux")
 			}
-			if _, err := exec.LookPath("apt"); err != nil {
-				return exitcode.NewHint(exitcode.InvalidInput,
-					"run your distro package manager, for example: sudo apt remove qabas",
-					"apt is not installed")
+			e := load(f)
+			p := e.Paths
+			st, err := state.Load(p)
+			if err != nil {
+				return err
+			}
+			for _, dir := range []string{p.ConfigDir, p.StateDir, p.LogDir} {
+				if dir == "" || dir == "/" || dir == "." {
+					return exitcode.New(exitcode.InvalidInput, "unsafe uninstall path %q", dir)
+				}
+				if filepath.Clean(dir) != dir {
+					return exitcode.New(exitcode.InvalidInput, "unclean uninstall path %q", dir)
+				}
 			}
 			if f.DryRun {
-				load(f).Out.Println("would run: apt remove qabas")
+				e.Out.Printf("Would stop and remove Compose project %s with volumes, remove QabasOne schedules, then delete %s, %s, and %s. The qabas CLI remains installed.\n", compose.ProjectName, p.ConfigDir, p.StateDir, p.LogDir)
 				return nil
 			}
-			apt := exec.Command("apt", "remove", "qabas")
-			apt.Stdin = os.Stdin
-			apt.Stdout = os.Stdout
-			apt.Stderr = os.Stderr
-			if err := apt.Run(); err != nil {
-				return exitcode.New(exitcode.Generic, "apt remove qabas: %w", err)
+			if err := requireRoot(); err != nil {
+				return err
 			}
+			if err := e.confirm("Permanently delete the QabasOne system and local data? The qabas CLI will remain installed. Continue?"); err != nil {
+				return err
+			}
+			if _, err := os.Stat(p.ComposeFile()); err == nil {
+				if err := compose.NewRuntime().Down(p, compose.EnvForInstalledRelease(p, st.CurrentRelease), true); err != nil {
+					return err
+				}
+			} else if !os.IsNotExist(err) {
+				return err
+			}
+			if _, err := os.Stat(p.LogsUIDir()); err == nil {
+				if err := observability.NewRuntime().Down(p, true); err != nil {
+					return err
+				}
+			} else if !os.IsNotExist(err) {
+				return err
+			}
+			if err := autopilot.NewScheduler().Remove(cmdContext(cmd)); err != nil {
+				return err
+			}
+			if err := backup.RemoveScheduleTimer(cmdContext(cmd), &nodeexec.Local{Name: "local"}); err != nil {
+				return err
+			}
+			if err := removeOtherQabasUnits(); err != nil {
+				return err
+			}
+			for _, dir := range []string{p.ConfigDir, p.StateDir, p.LogDir} {
+				if err := os.RemoveAll(dir); err != nil {
+					return err
+				}
+			}
+			e.Out.Println("QabasOne system removed. The qabas CLI remains installed.")
 			return nil
 		},
 	}
 	return cmd
+}
+
+// Remove only known product units; the qabas package and its files stay installed.
+func removeOtherQabasUnits() error {
+	units := []string{
+		"qabas-pitr-base.timer", "qabas-pitr-base.service",
+		"qabas-autoscale.timer", "qabas-autoscale.service",
+		"qabas-dr-lease.timer", "qabas-dr-lease.service",
+		"qabas-dr-check.timer", "qabas-dr-check.service",
+		"qabas-relay.service", "qabas-relay-client.service",
+	}
+	changed := false
+	for _, name := range units {
+		path := filepath.Join("/etc/systemd/system", name)
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			continue
+		} else if err != nil {
+			return err
+		}
+		_ = exec.Command("systemctl", "disable", "--now", name).Run()
+		if err := os.Remove(path); err != nil {
+			return err
+		}
+		changed = true
+	}
+	if changed {
+		if out, err := exec.Command("systemctl", "daemon-reload").CombinedOutput(); err != nil {
+			return fmt.Errorf("systemctl daemon-reload: %w: %s", err, strings.TrimSpace(string(out)))
+		}
+	}
+	return nil
 }

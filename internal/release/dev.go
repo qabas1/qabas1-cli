@@ -34,7 +34,7 @@ func LatestDevFromGHCR(httpClient *http.Client, owner, username, token string) (
 		httpClient = httpx.New(30 * time.Second)
 	}
 	if owner == "" {
-		owner = "qabasone"
+		owner = "qabas1"
 	}
 	if username == "" || token == "" {
 		return nil, exitcode.NewHint(exitcode.InvalidInput,
@@ -98,7 +98,7 @@ func LatestDevComponent(httpClient *http.Client, owner, service, username, token
 		httpClient = httpx.New(30 * time.Second)
 	}
 	if owner == "" {
-		owner = "qabasone"
+		owner = "qabas1"
 	}
 	if username == "" || token == "" {
 		return manifest.Component{}, exitcode.NewHint(exitcode.InvalidInput,
@@ -120,7 +120,7 @@ func ResolveComponent(httpClient *http.Client, owner, service, spec, username, t
 		httpClient = httpx.New(30 * time.Second)
 	}
 	if owner == "" {
-		owner = "qabasone"
+		owner = "qabas1"
 	}
 	if token == "" {
 		return manifest.Component{}, exitcode.New(exitcode.InvalidInput, "GHCR credentials are required")

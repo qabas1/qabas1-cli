@@ -57,7 +57,7 @@ func TestVerifyChecksumMismatch(t *testing.T) {
 
 func TestCheckTrackDevUsesDevLatestAssets(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasSuffix(r.URL.Path, "/repos/qabasone/qabas1-cli/releases/tags/dev-latest") {
+		if !strings.HasSuffix(r.URL.Path, "/repos/qabas1/qabas1-cli/releases/tags/dev-latest") {
 			t.Fatalf("unexpected path %s", r.URL.Path)
 		}
 		resp := map[string]any{
@@ -95,7 +95,7 @@ func TestCheckStablePrefersDebPackage(t *testing.T) {
 		t.Skip("linux package selection")
 	}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasSuffix(r.URL.Path, "/repos/qabasone/qabas1-cli/releases/latest") {
+		if !strings.HasSuffix(r.URL.Path, "/repos/qabas1/qabas1-cli/releases/latest") {
 			t.Fatalf("unexpected path %s", r.URL.Path)
 		}
 		resp := map[string]any{

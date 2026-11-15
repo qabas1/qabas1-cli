@@ -56,6 +56,33 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 	if err := release.RequireAuth(); err != nil {
 		return err
 	}
+	// Check release assets before writing phase, config, or credentials. A sparse
+	// deploy repository should fail with a useful error and leave the VPS intact.
+	var bundle []byte
+	if plan.Service == "" {
+		bundle, err = e.Client.FetchCompose()
+		if err != nil {
+			return fmt.Errorf("deploy repository %s@%s is missing compose/compose.yaml: %w", e.Client.Repo, e.Client.Ref, err)
+		}
+	}
+	names, err := secrets.RequiredTemplates(e.Paths)
+	if err != nil {
+		return err
+	}
+	templates := make(map[string][]byte, len(names))
+	for _, name := range names {
+		raw, fetchErr := e.Client.FetchTemplate(name)
+		if fetchErr != nil {
+			return fmt.Errorf("deploy repository %s@%s is missing compose/templates/%s: %w", e.Client.Repo, e.Client.Ref, name, fetchErr)
+		}
+		templates[name] = raw
+	}
+	fetchTemplate := func(name string) ([]byte, error) {
+		if raw, ok := templates[name]; ok {
+			return raw, nil
+		}
+		return e.Client.FetchTemplate(name)
+	}
 
 	e.setPhase("PREPARE", "")
 	if !e.State.Installed() {
@@ -72,7 +99,7 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 	}
 	// Materialize missing env files and stage the runtime password. Existing
 	// API/worker URLs are upgraded after the database role is initialized.
-	if err := secrets.WriteEnvFiles(e.Paths, sec, e.Config.EffectiveDomains(), e.Client.FetchTemplate); err != nil {
+	if err := secrets.WriteEnvFiles(e.Paths, sec, e.Config.EffectiveDomains(), fetchTemplate); err != nil {
 		return err
 	}
 	if err := e.abortIfInterrupted(opt, plan, "", "PREPARE"); err != nil {
@@ -88,10 +115,6 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 			return err
 		}
 	} else {
-		bundle, err := e.Client.FetchCompose()
-		if err != nil {
-			return err
-		}
 		// Stage compose under compose.yaml.next; promote only at SWITCH so an
 		// interrupt before SWITCH leaves live compose on the installed release.
 		if err := compose.WriteBundleNext(e.Paths, bundle); err != nil {

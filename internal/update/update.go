@@ -23,7 +23,7 @@ import (
 	"github.com/qabas1/qabas1-cli/internal/version"
 )
 
-const repo = "qabasone/qabas1-cli"
+const repo = "qabas1/qabas1-cli"
 
 type Info struct {
 	Current string `json:"current"`

@@ -285,6 +285,20 @@ var envTemplates = []struct {
 	{".env.compose.example", paths.Paths.EnvCompose},
 }
 
+// RequiredTemplates lists the release assets needed for missing host env files.
+func RequiredTemplates(p paths.Paths) ([]string, error) {
+	var names []string
+	for _, tmpl := range envTemplates {
+		_, err := os.Stat(tmpl.dest(p))
+		if os.IsNotExist(err) {
+			names = append(names, tmpl.name)
+		} else if err != nil {
+			return nil, err
+		}
+	}
+	return names, nil
+}
+
 // WriteEnvFiles materializes missing env files and stages the runtime role
 // password. Existing API/worker credentials change only after role setup.
 func WriteEnvFiles(p paths.Paths, b Bundle, domains config.Domains, fetch TemplateFetcher) error {
