@@ -102,6 +102,39 @@ func TestWriteEnvFilesGeneratesStableJSReportCredentials(t *testing.T) {
 	}
 }
 
+func TestWriteEnvFilesDoesNotFetchTemplateForExistingComposeEnv(t *testing.T) {
+	p := paths.Paths{ConfigDir: filepath.Join(t.TempDir(), "etc")}
+	if err := os.MkdirAll(p.ConfigDir, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	b, err := secrets.Generate()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(p.EnvCompose(), []byte("MAIN_DOMAIN=example.com\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	fetch := func(name string) ([]byte, error) {
+		if name == ".env.compose.example" {
+			t.Fatal("existing Compose env must not fetch its template")
+		}
+		return testFetcher(productionLikeTemplates())(name)
+	}
+	if err := secrets.WriteEnvFiles(p, b, config.Domains{}, fetch); err != nil {
+		t.Fatal(err)
+	}
+	first := read(t, p.EnvCompose())
+	if !strings.Contains(first, "MAIN_DOMAIN=example.com") || !strings.Contains(first, "JSREPORT_ADMIN_PASSWORD=") || !strings.Contains(first, "JSREPORT_COOKIE_SECRET=") {
+		t.Fatalf("existing Compose env or Studio credentials missing: %s", first)
+	}
+	if err := secrets.WriteEnvFiles(p, b, config.Domains{}, fetch); err != nil {
+		t.Fatal(err)
+	}
+	if got := read(t, p.EnvCompose()); got != first {
+		t.Fatal("existing Compose env changed on repeat provisioning")
+	}
+}
+
 func TestWriteEnvFilesUsesDomainMapping(t *testing.T) {
 	dir := t.TempDir()
 	p := paths.Paths{ConfigDir: filepath.Join(dir, "etc")}

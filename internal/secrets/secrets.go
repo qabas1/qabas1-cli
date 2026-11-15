@@ -311,7 +311,7 @@ func WriteEnvFiles(p paths.Paths, b Bundle, domains config.Domains, fetch Templa
 	if err := prepareRuntimeDBEnv(p, b); err != nil {
 		return err
 	}
-	return ensureJSReportCredentials(p, fetch)
+	return ensureJSReportCredentials(p)
 }
 
 // ApplyReplicaDomains updates only domain-related values in an already configured
@@ -372,14 +372,7 @@ func ApplyReplicaDomains(p paths.Paths, domains config.Domains, trade string) er
 
 // Studio credentials are kept in the operator-owned Compose env file. Upgrade
 // existing installs without rotating values already configured by the operator.
-func ensureJSReportCredentials(p paths.Paths, fetch TemplateFetcher) error {
-	template, err := fetch(".env.compose.example")
-	if err != nil {
-		return err
-	}
-	if !strings.Contains(string(template), "JSREPORT_ADMIN_PASSWORD=") {
-		return nil
-	}
+func ensureJSReportCredentials(p paths.Paths) error {
 	raw, err := os.ReadFile(p.EnvCompose())
 	if err != nil {
 		return err
