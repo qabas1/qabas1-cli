@@ -55,7 +55,7 @@ func catalog(t *testing.T) *release.Client {
 		_, _ = w.Write(b)
 	}))
 	t.Cleanup(srv.Close)
-	c := release.New("qabasone/qabas1-deploy", "main")
+	c := release.New("qabas1/qabas1-deploy", "main")
 	c.HTTP = srv.Client()
 	c.APIBase = srv.URL
 	c.RawBase = srv.URL

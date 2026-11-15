@@ -326,7 +326,7 @@ func TestWriterGuardSupportsScaledAPIContainers(t *testing.T) {
 	w := &hookExec{Fake: fx.writer}
 	w.hook = func(script string) (nodeexec.Result, bool) {
 		if strings.Contains(script, "docker ps -a --format '{{.Names}}'") {
-			return nodeexec.Result{Stdout: "qabas1-api-1\nqabasone-api-2\n"}, true
+			return nodeexec.Result{Stdout: "qabas1-api-1\nqabas1-api-2\n"}, true
 		}
 		return nodeexec.Result{}, false
 	}
@@ -349,7 +349,7 @@ func TestWaitHealthyReportsScaledAPIContainerFailure(t *testing.T) {
 	w := &hookExec{Fake: fx.writer}
 	w.hook = func(script string) (nodeexec.Result, bool) {
 		if strings.Contains(script, "docker ps -a --format '{{.Names}}'") {
-			return nodeexec.Result{Stdout: "qabas1-api-1\nqabasone-api-2\n"}, true
+			return nodeexec.Result{Stdout: "qabas1-api-1\nqabas1-api-2\n"}, true
 		}
 		if strings.Contains(script, "docker inspect") && strings.Contains(script, "qabas1-api-2") {
 			return nodeexec.Result{Stdout: "unhealthy"}, true
@@ -369,7 +369,7 @@ func TestWaitHealthyReportsScaledAPIContainerFailure(t *testing.T) {
 }
 
 func TestContainerProblems(t *testing.T) {
-	out := "qabas1-api|Up 1 minute (healthy)\nqabasone-minio-init|Exited (0) 2 minutes ago\nqabasone-app|Restarting (1) 3 seconds ago\nqabasone-dash|Up 1 minute (unhealthy)\nqabasone-siraj|Exited (137) 1 minute ago\n"
+	out := "qabas1-api|Up 1 minute (healthy)\nqabas1-minio-init|Exited (0) 2 minutes ago\nqabas1-app|Restarting (1) 3 seconds ago\nqabas1-dash|Up 1 minute (unhealthy)\nqabas1-siraj|Exited (137) 1 minute ago\n"
 	problems, seen := containerProblems(out)
 	if seen != 5 || len(problems) != 3 {
 		t.Fatalf("seen=%d problems=%v", seen, problems)

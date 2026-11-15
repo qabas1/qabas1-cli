@@ -34,7 +34,7 @@ func TestRedact(t *testing.T) {
 	m := config.RedactMap(map[string]string{
 		"channel":     "stable",
 		"jwt.secret":  "super-secret",
-		"deploy.repo": "qabasone/qabas1-deploy",
+		"deploy.repo": "qabas1/qabas1-deploy",
 	})
 	if m["jwt.secret"] != "********" {
 		t.Fatalf("secret %q", m["jwt.secret"])

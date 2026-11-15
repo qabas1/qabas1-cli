@@ -69,8 +69,8 @@ func newFixture(t *testing.T, preflight string) *fixture {
 		OnOut("{{if .State.Health}}", "healthy").
 		OnOut("health/dr", healthJSON).
 		OnOut("docker ps -a --format '{{.Names}}'", "qabas1-api\n").
-		OnOut("docker ps --format", "qabas1-api\nqabasone-postgres\nqabasone-minio").
-		OnOut("{{.Names}}|{{.Status}}", "qabas1-api|Up 2 minutes (healthy)\nqabasone-postgres|Up 3 minutes (healthy)\nqabasone-minio-init|Exited (0) 3 minutes ago")
+		OnOut("docker ps --format", "qabas1-api\nqabas1-postgres\nqabas1-minio").
+		OnOut("{{.Names}}|{{.Status}}", "qabas1-api|Up 2 minutes (healthy)\nqabas1-postgres|Up 3 minutes (healthy)\nqabas1-minio-init|Exited (0) 3 minutes ago")
 
 	eng := &Engine{
 		Paths: p, Cluster: c, Self: "hq",

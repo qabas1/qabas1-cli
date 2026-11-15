@@ -13,7 +13,7 @@
  * Deploy: see install/cloudflare/README.md
  */
 
-const DEFAULT_REPO = "qabasone/qabas1-cli";
+const DEFAULT_REPO = "qabas1/qabas1-cli";
 const DEFAULT_REF = "main";
 const SCRIPT_PATH = "install/install.sh";
 const WINDOWS_SCRIPT_PATH = "install/install.ps1";
