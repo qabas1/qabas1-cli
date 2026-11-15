@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/backup"
-	"github.com/qabasone/qabasone-cli/internal/compose"
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/state"
+	"github.com/qabas1/qabasone-cli/internal/backup"
+	"github.com/qabas1/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/state"
 	"gopkg.in/yaml.v3"
 )
 

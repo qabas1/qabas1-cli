@@ -1,9 +1,9 @@
 package cli
 
 import (
-	"github.com/qabasone/qabasone-cli/internal/compose"
-	"github.com/qabasone/qabasone-cli/internal/observability"
-	"github.com/qabasone/qabasone-cli/internal/state"
+	"github.com/qabas1/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/observability"
+	"github.com/qabas1/qabasone-cli/internal/state"
 	"github.com/spf13/cobra"
 )
 

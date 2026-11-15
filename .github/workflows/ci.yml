@@ -51,7 +51,7 @@ jobs:
     env:
       VERSION: pr-${{ github.event.pull_request.number || github.run_number }}
       COMMIT: ${{ github.sha }}
-      MODULE: github.com/qabasone/qabasone-cli
+      MODULE: github.com/qabas1/qabasone-cli
     steps:
       - uses: actions/checkout@v4
 

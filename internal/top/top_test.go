@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
-	"github.com/qabasone/qabasone-cli/internal/pgctl"
-	"github.com/qabasone/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/pgctl"
+	"github.com/qabas1/qabasone-cli/internal/sysinfo"
 )
 
 const statsNDJSON = `{"BlockIO":"1.5MB / 20MB","CPUPerc":"12.50%","Container":"abc","ID":"abc","MemPerc":"25.00%","MemUsage":"256MiB / 1GiB","Name":"qabasone-api","NetIO":"1kB / 2kB","PIDs":"20"}

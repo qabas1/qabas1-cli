@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
 )
 
 func fakeBackupDir(t *testing.T) (string, Meta) {

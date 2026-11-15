@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
 )
 
 // hookExec records every script in the embedded Fake and lets a test change results

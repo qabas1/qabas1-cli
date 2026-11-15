@@ -3,8 +3,8 @@ package guide
 import (
 	"fmt"
 
-	"github.com/qabasone/qabasone-cli/internal/backup"
-	"github.com/qabasone/qabasone-cli/internal/config"
+	"github.com/qabas1/qabasone-cli/internal/backup"
+	"github.com/qabas1/qabasone-cli/internal/config"
 )
 
 func backupTopic() Topic {

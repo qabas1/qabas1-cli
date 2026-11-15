@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
 )
 
 // Daily full backup units installed by `qabas backup schedule enable`.

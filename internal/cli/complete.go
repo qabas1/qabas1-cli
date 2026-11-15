@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/backup"
-	"github.com/qabasone/qabasone-cli/internal/config"
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/release"
+	"github.com/qabas1/qabasone-cli/internal/backup"
+	"github.com/qabas1/qabasone-cli/internal/config"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/release"
 	"github.com/spf13/cobra"
 )
 

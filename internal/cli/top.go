@@ -17,16 +17,16 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/qabasone/qabasone-cli/internal/autopilot"
-	"github.com/qabasone/qabasone-cli/internal/backup"
-	"github.com/qabasone/qabasone-cli/internal/compose"
-	"github.com/qabasone/qabasone-cli/internal/lock"
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
-	"github.com/qabasone/qabasone-cli/internal/output"
-	"github.com/qabasone/qabasone-cli/internal/state"
-	"github.com/qabasone/qabasone-cli/internal/sysinfo"
-	"github.com/qabasone/qabasone-cli/internal/top"
-	"github.com/qabasone/qabasone-cli/internal/top/tui"
+	"github.com/qabas1/qabasone-cli/internal/autopilot"
+	"github.com/qabas1/qabasone-cli/internal/backup"
+	"github.com/qabas1/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/lock"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/output"
+	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabasone-cli/internal/top"
+	"github.com/qabas1/qabasone-cli/internal/top/tui"
 )
 
 // Slow, rarely-changing sources are refreshed less often than the dashboard.

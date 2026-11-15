@@ -46,7 +46,7 @@ export default {
         "Uninstall: apt remove qabas (Linux .deb) / Apps & Features (Windows MSI).",
         "",
         "Private repos: export GITHUB_TOKEN before curl/iwr, or pass Authorization.",
-        "Docs: https://github.com/qabasone/qabasone-cli",
+        "Docs: https://github.com/qabas1/qabasone-cli",
         "",
       ].join("\n");
       return text(body, 200);

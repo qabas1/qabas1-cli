@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/lease"
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/pgctl"
-	"github.com/qabasone/qabasone-cli/internal/replica"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/lease"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/pgctl"
+	"github.com/qabas1/qabasone-cli/internal/replica"
 )
 
 func testCluster() *cluster.Cluster {

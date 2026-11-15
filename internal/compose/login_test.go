@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/compose"
 )
 
 func TestLoginGHCR(t *testing.T) {

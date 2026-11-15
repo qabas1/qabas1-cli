@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/cli"
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/cli"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
 )
 
 func TestRootHelp(t *testing.T) {

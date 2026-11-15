@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/config"
-	"github.com/qabasone/qabasone-cli/internal/nodestack"
-	"github.com/qabasone/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/config"
+	"github.com/qabas1/qabasone-cli/internal/nodestack"
+	"github.com/qabas1/qabasone-cli/internal/paths"
 )
 
 func TestGatewayConfigRoutesDomainsAndScaledAPI(t *testing.T) {

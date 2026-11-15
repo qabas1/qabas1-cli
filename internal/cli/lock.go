@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/lock"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/lock"
 	"github.com/spf13/cobra"
 )
 

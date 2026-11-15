@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
 )
 
 func TestCheckPathsUsesDistinctContainerRoutes(t *testing.T) {

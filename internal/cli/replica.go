@@ -10,14 +10,14 @@ import (
 	"strings"
 	"time"
 
-	installer "github.com/qabasone/qabasone-cli/install"
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/dr"
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/guide"
-	"github.com/qabasone/qabasone-cli/internal/output"
-	"github.com/qabasone/qabasone-cli/internal/replica"
-	"github.com/qabasone/qabasone-cli/internal/sshx"
+	installer "github.com/qabas1/qabasone-cli/install"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/dr"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/guide"
+	"github.com/qabas1/qabasone-cli/internal/output"
+	"github.com/qabas1/qabasone-cli/internal/replica"
+	"github.com/qabas1/qabasone-cli/internal/sshx"
 	"github.com/spf13/cobra"
 )
 

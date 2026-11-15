@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/manifest"
 )
 
 func fixture(t *testing.T, name string) []byte {

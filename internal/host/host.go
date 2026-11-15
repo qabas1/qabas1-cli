@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/sysinfo"
 )
 
 type Report struct {

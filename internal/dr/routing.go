@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
 )
 
 // RoutingOptions for a site's local entry point.

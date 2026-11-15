@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/hint"
-	"github.com/qabasone/qabasone-cli/internal/release"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/hint"
+	"github.com/qabas1/qabasone-cli/internal/release"
 	"github.com/spf13/cobra"
 )
 

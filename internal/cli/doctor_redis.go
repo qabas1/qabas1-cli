@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
-	"github.com/qabasone/qabasone-cli/internal/output"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/output"
 	"github.com/spf13/cobra"
 )
 

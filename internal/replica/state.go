@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/paths"
 )
 
 // Phase is one resumable provisioning step.

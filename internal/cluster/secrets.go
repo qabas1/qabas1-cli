@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/redact"
 )
 
 // Per-node secret names (files under /etc/qabasone/nodes/<node>/, mode 0600).

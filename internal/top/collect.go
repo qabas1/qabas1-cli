@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
-	"github.com/qabasone/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/sysinfo"
 )
 
 // DefaultSourceTimeout bounds each source so one slow probe never stalls a refresh.

@@ -7,14 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/autopilot"
-	"github.com/qabasone/qabasone-cli/internal/backup"
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/compose"
-	"github.com/qabasone/qabasone-cli/internal/deploy"
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/manifest"
-	"github.com/qabasone/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabasone-cli/internal/autopilot"
+	"github.com/qabas1/qabasone-cli/internal/backup"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/deploy"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabasone-cli/internal/sysinfo"
 	"github.com/spf13/cobra"
 )
 

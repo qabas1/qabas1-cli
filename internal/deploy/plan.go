@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/qabasone/qabasone-cli/internal/compose"
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/manifest"
-	"github.com/qabasone/qabasone-cli/internal/release"
-	"github.com/qabasone/qabasone-cli/internal/version"
+	"github.com/qabas1/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabasone-cli/internal/release"
+	"github.com/qabas1/qabasone-cli/internal/version"
 )
 
 func (e *Engine) BuildPlan(opt Options) (*Plan, error) {

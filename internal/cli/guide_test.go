@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/cli"
-	"github.com/qabasone/qabasone-cli/internal/guide"
+	"github.com/qabas1/qabasone-cli/internal/cli"
+	"github.com/qabas1/qabasone-cli/internal/guide"
 	"github.com/spf13/cobra"
 )
 

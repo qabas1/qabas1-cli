@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/relay"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/relay"
 )
 
 const (

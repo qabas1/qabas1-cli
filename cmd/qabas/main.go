@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/qabasone/qabasone-cli/internal/cli"
+	"github.com/qabas1/qabasone-cli/internal/cli"
 )
 
 func main() {

@@ -4,10 +4,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/compose"
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/nodestack"
-	"github.com/qabasone/qabasone-cli/internal/state"
+	"github.com/qabas1/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/nodestack"
+	"github.com/qabas1/qabasone-cli/internal/state"
 	"github.com/spf13/cobra"
 )
 

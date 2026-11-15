@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/manifest"
-	"github.com/qabasone/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabasone-cli/internal/paths"
 )
 
 func TestRestartAPIWaitsForEachReplica(t *testing.T) {

@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/interrupt"
-	"github.com/qabasone/qabasone-cli/internal/lock"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/interrupt"
+	"github.com/qabas1/qabasone-cli/internal/lock"
 )
 
 const (

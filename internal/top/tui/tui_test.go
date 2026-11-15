@@ -14,8 +14,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/termenv"
 
-	"github.com/qabasone/qabasone-cli/internal/sysinfo"
-	"github.com/qabasone/qabasone-cli/internal/top"
+	"github.com/qabas1/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabasone-cli/internal/top"
 )
 
 var update = flag.Bool("update", false, "rewrite golden files")

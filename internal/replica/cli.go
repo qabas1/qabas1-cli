@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
 )
 
 // QabasCmd is how systemd units and remote scripts invoke the package-installed CLI

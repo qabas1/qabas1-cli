@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/config"
-	"github.com/qabasone/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/config"
+	"github.com/qabas1/qabasone-cli/internal/paths"
 )
 
 func scheduleFixture(t *testing.T, self string) paths.Paths {

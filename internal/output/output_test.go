@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/output"
+	"github.com/qabas1/qabasone-cli/internal/output"
 )
 
 type row struct {

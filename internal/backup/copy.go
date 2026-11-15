@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
 )
 
 // Copy recursively copies a backup wrapper directory to dest.

@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/paths"
 )
 
 // Shell that matches compose migrate service: materialize Prisma 7 config then run a prisma subcommand.

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
 )
 
 // CriticalPhases are never interrupted automatically: stopping them mid-way can

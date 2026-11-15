@@ -3,7 +3,7 @@ package compose
 import (
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabasone-cli/internal/manifest"
 )
 
 func TestJSReportImagePin(t *testing.T) {

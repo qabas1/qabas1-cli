@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabasone-cli/internal/sysinfo"
 )
 
 // Stats sources reported in ServicesSection.Source.

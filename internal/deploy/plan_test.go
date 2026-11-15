@@ -10,13 +10,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/config"
-	"github.com/qabasone/qabasone-cli/internal/deploy"
-	"github.com/qabasone/qabasone-cli/internal/manifest"
-	"github.com/qabasone/qabasone-cli/internal/output"
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/release"
-	"github.com/qabasone/qabasone-cli/internal/state"
+	"github.com/qabas1/qabasone-cli/internal/config"
+	"github.com/qabas1/qabasone-cli/internal/deploy"
+	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabasone-cli/internal/output"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/release"
+	"github.com/qabas1/qabasone-cli/internal/state"
 )
 
 func catalog(t *testing.T) *release.Client {

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/pgctl"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/pgctl"
 )
 
 // DefaultWALBudgetGB bounds WAL a replication slot may retain on the writer when no

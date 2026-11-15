@@ -1,4 +1,4 @@
-MODULE := github.com/qabasone/qabasone-cli
+MODULE := github.com/qabas1/qabasone-cli
 VERSION ?= dev
 COMMIT ?= none
 LDFLAGS := -s -w -X $(MODULE)/internal/version.Version=$(VERSION) -X $(MODULE)/internal/version.Commit=$(COMMIT)

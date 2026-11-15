@@ -5,7 +5,7 @@ package execx_test
 import (
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/execx"
+	"github.com/qabas1/qabasone-cli/internal/execx"
 )
 
 func TestCommandSetsPgid(t *testing.T) {

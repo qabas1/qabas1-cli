@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/replica"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/replica"
 )
 
 type CheckReport struct {

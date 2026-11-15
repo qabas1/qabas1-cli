@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/manifest"
-	"github.com/qabasone/qabasone-cli/internal/replica"
-	"github.com/qabasone/qabasone-cli/internal/state"
-	"github.com/qabasone/qabasone-cli/internal/update"
-	"github.com/qabasone/qabasone-cli/internal/version"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabasone-cli/internal/replica"
+	"github.com/qabas1/qabasone-cli/internal/state"
+	"github.com/qabas1/qabasone-cli/internal/update"
+	"github.com/qabas1/qabasone-cli/internal/version"
 	"github.com/spf13/cobra"
 )
 

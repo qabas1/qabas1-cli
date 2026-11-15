@@ -13,8 +13,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/interrupt"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/interrupt"
 )
 
 // EnvStuckAfter overrides DefaultLimit (a Go duration such as "8h").

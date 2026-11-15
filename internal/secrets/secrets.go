@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/config"
-	"github.com/qabasone/qabasone-cli/internal/nodestack"
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabasone-cli/internal/config"
+	"github.com/qabas1/qabasone-cli/internal/nodestack"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/redact"
 )
 
 // TemplateFetcher loads an env template by filename from the deploy release

@@ -15,10 +15,10 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/execx"
-	"github.com/qabasone/qabasone-cli/internal/redact"
-	"github.com/qabasone/qabasone-cli/internal/sshx"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/execx"
+	"github.com/qabas1/qabasone-cli/internal/redact"
+	"github.com/qabas1/qabasone-cli/internal/sshx"
 )
 
 type Result struct {

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
 )
 
 const edgeNetwork = "edge-network"

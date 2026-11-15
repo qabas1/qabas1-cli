@@ -10,7 +10,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/registry"
 )

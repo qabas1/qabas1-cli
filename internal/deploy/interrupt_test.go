@@ -7,13 +7,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/compose"
-	"github.com/qabasone/qabasone-cli/internal/config"
-	"github.com/qabasone/qabasone-cli/internal/history"
-	"github.com/qabasone/qabasone-cli/internal/interrupt"
-	"github.com/qabasone/qabasone-cli/internal/output"
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/state"
+	"github.com/qabas1/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/config"
+	"github.com/qabas1/qabasone-cli/internal/history"
+	"github.com/qabas1/qabasone-cli/internal/interrupt"
+	"github.com/qabas1/qabasone-cli/internal/output"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/state"
 )
 
 func TestIncompletePhase(t *testing.T) {

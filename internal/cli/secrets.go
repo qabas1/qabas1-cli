@@ -6,10 +6,10 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/output"
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/release"
-	"github.com/qabasone/qabasone-cli/internal/secrets"
+	"github.com/qabas1/qabasone-cli/internal/output"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/release"
+	"github.com/qabas1/qabasone-cli/internal/secrets"
 	"github.com/spf13/cobra"
 )
 

@@ -9,13 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/clilog"
-	"github.com/qabasone/qabasone-cli/internal/compose"
-	"github.com/qabasone/qabasone-cli/internal/history"
-	"github.com/qabasone/qabasone-cli/internal/observability"
-	"github.com/qabasone/qabasone-cli/internal/paths"
-	"github.com/qabasone/qabasone-cli/internal/secrets"
-	"github.com/qabasone/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabasone-cli/internal/clilog"
+	"github.com/qabas1/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/history"
+	"github.com/qabas1/qabasone-cli/internal/observability"
+	"github.com/qabas1/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/secrets"
+	"github.com/qabas1/qabasone-cli/internal/sysinfo"
 )
 
 // Thresholds for log-size warnings.

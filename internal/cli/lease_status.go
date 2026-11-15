@@ -6,10 +6,10 @@ import (
 	"io/fs"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/cluster"
-	"github.com/qabasone/qabasone-cli/internal/doctor"
-	"github.com/qabasone/qabasone-cli/internal/lease"
-	"github.com/qabasone/qabasone-cli/internal/nodestack"
+	"github.com/qabas1/qabasone-cli/internal/cluster"
+	"github.com/qabas1/qabasone-cli/internal/doctor"
+	"github.com/qabas1/qabasone-cli/internal/lease"
+	"github.com/qabas1/qabasone-cli/internal/nodestack"
 )
 
 // localWriterLease reports the writer lease when this node is the registered writer

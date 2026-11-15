@@ -6,8 +6,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/interrupt"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/interrupt"
 )
 
 func TestProtectDefersSignal(t *testing.T) {

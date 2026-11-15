@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/sysinfo"
+	"github.com/qabas1/qabasone-cli/internal/sysinfo"
 )
 
 func TestStatusShowsSystemAndDataDiskUsage(t *testing.T) {

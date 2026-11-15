@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/compose"
-	"github.com/qabasone/qabasone-cli/internal/manifest"
+	"github.com/qabas1/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/manifest"
 )
 
 func baseRelease(api, app, dash, siraj string) *manifest.Release {

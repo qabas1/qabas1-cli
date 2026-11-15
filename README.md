@@ -4,7 +4,7 @@ Official system administration CLI for QabasOne.
 
 `qabas` is the **deployment engine**. It does not contain a hardcoded list of
 product releases. Complete QabasOne versions (API + App + Dash) are defined in
-[`qabasone-deploy`](https://github.com/qabasone/qabasone-deploy).
+[`qabasone-deploy`](https://github.com/qabas1/qabasone-deploy).
 
 ```text
 qabasone-cli     = deployment engine
@@ -48,7 +48,7 @@ Windows release assets are temporarily paused. QabasOne product deployment
 requires Linux; the Windows CLI build scripts remain available under
 `packaging/windows/` for local development.
 
-Manual packages are also attached to each [GitHub Release](https://github.com/qabasone/qabasone-cli/releases)
+Manual packages are also attached to each [GitHub Release](https://github.com/qabas1/qabasone-cli/releases)
 (`.deb` and raw Linux binaries).
 
 ### Private GitHub repos + GHCR (one-time auth)

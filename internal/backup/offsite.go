@@ -15,7 +15,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
 	"gopkg.in/yaml.v3"
 )
 

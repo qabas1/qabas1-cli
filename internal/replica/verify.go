@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/minioctl"
-	"github.com/qabasone/qabasone-cli/internal/nodeexec"
-	"github.com/qabasone/qabasone-cli/internal/pgctl"
+	"github.com/qabas1/qabasone-cli/internal/minioctl"
+	"github.com/qabas1/qabasone-cli/internal/nodeexec"
+	"github.com/qabas1/qabasone-cli/internal/pgctl"
 )
 
 // Check is one verification result.

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
 )
 
 func TestCodeOf(t *testing.T) {

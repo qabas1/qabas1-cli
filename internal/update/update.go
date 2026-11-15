@@ -16,11 +16,11 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
-	"github.com/qabasone/qabasone-cli/internal/hint"
-	"github.com/qabasone/qabasone-cli/internal/httpx"
-	"github.com/qabasone/qabasone-cli/internal/release"
-	"github.com/qabasone/qabasone-cli/internal/version"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/hint"
+	"github.com/qabas1/qabasone-cli/internal/httpx"
+	"github.com/qabas1/qabasone-cli/internal/release"
+	"github.com/qabas1/qabasone-cli/internal/version"
 )
 
 const repo = "qabasone/qabasone-cli"

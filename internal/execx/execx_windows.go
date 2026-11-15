@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"syscall"
 
-	"github.com/qabasone/qabasone-cli/internal/interrupt"
+	"github.com/qabas1/qabasone-cli/internal/interrupt"
 )
 
 // detach starts children in a new process group during critical sections so

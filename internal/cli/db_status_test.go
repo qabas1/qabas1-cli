@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/compose"
+	"github.com/qabas1/qabasone-cli/internal/compose"
 	"github.com/spf13/cobra"
 )
 

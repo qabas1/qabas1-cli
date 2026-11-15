@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/update"
+	"github.com/qabas1/qabasone-cli/internal/update"
 )
 
 func TestNeedsUpdate(t *testing.T) {

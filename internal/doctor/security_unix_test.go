@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/paths"
 )
 
 func TestSecurityChecksSecretPerms(t *testing.T) {

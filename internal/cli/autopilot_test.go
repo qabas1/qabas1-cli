@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/qabasone/qabasone-cli/internal/config"
-	"github.com/qabasone/qabasone-cli/internal/lock"
-	"github.com/qabasone/qabasone-cli/internal/paths"
+	"github.com/qabas1/qabasone-cli/internal/config"
+	"github.com/qabas1/qabasone-cli/internal/lock"
+	"github.com/qabas1/qabasone-cli/internal/paths"
 )
 
 func TestAutopilotRunSkipsOnlyWhenBusy(t *testing.T) {

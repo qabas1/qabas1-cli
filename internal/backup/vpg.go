@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/qabasone/qabasone-cli/internal/execx"
-	"github.com/qabasone/qabasone-cli/internal/exitcode"
+	"github.com/qabas1/qabasone-cli/internal/execx"
+	"github.com/qabas1/qabasone-cli/internal/exitcode"
 )
 
 const (
