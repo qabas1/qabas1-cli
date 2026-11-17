@@ -107,6 +107,10 @@ func TestGatewaySameClientRESTAndPollingIntegration(t *testing.T) {
 	}
 	var pinned string
 	for i := 0; i < 12; i++ {
+		if i == 6 {
+			// Cross the resolver's 10-second refresh window with the peer set unchanged.
+			time.Sleep(12 * time.Second)
+		}
 		path := "/socket.io/?EIO=4&transport=polling"
 		if i%2 == 0 {
 			path = "/socket.io?EIO=4&transport=polling"
