@@ -54,7 +54,7 @@ func TestGatewaySameClientRESTAndPollingIntegration(t *testing.T) {
 	start("backend-b", backend, false)
 	cfg := config.Default()
 	cfg.Domain = "qabas.one"
-	rendered, err := gatewayConfig(cfg.EffectiveDomains(), "")
+	rendered, err := gatewayConfig(cfg.EffectiveDomains())
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -179,7 +179,7 @@ func (e *Engine) Verify(ctx context.Context, name string) Report {
 
 	out, _ := run(ctx, x, "docker ps --format '{{.Names}}' --filter status=running")
 	var running []string
-	for _, wk := range []string{"operations-worker", "notifications-worker", "printables-worker", "documents-worker", "audit-cleanup", "migrate"} {
+	for _, wk := range []string{"operations-worker", "notifications-worker", "printables-worker", "audit-cleanup", "migrate"} {
 		if strings.Contains(out, "qabas1-"+wk) {
 			running = append(running, wk)
 		}

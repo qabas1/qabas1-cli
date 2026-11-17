@@ -36,8 +36,6 @@ func ServiceAlias(name string) (string, error) {
 		return "jsreport", nil
 	case "printables", "rworker":
 		return "printables-worker", nil
-	case "documents", "documents-worker":
-		return "documents-worker", nil
 	case "operations", "operations-worker", "ops", "posting", "post", "posting-worker":
 		// posting / posting-worker remain as legacy aliases after the rename.
 		return "operations-worker", nil
@@ -71,7 +69,6 @@ func APIImageServices() []string {
 	return []string{
 		"api",
 		"printables-worker",
-		"documents-worker",
 		"operations-worker",
 		"notifications-worker",
 		"audit-cleanup",

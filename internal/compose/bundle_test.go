@@ -19,7 +19,6 @@ func TestServiceAlias(t *testing.T) {
 		{"posting-worker", "operations-worker"},
 		{"notifications", "notifications-worker"},
 		{"printables", "printables-worker"},
-		{"documents", "documents-worker"},
 		{"jsreport", "jsreport"},
 		{"audit", "audit-cleanup"},
 	}
@@ -64,7 +63,6 @@ func TestDeployComposeServices(t *testing.T) {
 	want := []string{
 		"api",
 		"printables-worker",
-		"documents-worker",
 		"operations-worker",
 		"notifications-worker",
 		"audit-cleanup",

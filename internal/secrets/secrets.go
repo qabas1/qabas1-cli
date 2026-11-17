@@ -330,7 +330,7 @@ func WriteEnvFiles(p paths.Paths, b Bundle, domains config.Domains, fetch Templa
 
 // ApplyReplicaDomains updates only domain-related values in an already configured
 // replica's env files. Existing credentials and all unrelated settings are preserved.
-func ApplyReplicaDomains(p paths.Paths, domains config.Domains, trade string) error {
+func ApplyReplicaDomains(p paths.Paths, domains config.Domains) error {
 	if !domains.Complete() {
 		return fmt.Errorf("replica gateway requires API, app, dashboard, Siraj, S3, and S3 Console domains")
 	}
@@ -343,9 +343,6 @@ func ApplyReplicaDomains(p paths.Paths, domains config.Domains, trade string) er
 		"SIRAJ_DOMAIN":      domains.Siraj,
 		"S3_DOMAIN":         domains.S3,
 		"S3_CONSOLE_DOMAIN": domains.S3Console,
-	}
-	if trade != "" {
-		composeEnv["TRADE_DOMAIN"] = trade
 	}
 	files := []struct {
 		path string

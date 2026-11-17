@@ -14,14 +14,17 @@ import (
 func TestGatewayConfigRoutesDomainsAndScaledAPI(t *testing.T) {
 	cfg := config.Default()
 	cfg.Domain = "qabas.one"
-	got, err := gatewayConfig(cfg.EffectiveDomains(), "trade.qabas.one")
+	got, err := gatewayConfig(cfg.EffectiveDomains())
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, want := range []string{"server api:3030 resolve max_fails=0", "server app:8080 resolve", "server dash:8080 resolve", "server siraj:8080 resolve", "server minio:9000 resolve", "server minio:9001 resolve", "server trade:8080 resolve", "hash $http_x_forwarded_for;", "server_name api.qabas.one", "server_name app.qabas.one", "server_name dash.qabas.one", "server_name siraj.qabas.one", "server_name s3.qabas.one", "server_name s3c.qabas.one", "server_name trade.qabas.one", "proxy_pass http://qabas_app", "proxy_pass http://qabas_minio_console", "proxy_set_header Upgrade $http_upgrade", "location = /__gateway/health"} {
+	for _, want := range []string{"server api:3030 resolve max_fails=0", "server app:8080 resolve", "server dash:8080 resolve", "server siraj:8080 resolve", "server minio:9000 resolve", "server minio:9001 resolve", "hash $http_x_forwarded_for;", "server_name api.qabas.one", "server_name app.qabas.one", "server_name dash.qabas.one", "server_name siraj.qabas.one", "server_name s3.qabas.one", "server_name s3c.qabas.one", "proxy_pass http://qabas_app", "proxy_pass http://qabas_minio_console", "proxy_set_header Upgrade $http_upgrade", "location = /__gateway/health"} {
 		if !strings.Contains(got, want) {
 			t.Errorf("missing %q", want)
 		}
+	}
+	if strings.Contains(got, "trade") {
+		t.Fatal("gateway must not render a trade upstream or route")
 	}
 	for _, want := range []string{"log_format audit escape=json", "access_log /dev/stdout audit", "\"client_ip\"", "\"peer_ip\"", "$upstream_response_time", "$request_id", "\"path\":\"$uri\""} {
 		if !strings.Contains(got, want) {
@@ -33,7 +36,7 @@ func TestGatewayConfigRoutesDomainsAndScaledAPI(t *testing.T) {
 func TestGatewaySeparatesRESTFromSocketAffinity(t *testing.T) {
 	cfg := config.Default()
 	cfg.Domain = "qabas.one"
-	got, err := gatewayConfig(cfg.EffectiveDomains(), "")
+	got, err := gatewayConfig(cfg.EffectiveDomains())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -64,7 +67,7 @@ func TestGatewayConfigRejectsDuplicateDomain(t *testing.T) {
 	cfg.Domain = "qabas.one"
 	d := cfg.EffectiveDomains()
 	d.App = d.API
-	if _, err := gatewayConfig(d, ""); err == nil {
+	if _, err := gatewayConfig(d); err == nil {
 		t.Fatal("duplicate hostname accepted")
 	}
 }

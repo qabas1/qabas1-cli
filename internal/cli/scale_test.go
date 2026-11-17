@@ -33,7 +33,7 @@ func TestScalingRejectsLegacyRouting(t *testing.T) {
 	}
 	cfg := config.Default()
 	cfg.Domain = "qabas.one"
-	current, err := gatewayConfig(cfg.EffectiveDomains(), "")
+	current, err := gatewayConfig(cfg.EffectiveDomains())
 	if err != nil {
 		t.Fatal(err)
 	}

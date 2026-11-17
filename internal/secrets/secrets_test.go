@@ -497,13 +497,12 @@ func TestApplyReplicaDomainsRewritesOnlyReplicaEnv(t *testing.T) {
 	domains := config.Domains{
 		API: "api.dr.example", App: "app.dr.example", Dash: "dash.dr.example",
 		Siraj: "siraj.dr.example", S3: "s3.dr.example", S3Console: "s3c.dr.example",
-		Trade: "trade.dr.example",
 	}
-	if err := secrets.ApplyReplicaDomains(replica, domains, domains.Trade); err != nil {
+	if err := secrets.ApplyReplicaDomains(replica, domains); err != nil {
 		t.Fatal(err)
 	}
 	for path, want := range map[string][]string{
-		replica.EnvCompose(): {"MINIO_ROOT_PASSWORD=keep-me", "MAIN_DOMAIN=dr.example", "API_DOMAIN=api.dr.example", "TRADE_DOMAIN=trade.dr.example"},
+		replica.EnvCompose(): {"MINIO_ROOT_PASSWORD=keep-me", "MAIN_DOMAIN=dr.example", "API_DOMAIN=api.dr.example"},
 		replica.EnvAPI():     {"JWT_SECRET=keep-jwt", "CORS_ALLOWED_DOMAINS=app.dr.example,dash.dr.example,s3.dr.example,s3c.dr.example", "API_PUBLIC_BASE_URL=https://api.dr.example", "WEBAUTHN_RP_ID=app.dr.example"},
 		replica.EnvApp():     {"API_BASE_URL=https://api.dr.example/api/v1"},
 		replica.EnvDash():    {"API_BASE_URL=https://api.dr.example/api/v1"},

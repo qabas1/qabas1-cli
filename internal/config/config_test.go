@@ -105,7 +105,7 @@ func TestEffectiveDomainsFromBaseDomain(t *testing.T) {
 	cfg := config.Default()
 	cfg.Domain = "example.com"
 	d := cfg.EffectiveDomains()
-	if d.API != "api.example.com" || d.App != "app.example.com" || d.Dash != "dash.example.com" || d.Siraj != "siraj.example.com" || d.S3 != "s3.example.com" || d.S3Console != "s3c.example.com" || d.Trade != "trade.example.com" {
+	if d.API != "api.example.com" || d.App != "app.example.com" || d.Dash != "dash.example.com" || d.Siraj != "siraj.example.com" || d.S3 != "s3.example.com" || d.S3Console != "s3c.example.com" {
 		t.Fatalf("domains %#v", d)
 	}
 }
@@ -115,11 +115,8 @@ func TestEffectiveDomainsAllowOverrides(t *testing.T) {
 	cfg.Domain = "example.com"
 	cfg.Domains.API = "backend.example.com"
 	d := cfg.EffectiveDomains()
-	if d.API != "backend.example.com" || d.App != "app.example.com" || d.Dash != "dash.example.com" || d.Siraj != "siraj.example.com" || d.S3 != "s3.example.com" || d.S3Console != "s3c.example.com" || d.Trade != "trade.example.com" {
+	if d.API != "backend.example.com" || d.App != "app.example.com" || d.Dash != "dash.example.com" || d.Siraj != "siraj.example.com" || d.S3 != "s3.example.com" || d.S3Console != "s3c.example.com" {
 		t.Fatalf("domains %#v", d)
 	}
-	cfg.Domains.Trade = "market.example.com"
-	if got := cfg.EffectiveDomains().Trade; got != "market.example.com" {
-		t.Fatalf("trade domain = %q", got)
-	}
+
 }

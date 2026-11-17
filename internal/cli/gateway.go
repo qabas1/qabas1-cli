@@ -37,14 +37,11 @@ func installedGatewayContainerID(e *env) (string, error) {
 	return gatewayContainerID(e, compose.EnvForInstalledRelease(e.Paths, st.CurrentRelease))
 }
 
-func gatewayConfig(domains config.Domains, trade string) (string, error) {
+func gatewayConfig(domains config.Domains) (string, error) {
 	routes := []struct{ host, upstream string }{
 		{domains.API, "http://api:3030"}, {domains.App, "http://app:8080"},
 		{domains.Dash, "http://dash:8080"}, {domains.Siraj, "http://siraj:8080"},
 		{domains.S3, "http://minio:9000"}, {domains.S3Console, "http://minio:9001"},
-	}
-	if trade != "" {
-		routes = append(routes, struct{ host, upstream string }{trade, "http://trade:8080"})
 	}
 	seen := map[string]bool{}
 	var b strings.Builder
@@ -61,11 +58,8 @@ func gatewayConfig(domains config.Domains, trade string) (string, error) {
 	b.WriteString("  upstream qabas_api_socket { zone qabas_api_socket 64k; hash $http_x_forwarded_for; server api:3030 resolve max_fails=0; }\n")
 	for _, service := range []struct{ name, address string }{
 		{"app", "app:8080"}, {"dash", "dash:8080"}, {"siraj", "siraj:8080"},
-		{"minio", "minio:9000"}, {"minio_console", "minio:9001"}, {"trade", "trade:8080"},
+		{"minio", "minio:9000"}, {"minio_console", "minio:9001"},
 	} {
-		if service.name == "trade" && trade == "" {
-			continue
-		}
 		fmt.Fprintf(&b, "  upstream qabas_%s { zone qabas_%s 64k; server %s resolve; }\n", service.name, service.name, service.address)
 	}
 	b.WriteString("  server { listen 8080 default_server; server_name _; location = /__gateway/health { return 200 'ok'; } location / { return 404; } }\n")
@@ -89,8 +83,6 @@ func gatewayConfig(domains config.Domains, trade string) (string, error) {
 				upstream = "http://qabas_minio"
 			case "http://minio:9001":
 				upstream = "http://qabas_minio_console"
-			case "http://trade:8080":
-				upstream = "http://qabas_trade"
 			}
 		}
 		fmt.Fprintf(&b, "  server { listen 8080; server_name %s;\n", r.host)
@@ -163,32 +155,10 @@ func applyGateway(e *env) error {
 		return fmt.Errorf("QabasOne is not installed")
 	}
 	domains := cfg.EffectiveDomains()
-	trade := domains.Trade
-	if trade == "" && cfg.Domain != "" {
-		trade = "trade." + cfg.Domain
-	}
-	tradeEnabled := false
-	for _, file := range nodestack.ReadDirectives(e.Paths.ComposeDir()).Files {
-		if filepath.Base(file) == "compose.trade.yaml" {
-			tradeEnabled = true
-		}
-	}
-	if !tradeEnabled {
-		trade = ""
-	} else if replicaStack && trade == "" {
-		return fmt.Errorf("set the replica-local domains.trade or base domain before applying the Trade gateway route")
-	}
-	if !replicaStack && cfg.Domains.Trade == "" {
-		if b, err := os.ReadFile(e.Paths.EnvCompose()); err == nil {
-			if override := nodestack.ParseEnv(b)["TRADE_DOMAIN"]; override != "" {
-				trade = override
-			}
-		}
-	}
 	if replicaStack && !domains.Complete() {
 		return fmt.Errorf("set a replica-local base domain or all service domains with `qabas config set` before applying the gateway")
 	}
-	conf, err := gatewayConfig(domains, trade)
+	conf, err := gatewayConfig(domains)
 	if err != nil {
 		return err
 	}
@@ -206,7 +176,7 @@ func applyGateway(e *env) error {
 		return err
 	}
 	if replicaStack {
-		if err := secrets.ApplyReplicaDomains(e.Paths, domains, trade); err != nil {
+		if err := secrets.ApplyReplicaDomains(e.Paths, domains); err != nil {
 			return err
 		}
 	}

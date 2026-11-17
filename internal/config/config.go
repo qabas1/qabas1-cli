@@ -27,7 +27,6 @@ type Domains struct {
 	Siraj     string `yaml:"siraj"`
 	S3        string `yaml:"s3"`
 	S3Console string `yaml:"s3Console"`
-	Trade     string `yaml:"trade,omitempty"`
 }
 
 type Backup struct {
@@ -162,8 +161,6 @@ func (c Config) Get(key string) (string, error) {
 		return c.Domains.S3, nil
 	case "domains.s3Console":
 		return c.Domains.S3Console, nil
-	case "domains.trade":
-		return c.Domains.Trade, nil
 	case "backup.destination":
 		return c.Backup.Destination, nil
 	case "deploy.repo":
@@ -193,8 +190,6 @@ func (c *Config) Set(key, value string) error {
 		c.Domains.S3 = value
 	case "domains.s3Console":
 		c.Domains.S3Console = value
-	case "domains.trade":
-		c.Domains.Trade = value
 	case "backup.destination":
 		c.Backup.Destination = value
 	case "deploy.repo":
@@ -217,7 +212,6 @@ func (c Config) Map() map[string]string {
 		"domains.siraj":      c.Domains.Siraj,
 		"domains.s3":         c.Domains.S3,
 		"domains.s3Console":  c.Domains.S3Console,
-		"domains.trade":      c.Domains.Trade,
 		"backup.destination": c.Backup.Destination,
 		"deploy.repo":        c.Deploy.Repo,
 		"deploy.ref":         c.Deploy.Ref,
@@ -272,9 +266,6 @@ func (c Config) EffectiveDomains() Domains {
 		if d.S3Console == "" {
 			d.S3Console = "s3c." + c.Domain
 		}
-		if d.Trade == "" {
-			d.Trade = "trade." + c.Domain
-		}
 	}
 	return d
 }
@@ -291,7 +282,6 @@ func (d Domains) Map() map[string]string {
 		"domains.siraj":     d.Siraj,
 		"domains.s3":        d.S3,
 		"domains.s3Console": d.S3Console,
-		"domains.trade":     d.Trade,
 	}
 }
 

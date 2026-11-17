@@ -102,7 +102,7 @@ func completeLogServices(_ *cobra.Command, args []string, toComplete string) ([]
 	}
 	services := []string{
 		"api", "app", "dash", "siraj", "postgres", "redis", "minio",
-		"gotenberg", "jsreport", "printables", "documents", "operations", "notifications",
+		"gotenberg", "jsreport", "printables", "operations", "notifications",
 		"audit-cleanup",
 	}
 	out := make([]string, 0, len(services))
