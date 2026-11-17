@@ -14,6 +14,7 @@ import (
 	"github.com/qabas1/qabas1-cli/internal/release"
 	"github.com/qabas1/qabas1-cli/internal/state"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 const scaleMin = 2
@@ -53,7 +54,30 @@ func ensureScaleOverlay(e *env) error {
 			return err
 		}
 	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	if err := validateScaleOverlay(data); err != nil {
+		return err
+	}
 	return nodestack.AddDirective(e.Paths.ComposeDir(), "file:"+nodestack.OverlayScale)
+}
+
+func validateScaleOverlay(data []byte) error {
+	var doc struct {
+		Services map[string]struct {
+			Environment map[string]string `yaml:"environment"`
+		} `yaml:"services"`
+	}
+	if err := yaml.Unmarshal(data, &doc); err != nil {
+		return fmt.Errorf("invalid scale overlay: %w", err)
+	}
+	if doc.Services["pgbouncer"].Environment["POOL_MODE"] != "session" ||
+		doc.Services["api"].Environment["PG_POOL_MAX"] == "" {
+		return fmt.Errorf("installed scale overlay must use PgBouncer session pooling and explicit PG_POOL_MAX; update compose.scale.yaml from a reviewed deployment release before scaling")
+	}
+	return nil
 }
 
 func setAPIScale(e *env, count int) error {
@@ -86,6 +110,9 @@ func setAPIScale(e *env, count int) error {
 	}
 	rt := newRuntime()
 	serviceEnv := scaleEnvironment(e, st.CurrentRelease, count)
+	if err := rt.CheckScalePoolBudget(e.Paths, serviceEnv, count); err != nil {
+		return err
+	}
 	if err := rt.UpService(e.Paths, serviceEnv, "pgbouncer", false, true); err != nil {
 		return err
 	}
@@ -114,9 +141,17 @@ func checkAPIRouting(e *env) error {
 	if err != nil {
 		return fmt.Errorf("cannot verify QabasOne gateway routing: %w", err)
 	}
-	conf := string(out)
+	return validateAPIRouting(string(out))
+}
+
+func validateAPIRouting(conf string) error {
 	if !strings.Contains(conf, "resolver 127.0.0.11") || !strings.Contains(conf, "api:3030 resolve") {
 		return fmt.Errorf("QabasOne gateway must resolve API replicas through Docker DNS")
+	}
+	for _, marker := range []string{"upstream qabas_api { zone qabas_api 64k; least_conn;", "upstream qabas_api_socket", "location = /socket.io", "location ^~ /socket.io/"} {
+		if !strings.Contains(conf, marker) {
+			return fmt.Errorf("run 'qabas gateway apply' to install independent REST balancing and Socket.IO affinity before API scaling")
+		}
 	}
 	return nil
 }

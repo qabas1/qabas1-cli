@@ -30,6 +30,32 @@ func TestGatewayConfigRoutesDomainsAndScaledAPI(t *testing.T) {
 	}
 }
 
+func TestGatewaySeparatesRESTFromSocketAffinity(t *testing.T) {
+	cfg := config.Default()
+	cfg.Domain = "qabas.one"
+	got, err := gatewayConfig(cfg.EffectiveDomains(), "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{
+		"upstream qabas_api { zone qabas_api 64k; least_conn;",
+		"upstream qabas_api_socket { zone qabas_api_socket 64k; hash $http_x_forwarded_for consistent;",
+		"location / {\n      proxy_pass http://qabas_api;",
+		"location = /socket.io {\n      proxy_pass http://qabas_api_socket;",
+		"location ^~ /socket.io/ {\n      proxy_pass http://qabas_api_socket;",
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("missing routing boundary %q", want)
+		}
+	}
+	if strings.Contains(got, "upstream qabas_api { zone qabas_api 64k; hash") {
+		t.Fatal("REST traffic must not use client-IP affinity")
+	}
+	if strings.Count(got, "proxy_pass http://qabas_api_socket;") != 2 {
+		t.Fatal("socket affinity must be limited to the exact and trailing-slash Socket.IO locations")
+	}
+}
+
 func TestGatewayConfigRejectsDuplicateDomain(t *testing.T) {
 	cfg := config.Default()
 	cfg.Domain = "qabas.one"

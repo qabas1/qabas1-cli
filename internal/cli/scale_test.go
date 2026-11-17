@@ -6,8 +6,41 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/qabas1/qabas1-cli/internal/config"
 	"github.com/qabas1/qabas1-cli/internal/paths"
 )
+
+func TestScalingRejectsLegacySessionUnsafeOverlay(t *testing.T) {
+	for _, data := range []string{
+		"services:\n  pgbouncer:\n    environment:\n      POOL_MODE: transaction\n  api:\n    environment:\n      PG_POOL_MAX: '10'\n",
+		"services:\n  pgbouncer:\n    environment:\n      POOL_MODE: session\n",
+		"not: [valid",
+	} {
+		if err := validateScaleOverlay([]byte(data)); err == nil {
+			t.Fatal("unsafe or incomplete scale overlay accepted")
+		}
+	}
+	safe := "services:\n  pgbouncer:\n    environment:\n      POOL_MODE: session\n  api:\n    container_name: !reset null\n    environment:\n      PG_POOL_MAX: ${QABAS_API_DB_CONNECTIONS:-10}\n"
+	if err := validateScaleOverlay([]byte(safe)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestScalingRejectsLegacyRouting(t *testing.T) {
+	old := "resolver 127.0.0.11; upstream qabas_api { hash $http_x_forwarded_for consistent; server api:3030 resolve; }"
+	if err := validateAPIRouting(old); err == nil {
+		t.Fatal("legacy all-REST client affinity accepted")
+	}
+	cfg := config.Default()
+	cfg.Domain = "qabas.one"
+	current, err := gatewayConfig(cfg.EffectiveDomains(), "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := validateAPIRouting(current); err != nil {
+		t.Fatal(err)
+	}
+}
 
 func TestScaleCountReadsSavedComposeEnv(t *testing.T) {
 	dir := t.TempDir()

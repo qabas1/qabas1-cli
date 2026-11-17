@@ -52,9 +52,11 @@ func gatewayConfig(domains config.Domains, trade string) (string, error) {
 	b.WriteString("  map $http_x_real_ip $audit_client_ip { default $http_x_real_ip; '' $remote_addr; }\n")
 	b.WriteString("  log_format audit escape=json '{\"time\":\"$time_iso8601\",\"request_id\":\"$request_id\",\"client_ip\":\"$audit_client_ip\",\"peer_ip\":\"$remote_addr\",\"forwarded_for\":\"$http_x_forwarded_for\",\"method\":\"$request_method\",\"host\":\"$host\",\"path\":\"$uri\",\"protocol\":\"$server_protocol\",\"status\":$status,\"bytes_sent\":$body_bytes_sent,\"request_bytes\":$request_length,\"duration\":$request_time,\"upstream\":\"$upstream_addr\",\"upstream_status\":\"$upstream_status\",\"upstream_duration\":\"$upstream_response_time\",\"referer\":\"$http_referer\",\"user_agent\":\"$http_user_agent\",\"scheme\":\"$http_x_forwarded_proto\"}';\n  access_log /dev/stdout audit;\n  client_body_temp_path /tmp/client_temp;\n  proxy_temp_path /tmp/proxy_temp;\n")
 	b.WriteString("  resolver 127.0.0.11 valid=10s ipv6=off;\n  map $http_upgrade $connection_upgrade { default upgrade; '' close; }\n")
-	// Docker DNS publishes a container before Node has finished startup. A failed
-	// connect must not quarantine every replica for nginx's default fail_timeout.
-	b.WriteString("  upstream qabas_api { zone qabas_api 64k; hash $http_x_forwarded_for consistent; server api:3030 resolve max_fails=0; }\n")
+	// REST is balanced independently of the client address. Only Socket.IO polling
+	// needs affinity; NAT must not pin an entire office's REST traffic to one replica.
+	// Keep REST failure suppression short while Docker DNS exposes starting replicas.
+	b.WriteString("  upstream qabas_api { zone qabas_api 64k; least_conn; server api:3030 resolve max_fails=1 fail_timeout=2s; }\n")
+	b.WriteString("  upstream qabas_api_socket { zone qabas_api_socket 64k; hash $http_x_forwarded_for consistent; server api:3030 resolve max_fails=0; }\n")
 	for _, service := range []struct{ name, address string }{
 		{"app", "app:8080"}, {"dash", "dash:8080"}, {"siraj", "siraj:8080"},
 		{"minio", "minio:9000"}, {"minio_console", "minio:9001"}, {"trade", "trade:8080"},
@@ -90,12 +92,21 @@ func gatewayConfig(domains config.Domains, trade string) (string, error) {
 			}
 		}
 		fmt.Fprintf(&b, "  server { listen 8080; server_name %s;\n", r.host)
-		b.WriteString("    client_max_body_size 0;\n    location / {\n")
-		fmt.Fprintf(&b, "      proxy_pass %s;\n", upstream)
-		b.WriteString("      proxy_http_version 1.1;\n      proxy_set_header Host $host;\n      proxy_set_header X-Real-IP $audit_client_ip;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;\n      proxy_set_header X-Request-ID $request_id;\n      proxy_set_header Upgrade $http_upgrade;\n      proxy_set_header Connection $connection_upgrade;\n      proxy_read_timeout 3600s;\n      proxy_request_buffering off;\n    }\n  }\n")
+		b.WriteString("    client_max_body_size 0;\n")
+		writeGatewayLocation(&b, "/", upstream)
+		if r.host == domains.API {
+			writeGatewayLocation(&b, "= /socket.io", "http://qabas_api_socket")
+			writeGatewayLocation(&b, "^~ /socket.io/", "http://qabas_api_socket")
+		}
+		b.WriteString("  }\n")
 	}
 	b.WriteString("}\n")
 	return b.String(), nil
+}
+
+func writeGatewayLocation(b *strings.Builder, location, upstream string) {
+	fmt.Fprintf(b, "    location %s {\n      proxy_pass %s;\n", location, upstream)
+	b.WriteString("      proxy_http_version 1.1;\n      proxy_set_header Host $host;\n      proxy_set_header X-Real-IP $audit_client_ip;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;\n      proxy_set_header X-Request-ID $request_id;\n      proxy_set_header Upgrade $http_upgrade;\n      proxy_set_header Connection $connection_upgrade;\n      proxy_read_timeout 3600s;\n      proxy_request_buffering off;\n    }\n")
 }
 
 func ensureGatewayOverlay(e *env) error {

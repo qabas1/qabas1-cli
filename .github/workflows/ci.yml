@@ -35,6 +35,11 @@ jobs:
       - name: Test
         run: go test -count=1 ./...
 
+      - name: NGINX replica routing regression
+        env:
+          QABAS_GATEWAY_INTEGRATION: "1"
+        run: go test -count=1 -timeout 3m ./internal/cli -run TestGatewaySameClientRESTAndPollingIntegration
+
       - name: Vet
         run: go vet ./...
 

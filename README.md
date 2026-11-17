@@ -540,6 +540,9 @@ are rotated with `qabas auth login --token-file`.
 
 ### Resource limits
 
+API balancing, database pool preflight checks, and the coordinated deployment
+overlay upgrade are documented in [Scaling safety](docs/scaling-safety.md).
+
 On deploy, `compose/compose.qabas-limits.yaml` gives every long-running service
 a memory limit sized from the RAM Docker sees (PostgreSQL 25%, API 15%, each
 worker 8%, Redis/MinIO 10%, front-ends 5%, each with a floor and ceiling), a
