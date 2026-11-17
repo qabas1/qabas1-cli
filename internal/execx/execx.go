@@ -5,8 +5,9 @@ package execx
 
 import "os/exec"
 
-// Command is like exec.Command but detaches the child from the controlling
-// terminal's process group on Unix so Ctrl+C does not deliver SIGINT to it.
+// Command is like exec.Command but shields the child from terminal Ctrl+C
+// during interrupt.Protect critical sections. Other commands share the
+// terminal's process group so interactive commands stop on Ctrl+C.
 func Command(name string, arg ...string) *exec.Cmd {
 	cmd := exec.Command(name, arg...)
 	detach(cmd)
