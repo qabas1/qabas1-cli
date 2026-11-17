@@ -3,7 +3,7 @@
 The managed gateway uses separate NGINX upstreams for API traffic:
 
 - Ordinary REST: least connections, independent of the caller's public IP.
-- `/socket.io` and `/socket.io/`: consistent client-address hashing for polling
+- `/socket.io` and `/socket.io/`: plain client-address hashing over resolved peers for polling
   affinity. WebSocket upgrades retain the existing headers and timeout.
 
 Docker DNS still discovers replica addresses dynamically. REST uses short passive
@@ -12,6 +12,11 @@ behind NAT can use different REST replicas; polling from one source stays on one
 replica while the peer set is stable. Scaling changes can remap polling sessions,
 so clients must reconnect/refetch normally. The trusted edge must overwrite
 forwarding headers, not forward client-supplied values unchanged.
+
+Do not add NGINX's `consistent` option to the single Docker-DNS server entry:
+it hashes the logical server name and can then distribute requests among that
+name's resolved addresses, defeating polling affinity. The live regression
+checks requests against two addresses, not merely the rendered directive.
 
 `qabas scale api N` refuses legacy gateway routing and an installed scale overlay
 that lacks PgBouncer session pooling or explicit `PG_POOL_MAX`. It never silently

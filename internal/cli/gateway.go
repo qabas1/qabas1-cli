@@ -56,7 +56,9 @@ func gatewayConfig(domains config.Domains, trade string) (string, error) {
 	// needs affinity; NAT must not pin an entire office's REST traffic to one replica.
 	// Keep REST failure suppression short while Docker DNS exposes starting replicas.
 	b.WriteString("  upstream qabas_api { zone qabas_api 64k; least_conn; server api:3030 resolve max_fails=1 fail_timeout=2s; }\n")
-	b.WriteString("  upstream qabas_api_socket { zone qabas_api_socket 64k; hash $http_x_forwarded_for consistent; server api:3030 resolve max_fails=0; }\n")
+	// Plain hash selects a resolved peer. Consistent hash selects the logical server
+	// name, then round-robins its addresses, breaking polling affinity for Docker DNS.
+	b.WriteString("  upstream qabas_api_socket { zone qabas_api_socket 64k; hash $http_x_forwarded_for; server api:3030 resolve max_fails=0; }\n")
 	for _, service := range []struct{ name, address string }{
 		{"app", "app:8080"}, {"dash", "dash:8080"}, {"siraj", "siraj:8080"},
 		{"minio", "minio:9000"}, {"minio_console", "minio:9001"}, {"trade", "trade:8080"},
