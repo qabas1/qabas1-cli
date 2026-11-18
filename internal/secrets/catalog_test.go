@@ -202,6 +202,18 @@ func TestMountedSecretFilesAndEnvCleanup(t *testing.T) {
 	if err != nil || string(value) != b.JWTSecret {
 		t.Fatalf("mounted file: %q %v", value, err)
 	}
+	if err := ValidateMountedFiles(p, defs, b); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Remove(SecretValueFile(p, "JWT_SECRET")); err != nil {
+		t.Fatal(err)
+	}
+	if err := ValidateMountedFiles(p, defs, b); err == nil {
+		t.Fatal("missing Compose secret source was accepted")
+	}
+	if err := MaterializeFiles(p, defs, b); err != nil {
+		t.Fatal(err)
+	}
 	if st, err := os.Stat(filepath.Dir(SecretValueFile(p, "JWT_SECRET"))); err != nil || (runtime.GOOS != "windows" && st.Mode().Perm() != 0o700) {
 		t.Fatalf("secret directory mode: %v %v", st, err)
 	}

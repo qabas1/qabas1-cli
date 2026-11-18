@@ -68,13 +68,14 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 		return fmt.Errorf("load compose/compose.yaml: %w", err)
 	}
 	var catalogRaw []byte
+	var catalog []secrets.Secret
 	if plan.Service == "" {
 		catalogRaw, err = e.Client.FetchOptionalComposeFile("secrets.yaml")
 		if err != nil {
 			return fmt.Errorf("fetch compose/secrets.yaml: %w", err)
 		}
 		if len(catalogRaw) > 0 {
-			catalog, err := secrets.ParseCatalog(catalogRaw)
+			catalog, err = secrets.ParseCatalog(catalogRaw)
 			if err != nil {
 				return err
 			}
@@ -86,6 +87,11 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 			if err := secrets.ValidateCatalogCompose(bundle, catalog); err != nil {
 				return err
 			}
+		}
+	} else {
+		catalog, err = secrets.CatalogFor(e.Paths)
+		if err != nil {
+			return err
 		}
 	}
 	templateNames, err := secrets.ComposeTemplates(bundle)
@@ -241,6 +247,10 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 	if err := e.abortIfInterrupted(opt, plan, backupID, "PULL"); err != nil {
 		return err
 	}
+	// Check the actual bind sources before maintenance or a Compose switch.
+	if err := secrets.ValidateMountedFiles(e.Paths, catalog, sec); err != nil {
+		return err
+	}
 
 	if e.BeforeSwitch != nil {
 		if err := e.BeforeSwitch(); err != nil {
@@ -289,10 +299,17 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 			}
 		}
 		if scoped {
+			if err := secrets.ValidateMountedFiles(e.Paths, catalog, sec); err != nil {
+				e.recordFailure(opt, plan, err)
+				return err
+			}
 			if err := e.Runtime.UpServices(e.Paths, env, plan.PullServices, false, true); err != nil {
 				e.recordFailure(opt, plan, err)
 				return exitcode.Wrap(exitcode.Health, err)
 			}
+		} else if err := secrets.ValidateMountedFiles(e.Paths, catalog, sec); err != nil {
+			e.recordFailure(opt, plan, err)
+			return err
 		} else if err := e.Runtime.Up(e.Paths, env); err != nil {
 			e.recordFailure(opt, plan, err)
 			return exitcode.Wrap(exitcode.Health, err)

@@ -72,6 +72,32 @@ func MaterializeFiles(p paths.Paths, catalog []Secret, b Bundle) error {
 	return nil
 }
 
+// ValidateMountedFiles checks the host sources Compose will bind-mount. It
+// intentionally reports keys and paths only, never credential values.
+func ValidateMountedFiles(p paths.Paths, catalog []Secret, b Bundle) error {
+	for _, s := range catalog {
+		if s.Delivery != "file" {
+			continue
+		}
+		path := SecretValueFile(p, s.Key)
+		st, err := os.Lstat(path)
+		if err != nil {
+			return fmt.Errorf("Compose secret source %s is unavailable: %w", path, err)
+		}
+		if !st.Mode().IsRegular() || st.Mode()&os.ModeSymlink != 0 {
+			return fmt.Errorf("Compose secret source %s is not a regular file", path)
+		}
+		value, err := os.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("read Compose secret source %s: %w", path, err)
+		}
+		if string(value) != b.Value(s.Key) {
+			return fmt.Errorf("Compose secret source %s differs from secrets.env", path)
+		}
+	}
+	return nil
+}
+
 // FileDeliveryActive reports whether the installed Compose file grants every
 // file-delivered secret to its declared consumers.
 func FileDeliveryActive(p paths.Paths, catalog []Secret) bool {
