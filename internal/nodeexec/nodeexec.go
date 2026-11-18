@@ -86,6 +86,7 @@ func (l *Local) Close() error { return nil }
 
 func (l *Local) Run(ctx context.Context, script string, stdin io.Reader) (Result, error) {
 	cmd := execx.Command("sh", "-c", script)
+	prepareLocalCommand(cmd)
 	var out, errb bytes.Buffer
 	cmd.Stdout, cmd.Stderr, cmd.Stdin = &out, &errb, stdin
 	err := runCtx(ctx, cmd.Start, cmd.Wait, func() { killLocalProcessTree(cmd.Process) })
