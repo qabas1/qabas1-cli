@@ -18,6 +18,7 @@ type Release struct {
 	Compatibility Compatibility `yaml:"compatibility" json:"compatibility"`
 	Requirements  Requirements  `yaml:"requirements" json:"requirements"`
 	Database      Database      `yaml:"database" json:"database"`
+	Capabilities  Capabilities  `yaml:"capabilities,omitempty" json:"capabilities,omitempty"`
 	Raw           []byte        `yaml:"-" json:"-"`
 }
 
@@ -68,6 +69,10 @@ type Requirements struct {
 type Database struct {
 	MigrationStrategy  string `yaml:"migrationStrategy" json:"migrationStrategy"`
 	DowngradeSupported bool   `yaml:"downgradeSupported" json:"downgradeSupported"`
+}
+
+type Capabilities struct {
+	SecretFileConfig bool `yaml:"secretFileConfig,omitempty" json:"secretFileConfig,omitempty"`
 }
 
 func Parse(raw []byte) (*Release, error) {

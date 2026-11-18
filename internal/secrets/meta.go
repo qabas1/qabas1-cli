@@ -14,13 +14,20 @@ const MaxAge = 180 * 24 * time.Hour
 
 // Secret describes one credential in secrets.env.
 type Secret struct {
-	Name string `json:"name"`
-	Key  string `json:"key"`
-	Desc string `json:"description"`
+	Name         string   `json:"name" yaml:"name"`
+	Key          string   `json:"key" yaml:"key"`
+	Desc         string   `json:"description" yaml:"description"`
+	Bytes        int      `json:"bytes,omitempty" yaml:"bytes,omitempty"`
+	EnvKeys      []string `json:"envKeys,omitempty" yaml:"envKeys,omitempty"`
+	Placeholders []string `json:"placeholders,omitempty" yaml:"placeholders,omitempty"`
+	Services     []string `json:"services,omitempty" yaml:"services,omitempty"`
+	Files        []string `json:"files,omitempty" yaml:"files,omitempty"`
+	Delivery     string   `json:"delivery,omitempty" yaml:"delivery,omitempty"`
+	Mount        string   `json:"mount,omitempty" yaml:"mount,omitempty"`
 	// Impact is what operators and users notice when it is rotated.
-	Impact string `json:"impact"`
+	Impact string `json:"impact" yaml:"impact"`
 	// Destructive secrets make stored data unreadable when rotated and need --force.
-	Destructive bool `json:"destructive,omitempty"`
+	Destructive bool `json:"destructive,omitempty" yaml:"destructive,omitempty"`
 }
 
 var Catalog = []Secret{
@@ -65,7 +72,7 @@ func (b Bundle) Value(key string) string {
 	case "SERVICE_ACCOUNT_API_KEY_PEPPER":
 		return b.ServiceAccountAPIKeyPepper
 	}
-	return ""
+	return b.Extra[key]
 }
 
 // With returns a copy of b with key set to v.
@@ -87,6 +94,16 @@ func (b Bundle) With(key, v string) Bundle {
 		b.TwoFactorKey = v
 	case "SERVICE_ACCOUNT_API_KEY_PEPPER":
 		b.ServiceAccountAPIKeyPepper = v
+	default:
+		if b.Extra == nil {
+			b.Extra = map[string]string{}
+		}
+		copy := make(map[string]string, len(b.Extra)+1)
+		for k, value := range b.Extra {
+			copy[k] = value
+		}
+		copy[key] = v
+		b.Extra = copy
 	}
 	return b
 }

@@ -90,7 +90,11 @@ func collectSecretStatus(p paths.Paths, now time.Time) []secretStatus {
 		}
 		out = append(out, s)
 	}
-	for _, sec := range secrets.Catalog {
+	catalog, err := secrets.CatalogFor(p)
+	if err != nil {
+		catalog = secrets.Catalog
+	}
+	for _, sec := range catalog {
 		rotate := "qabas secrets rotate " + sec.Name
 		if sec.Destructive {
 			rotate += " --force"

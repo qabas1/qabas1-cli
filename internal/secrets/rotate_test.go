@@ -81,10 +81,13 @@ func TestRotateRewritesEverywhereAndStamps(t *testing.T) {
 	}
 	api, _ := os.ReadFile(p.EnvAPI())
 	sec, _ := os.ReadFile(p.SecretsFile())
-	for _, body := range []string{string(api), string(sec)} {
-		if strings.Contains(body, old.PostgresPassword) || strings.Contains(body, old.RedisPassword) {
-			t.Fatalf("old value left behind:\n%s", body)
-		}
+	if strings.Contains(string(api), old.PostgresPassword) || strings.Contains(string(api), old.RedisPassword) ||
+		strings.Contains(string(sec), "POSTGRES_PASSWORD="+old.PostgresPassword+"\n") ||
+		strings.Contains(string(sec), "REDIS_PASSWORD="+old.RedisPassword+"\n") {
+		t.Fatalf("old rotated value left behind in API or secret assignments")
+	}
+	if !strings.Contains(string(sec), "POSTGRES_APP_PASSWORD="+old.PostgresAppPassword+"\n") {
+		t.Fatal("unrotated runtime password changed")
 	}
 	if !strings.Contains(string(api), old.JWTSecret) {
 		t.Fatal("unrelated secret changed")
@@ -94,6 +97,43 @@ func TestRotateRewritesEverywhereAndStamps(t *testing.T) {
 	}
 	if st := LoadMeta(p)["postgres"]; st.RotatedAt.IsZero() {
 		t.Fatal("rotation not stamped")
+	}
+}
+
+func TestRotateDoesNotChangeOverlappingUnrotatedPassword(t *testing.T) {
+	p, old := rotateFixture(t)
+	api := "POSTGRES_URI=postgresql://app:" + old.PostgresAppPassword + "@postgres:5432/db\n"
+	if err := os.WriteFile(p.EnvAPI(), []byte(api), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Rotate(p, []string{"postgres"}, RotateDeps{Generate: counter()}); err != nil {
+		t.Fatal(err)
+	}
+	got, err := os.ReadFile(p.EnvAPI())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != api {
+		t.Fatalf("unrotated app password changed: %s", got)
+	}
+}
+
+func TestRotateDiscoversNewServiceEnv(t *testing.T) {
+	p, old := rotateFixture(t)
+	extra := filepath.Join(p.ConfigDir, ".env.reports")
+	if err := os.WriteFile(extra, []byte("JWT_SECRET="+old.JWTSecret+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	res, err := Rotate(p, []string{"jwt"}, RotateDeps{Generate: counter()})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, err := os.ReadFile(extra)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(got), old.JWTSecret) || len(res.Files) < 2 {
+		t.Fatalf("new env was not rotated: %+v", res)
 	}
 }
 

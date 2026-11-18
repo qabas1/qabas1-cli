@@ -38,6 +38,7 @@ func harden(p Paths) []error {
 		}
 	}
 	tighten(p.ConfigDir, ModeConfigDir)
+	tighten(filepath.Join(p.ConfigDir, "secret-files"), 0o700)
 	tighten(p.Backups(), ModeBackupsDir)
 	tighten(p.LogDir, ModeLogDir)
 	tighten(p.LockPath, ModeLockFile)
