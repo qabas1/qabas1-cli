@@ -35,15 +35,26 @@ func newSecretsRotateCmd(f *flags) *cobra.Command {
 If anything fails after step 3, the previous files and database password are
 restored and the stack is re-applied.
 
-Names: postgres, redis, minio, jwt (signs every user out), 2fa and pepper
-(destructive: need --force), all (every non-destructive secret), and logs-ui.
+Names come from the installed deploy secret catalog. Use status to list them.
+Destructive secrets need --force; all rotates every non-destructive secret.
 GitHub/GHCR tokens are issued by GitHub; rotating them prints the steps.`,
 		Example: `  sudo qabas secrets rotate redis
   sudo qabas secrets rotate all
   sudo qabas secrets rotate jwt --yes
   sudo qabas secrets rotate logs-ui`,
-		Args:      cobra.MinimumNArgs(1),
-		ValidArgs: rotateNames(),
+		Args: cobra.MinimumNArgs(1),
+		ValidArgsFunction: func(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
+			e := load(f)
+			catalog, err := secrets.CatalogFor(e.Paths)
+			if err != nil {
+				return nil, cobra.ShellCompDirectiveError
+			}
+			out := []string{"all", "logs-ui", "github-token", "ghcr-token"}
+			for _, s := range catalog {
+				out = append(out, s.Name)
+			}
+			return out, cobra.ShellCompDirectiveNoFileComp
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			e := load(f)
 			var stack []string
@@ -64,7 +75,7 @@ GitHub/GHCR tokens are issued by GitHub; rotating them prints the steps.`,
 			if len(stack) == 0 {
 				return nil
 			}
-			names, err := secrets.ResolveNames(stack, force)
+			names, err := secrets.ResolveNamesFor(e.Paths, stack, force)
 			if err != nil {
 				return exitcode.New(exitcode.InvalidInput, "%s", err)
 			}
@@ -76,18 +87,20 @@ GitHub/GHCR tokens are issued by GitHub; rotating them prints the steps.`,
 	return cmd
 }
 
-func rotateNames() []string {
-	out := []string{"all", "logs-ui", "github-token", "ghcr-token"}
-	for _, s := range secrets.Catalog {
-		out = append(out, s.Name)
-	}
-	return out
-}
-
 func rotateStack(e *env, f *flags, names []string, noBackup bool) error {
 	var impacts []string
+	catalog, err := secrets.CatalogFor(e.Paths)
+	if err != nil {
+		return err
+	}
 	for _, n := range names {
-		s, _ := secrets.Lookup(n)
+		var s secrets.Secret
+		for _, item := range catalog {
+			if item.Name == n {
+				s = item
+				break
+			}
+		}
 		impacts = append(impacts, fmt.Sprintf("  %-9s %s", s.Name, s.Impact))
 	}
 	e.Out.Printf("Rotating:\n%s\n", strings.Join(impacts, "\n"))

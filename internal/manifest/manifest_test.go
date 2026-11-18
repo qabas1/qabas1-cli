@@ -1,6 +1,7 @@
 package manifest_test
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -34,6 +35,17 @@ func TestParseAndCompat(t *testing.T) {
 	}
 	if got := rel.Components.API.DigestRef(); got != "ghcr.io/qabas1/qabas1-api@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" {
 		t.Fatalf("digest ref %s", got)
+	}
+}
+
+func TestParseSecretFileCapability(t *testing.T) {
+	raw := append(bytes.Clone(fixture(t, "2.8.0.yaml")), []byte("\ncapabilities:\n  secretFileConfig: true\n")...)
+	rel, err := manifest.Parse(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !rel.Capabilities.SecretFileConfig {
+		t.Fatal("secret file capability was lost")
 	}
 }
 

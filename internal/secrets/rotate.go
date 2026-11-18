@@ -3,7 +3,9 @@ package secrets
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -37,10 +39,14 @@ type RotateResult struct {
 
 // EnvFiles are the files that may carry secret values: secrets.env first.
 func EnvFiles(p paths.Paths) []string {
-	return []string{
-		p.SecretsFile(), p.EnvCompose(), p.EnvAPI(), p.EnvWorker(), p.EnvMigrate(),
-		p.EnvApp(), p.EnvDash(), p.EnvSiraj(),
+	files := []string{p.SecretsFile()}
+	matches, _ := filepath.Glob(filepath.Join(p.ConfigDir, ".env*"))
+	for _, path := range matches {
+		if info, err := os.Stat(path); err == nil && info.Mode().IsRegular() {
+			files = append(files, path)
+		}
 	}
+	return files
 }
 
 // valueBytes is the random length used when generating a key.
@@ -69,11 +75,15 @@ func Rotate(p paths.Paths, names []string, d RotateDeps) (RotateResult, error) {
 	if err != nil {
 		return res, fmt.Errorf("read %s: %w", p.SecretsFile(), err)
 	}
+	catalog, err := CatalogFor(p)
+	if err != nil {
+		return res, err
+	}
 	old := parse(string(raw))
 	next := old
 	replace := map[string]string{}
 	for _, name := range names {
-		sec, ok := Lookup(name)
+		sec, ok := lookupIn(catalog, name)
 		if !ok {
 			return res, fmt.Errorf("unknown secret %q", name)
 		}
@@ -81,12 +91,15 @@ func Rotate(p paths.Paths, names []string, d RotateDeps) (RotateResult, error) {
 		if len(cur) < 12 {
 			return res, fmt.Errorf("%s is missing or too short in %s; refusing to rotate", sec.Key, p.SecretsFile())
 		}
-		v, err := gen(valueBytes(sec.Key))
+		v, err := gen(secretBytes(sec))
 		if err != nil {
 			return res, err
 		}
 		next = next.With(sec.Key, v)
-		replace[cur] = v
+		replace[sec.Key] = v
+		for _, key := range sec.EnvKeys {
+			replace[key] = v
+		}
 		res.Rotated = append(res.Rotated, name)
 	}
 	next.Register()
@@ -96,6 +109,21 @@ func Rotate(p paths.Paths, names []string, d RotateDeps) (RotateResult, error) {
 		if b, err := os.ReadFile(f); err == nil {
 			snap[f] = b
 		}
+	}
+	for _, name := range names {
+		sec, _ := lookupIn(catalog, name)
+		if sec.Delivery != "file" {
+			continue
+		}
+		path := SecretValueFile(p, sec.Key)
+		value, err := os.ReadFile(path)
+		if err != nil {
+			return res, fmt.Errorf("read mounted secret %s: %w", sec.Name, err)
+		}
+		if string(value) != old.Value(sec.Key) {
+			return res, fmt.Errorf("mounted secret %s differs from secrets.env", sec.Name)
+		}
+		snap[path] = value
 	}
 
 	if d.Backup != nil {
@@ -143,13 +171,13 @@ func Rotate(p paths.Paths, names []string, d RotateDeps) (RotateResult, error) {
 		return res, fmt.Errorf("%w; previous secrets restored", cause)
 	}
 
-	if _, ok := replace[old.PostgresPassword]; ok && d.SetPostgresPassword != nil {
+	if _, ok := replace["POSTGRES_PASSWORD"]; ok && d.SetPostgresPassword != nil {
 		if err := d.SetPostgresPassword(next.PostgresPassword); err != nil {
 			return res, fmt.Errorf("change database password; nothing changed: %w", err)
 		}
 		pgChanged = true
 	}
-	if _, ok := replace[old.PostgresAppPassword]; ok && d.SetPostgresAppPassword != nil {
+	if _, ok := replace["POSTGRES_APP_PASSWORD"]; ok && d.SetPostgresAppPassword != nil {
 		if err := d.SetPostgresAppPassword(next.PostgresAppPassword); err != nil {
 			return rollback(fmt.Errorf("change runtime database password: %w", err))
 		}
@@ -160,10 +188,18 @@ func Rotate(p paths.Paths, names []string, d RotateDeps) (RotateResult, error) {
 		if !ok {
 			continue
 		}
-		body := string(b)
-		for from, to := range replace {
-			body = strings.ReplaceAll(body, from, to)
+		fileReplace := map[string]string{}
+		for _, name := range names {
+			sec, _ := lookupIn(catalog, name)
+			if f != p.SecretsFile() && !secretUsesFile(sec, f) {
+				continue
+			}
+			fileReplace[sec.Key] = replace[sec.Key]
+			for _, key := range sec.EnvKeys {
+				fileReplace[key] = replace[sec.Key]
+			}
 		}
+		body := replaceEnvValues(string(b), fileReplace, old)
 		if body == string(b) {
 			continue
 		}
@@ -171,6 +207,17 @@ func Rotate(p paths.Paths, names []string, d RotateDeps) (RotateResult, error) {
 			return rollback(fmt.Errorf("write %s: %w", f, err))
 		}
 		res.Files = append(res.Files, f)
+	}
+	for _, name := range names {
+		sec, _ := lookupIn(catalog, name)
+		if sec.Delivery != "file" {
+			continue
+		}
+		path := SecretValueFile(p, sec.Key)
+		if err := writeAtomic(path, []byte(replace[sec.Key])); err != nil {
+			return rollback(fmt.Errorf("write mounted secret %s: %w", sec.Name, err))
+		}
+		res.Files = append(res.Files, path)
 	}
 	if d.Apply != nil {
 		if err := d.Apply(); err != nil {
@@ -189,6 +236,59 @@ func Rotate(p paths.Paths, names []string, d RotateDeps) (RotateResult, error) {
 	}
 	_ = SaveMeta(p, meta)
 	return res, nil
+}
+
+// replaceEnvValues updates assignments by key and any derived URI that embeds a
+// rotated credential. It never substitutes a matching value in unrelated text.
+func replaceEnvValues(body string, values map[string]string, old Bundle) string {
+	lines := strings.SplitAfter(body, "\n")
+	for i, line := range lines {
+		key, value, ok := strings.Cut(strings.TrimSuffix(line, "\n"), "=")
+		if !ok || strings.HasPrefix(strings.TrimSpace(key), "#") {
+			continue
+		}
+		if next, ok := values[key]; ok {
+			ending := ""
+			if strings.HasSuffix(line, "\n") {
+				ending = "\n"
+			}
+			lines[i] = key + "=" + next + ending
+			continue
+		}
+		// Preserve URI encodings while changing only known credential fields.
+		switch key {
+		case "POSTGRES_URI", "DATABASE_URL":
+			value = rotatedURLPassword(value, old.PostgresAppPassword, values["POSTGRES_APP_PASSWORD"])
+			value = rotatedURLPassword(value, old.PostgresPassword, values["POSTGRES_PASSWORD"])
+		case "REDIS_URL":
+			value = rotatedURLPassword(value, old.RedisPassword, values["REDIS_PASSWORD"])
+		case "STORAGE_SECRET_ACCESS_KEY":
+			if next, ok := values["MINIO_ROOT_PASSWORD"]; ok && value == old.MinioPassword {
+				value = next
+			}
+		}
+		lines[i] = key + "=" + value
+		if strings.HasSuffix(line, "\n") {
+			lines[i] += "\n"
+		}
+	}
+	return strings.Join(lines, "")
+}
+
+func rotatedURLPassword(raw, old, next string) string {
+	if old == "" || next == "" {
+		return raw
+	}
+	u, err := url.Parse(raw)
+	if err != nil || u.User == nil {
+		return raw
+	}
+	password, ok := u.User.Password()
+	if !ok || password != old {
+		return raw
+	}
+	u.User = url.UserPassword(u.User.Username(), next)
+	return u.String()
 }
 
 // writeAtomic replaces path keeping its mode (0600 when new).
@@ -211,11 +311,23 @@ func writeAtomic(path string, data []byte) error {
 // ResolveNames expands "all" to every non-destructive secret and validates names.
 // Destructive secrets require force.
 func ResolveNames(args []string, force bool) ([]string, error) {
+	return resolveNames(Catalog, args, force)
+}
+
+func ResolveNamesFor(p paths.Paths, args []string, force bool) ([]string, error) {
+	catalog, err := CatalogFor(p)
+	if err != nil {
+		return nil, err
+	}
+	return resolveNames(catalog, args, force)
+}
+
+func resolveNames(catalog []Secret, args []string, force bool) ([]string, error) {
 	var out []string
 	seen := map[string]bool{}
 	for _, a := range args {
 		if a == "all" {
-			for _, s := range Catalog {
+			for _, s := range catalog {
 				if !s.Destructive && !seen[s.Name] {
 					seen[s.Name] = true
 					out = append(out, s.Name)
@@ -223,7 +335,7 @@ func ResolveNames(args []string, force bool) ([]string, error) {
 			}
 			continue
 		}
-		s, ok := Lookup(a)
+		s, ok := lookupIn(catalog, a)
 		if !ok {
 			return nil, fmt.Errorf("unknown secret %q", a)
 		}

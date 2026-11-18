@@ -12,6 +12,7 @@ import (
 	"github.com/qabas1/qabas1-cli/internal/nodeexec"
 	"github.com/qabas1/qabas1-cli/internal/nodestack"
 	"github.com/qabas1/qabas1-cli/internal/pgctl"
+	"github.com/qabas1/qabas1-cli/internal/secrets"
 	"gopkg.in/yaml.v3"
 )
 
@@ -142,6 +143,32 @@ func (e *Engine) pushEnvFiles(ctx context.Context, x nodeexec.Executor, l nodest
 			body = nodestack.SetEnv(body, map[string]string{"MINIO_ROOT_USER": user, "MINIO_ROOT_PASSWORD": pass})
 		}
 		if err := write(ctx, x, l.ConfigDir+"/"+f, body, 0o600); err != nil {
+			return err
+		}
+	}
+	catalogRaw, err := os.ReadFile(secrets.CatalogFile(e.Paths))
+	if os.IsNotExist(err) {
+		return nil
+	} // pre-catalog installations
+	if err != nil {
+		return err
+	}
+	catalog, err := secrets.ParseCatalog(catalogRaw)
+	if err != nil {
+		return err
+	}
+	if err := write(ctx, x, l.ConfigDir+"/secrets.catalog.yaml", catalogRaw, 0o600); err != nil {
+		return err
+	}
+	for _, s := range catalog {
+		if s.Delivery != "file" {
+			continue
+		}
+		value, err := os.ReadFile(secrets.SecretValueFile(e.Paths, s.Key))
+		if err != nil {
+			return fmt.Errorf("read secret file %s for replica: %w", s.Name, err)
+		}
+		if err := write(ctx, x, l.ConfigDir+"/secret-files/"+s.Key, value, 0o644); err != nil {
 			return err
 		}
 	}

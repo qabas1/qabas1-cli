@@ -75,6 +75,10 @@ func SecurityChecks(p paths.Paths, installed bool, pr SecurityProbes) []Check {
 		if st, err := os.Stat(p.ConfigDir); err == nil && st.Mode().Perm()&^paths.ModeConfigDir != 0 {
 			loose = append(loose, fmt.Sprintf("%s (%04o)", p.ConfigDir, st.Mode().Perm()))
 		}
+		mountDir := filepath.Join(p.ConfigDir, "secret-files")
+		if st, err := os.Stat(mountDir); err == nil && st.Mode().Perm()&0o077 != 0 {
+			loose = append(loose, fmt.Sprintf("%s (%04o)", mountDir, st.Mode().Perm()))
+		}
 		if st, err := os.Stat(p.LockPath); err == nil && st.Mode().Perm()&^paths.ModeLockFile != 0 {
 			loose = append(loose, fmt.Sprintf("%s (%04o)", filepath.Base(p.LockPath), st.Mode().Perm()))
 		}
@@ -98,7 +102,11 @@ func SecurityChecks(p paths.Paths, installed bool, pr SecurityProbes) []Check {
 	if installed {
 		meta := secrets.LoadMeta(p)
 		var due []string
-		for _, s := range secrets.Catalog {
+		catalog, err := secrets.CatalogFor(p)
+		if err != nil {
+			catalog = secrets.Catalog
+		}
+		for _, s := range catalog {
 			if stamp, ok := meta[s.Name]; ok && pr.Now().Sub(stamp.Since()) > secrets.MaxAge {
 				due = append(due, fmt.Sprintf("%s (%dd)", s.Name, int(pr.Now().Sub(stamp.Since()).Hours()/24)))
 			}

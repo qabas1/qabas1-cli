@@ -61,16 +61,39 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 	var bundle []byte
 	if plan.Service == "" {
 		bundle, err = e.Client.FetchCompose()
+	} else {
+		bundle, err = os.ReadFile(e.Paths.ComposeFile())
+	}
+	if err != nil {
+		return fmt.Errorf("load compose/compose.yaml: %w", err)
+	}
+	var catalogRaw []byte
+	if plan.Service == "" {
+		catalogRaw, err = e.Client.FetchOptionalComposeFile("secrets.yaml")
 		if err != nil {
-			return fmt.Errorf("deploy repository %s@%s is missing compose/compose.yaml: %w", e.Client.Repo, e.Client.Ref, err)
+			return fmt.Errorf("fetch compose/secrets.yaml: %w", err)
+		}
+		if len(catalogRaw) > 0 {
+			catalog, err := secrets.ParseCatalog(catalogRaw)
+			if err != nil {
+				return err
+			}
+			for _, secret := range catalog {
+				if secret.Delivery == "file" && !plan.Target.Capabilities.SecretFileConfig {
+					return fmt.Errorf("release %s API image has not declared secretFileConfig support; publish a compatible API release before using file-delivered secrets", plan.Target.Release.Version)
+				}
+			}
+			if err := secrets.ValidateCatalogCompose(bundle, catalog); err != nil {
+				return err
+			}
 		}
 	}
-	names, err := secrets.RequiredTemplates(e.Paths)
+	templateNames, err := secrets.ComposeTemplates(bundle)
 	if err != nil {
 		return err
 	}
-	templates := make(map[string][]byte, len(names))
-	for _, name := range names {
+	templates := make(map[string][]byte, len(templateNames))
+	for _, name := range templateNames {
 		raw, fetchErr := e.Client.FetchTemplate(name)
 		if fetchErr != nil {
 			return fmt.Errorf("deploy repository %s@%s is missing compose/templates/%s: %w", e.Client.Repo, e.Client.Ref, name, fetchErr)
@@ -93,13 +116,18 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 	if err := config.Save(e.Paths, e.Config); err != nil {
 		return err
 	}
+	if len(catalogRaw) > 0 {
+		if err := secrets.InstallCatalog(e.Paths, catalogRaw); err != nil {
+			return err
+		}
+	}
 	sec, err := secrets.Ensure(e.Paths)
 	if err != nil {
 		return err
 	}
 	// Materialize missing env files and stage the runtime password. Existing
 	// API/worker URLs are upgraded after the database role is initialized.
-	if err := secrets.WriteEnvFiles(e.Paths, sec, e.Config.EffectiveDomains(), fetchTemplate); err != nil {
+	if err := secrets.WriteComposeEnvFiles(e.Paths, sec, e.Config.EffectiveDomains(), templateNames, fetchTemplate); err != nil {
 		return err
 	}
 	if err := e.abortIfInterrupted(opt, plan, "", "PREPARE"); err != nil {
@@ -131,6 +159,31 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 	}
 	if err := e.abortIfInterrupted(opt, plan, "", "VALIDATE"); err != nil {
 		return err
+	}
+	if scoped {
+		body, err := os.ReadFile(e.Paths.ComposeFile())
+		if err != nil {
+			return err
+		}
+		imageKey := map[string]string{
+			"api": "QABASONE_API_IMAGE", "app": "QABASONE_APP_IMAGE",
+			"dash": "QABASONE_DASH_IMAGE", "siraj": "QABASONE_SIRAJ_IMAGE",
+		}[plan.Service]
+		plan.PullServices, err = compose.ServicesForImage(body, imageKey)
+		if err != nil {
+			return err
+		}
+	} else if !plan.PullAll {
+		current, err := e.currentManifest()
+		if err != nil {
+			return err
+		}
+		if current != nil {
+			plan.PullServices, err = changedComposeServices(bundle, current, plan.Target)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	backupID := ""
@@ -236,8 +289,7 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 			}
 		}
 		if scoped {
-			services := compose.DeployComposeServices(plan.Service)
-			if err := e.Runtime.UpServices(e.Paths, env, services, false, true); err != nil {
+			if err := e.Runtime.UpServices(e.Paths, env, plan.PullServices, false, true); err != nil {
 				e.recordFailure(opt, plan, err)
 				return exitcode.Wrap(exitcode.Health, err)
 			}
@@ -264,6 +316,13 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 		return nil
 	})
 	if err != nil {
+		return err
+	}
+	installedCatalog, err := secrets.CatalogFor(e.Paths)
+	if err != nil {
+		return err
+	}
+	if err := secrets.StripMountedEnv(e.Paths, installedCatalog); err != nil {
 		return err
 	}
 

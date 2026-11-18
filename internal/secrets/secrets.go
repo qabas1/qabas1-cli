@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/qabas1/qabas1-cli/internal/config"
@@ -28,6 +29,7 @@ type Bundle struct {
 	JWTSecret                  string
 	TwoFactorKey               string
 	ServiceAccountAPIKeyPepper string
+	Extra                      map[string]string
 }
 
 // ReadInstalled reads the host's current secrets without generating or changing them.
@@ -77,7 +79,11 @@ func Generate() (Bundle, error) {
 //   - missing secrets.env but complete service env files → reconstruct secrets.env once
 //   - no secrets at all → generate and write secrets.env once
 func Ensure(p paths.Paths) (Bundle, error) {
-	b, err := ensure(p)
+	catalog, err := CatalogFor(p)
+	if err != nil {
+		return Bundle{}, err
+	}
+	b, err := ensure(p, catalog)
 	if err == nil && b.PostgresAppPassword == "" {
 		// Existing installs need a distinct runtime credential without rotating the owner password.
 		b.PostgresAppPassword, err = randomHex(16)
@@ -89,7 +95,51 @@ func Ensure(p paths.Paths) (Bundle, error) {
 			}
 		}
 	}
+	// A new release may add a secret. Preserve every installed value and append
+	// only missing keys before rendering service env files.
+	_, catalogStatErr := os.Stat(CatalogFile(p))
+	if err == nil && catalogStatErr == nil {
+		var raw []byte
+		raw, err = os.ReadFile(p.SecretsFile())
+		if err == nil {
+			var additions []string
+			for _, s := range catalog {
+				if b.Value(s.Key) != "" {
+					continue
+				}
+				legacy := false
+				for _, core := range Catalog {
+					if core.Key == s.Key {
+						legacy = true
+						break
+					}
+				}
+				if legacy {
+					continue
+				}
+				var value string
+				value, err = existingCatalogValue(p, s)
+				if err != nil {
+					break
+				}
+				if value == "" {
+					value, err = randomHex(secretBytes(s))
+				}
+				if err != nil {
+					break
+				}
+				b = b.With(s.Key, value)
+				additions = append(additions, s.Key+"="+value)
+			}
+			if err == nil && len(additions) > 0 {
+				err = writeAtomic(p.SecretsFile(), []byte(strings.TrimRight(string(raw), "\n")+"\n"+strings.Join(additions, "\n")+"\n"))
+			}
+		}
+	}
 	b.Register()
+	if err == nil {
+		err = MaterializeFiles(p, catalog, b)
+	}
 	return b, err
 }
 
@@ -97,6 +147,9 @@ func Ensure(p paths.Paths) (Bundle, error) {
 // logs, history, and error output.
 func (b Bundle) Register() {
 	redact.Register(b.PostgresPassword, b.PostgresAppPassword, b.RedisPassword, b.MinioPassword, b.JWTSecret, b.TwoFactorKey, b.ServiceAccountAPIKeyPepper)
+	for _, value := range b.Extra {
+		redact.Register(value)
+	}
 }
 
 // RegisterKnown registers secrets.env values with the redactor when the file
@@ -111,7 +164,7 @@ func RegisterKnown(p paths.Paths) {
 	}
 }
 
-func ensure(p paths.Paths) (Bundle, error) {
+func ensure(p paths.Paths, catalog []Secret) (Bundle, error) {
 	if raw, err := os.ReadFile(p.SecretsFile()); err == nil {
 		b := parse(string(raw))
 		// Prefer pepper already present in service env if secrets.env omitted it,
@@ -136,7 +189,7 @@ func ensure(p paths.Paths) (Bundle, error) {
 		}
 		return b, nil
 	}
-	b, err := Generate()
+	b, err := GenerateForCatalog(catalog)
 	if err != nil {
 		return b, err
 	}
@@ -159,6 +212,14 @@ func writeSecretsFile(p paths.Paths, b Bundle) error {
 		"POSTGRES_PASSWORD=%s\nPOSTGRES_APP_PASSWORD=%s\nREDIS_PASSWORD=%s\nMINIO_ROOT_USER=%s\nMINIO_ROOT_PASSWORD=%s\nJWT_SECRET=%s\nTWO_FACTOR_SECRET_ENCRYPTION_KEY=%s\nSERVICE_ACCOUNT_API_KEY_PEPPER=%s\n",
 		b.PostgresPassword, b.PostgresAppPassword, b.RedisPassword, b.MinioUser, b.MinioPassword, b.JWTSecret, b.TwoFactorKey, b.ServiceAccountAPIKeyPepper,
 	)
+	var keys []string
+	for key := range b.Extra {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		body += key + "=" + b.Extra[key] + "\n"
+	}
 	return os.WriteFile(p.SecretsFile(), []byte(body), 0o600)
 }
 
@@ -302,23 +363,89 @@ func RequiredTemplates(p paths.Paths) ([]string, error) {
 // WriteEnvFiles materializes missing env files and stages the runtime role
 // password. Existing API/worker credentials change only after role setup.
 func WriteEnvFiles(p paths.Paths, b Bundle, domains config.Domains, fetch TemplateFetcher) error {
+	var names []string
+	for _, tmpl := range envTemplates {
+		names = append(names, tmpl.name)
+	}
+	return WriteComposeEnvFiles(p, b, domains, names, fetch)
+}
+
+// WriteComposeEnvFiles uses env files declared by the release's Compose file.
+func WriteComposeEnvFiles(p paths.Paths, b Bundle, domains config.Domains, names []string, fetch TemplateFetcher) error {
 	if fetch == nil {
 		return fmt.Errorf("env template fetcher is required (templates come from the qabas1-deploy release)")
 	}
-	for _, tmpl := range envTemplates {
-		dest := tmpl.dest(p)
-		if _, err := os.Stat(dest); err == nil {
-			// Existing credential/env files are operator-owned after first setup.
-			continue
-		} else if err != nil && !os.IsNotExist(err) {
+	catalog, err := CatalogFor(p)
+	if err != nil {
+		return err
+	}
+	_, catalogErr := os.Stat(CatalogFile(p))
+	hasCatalog := catalogErr == nil
+	fileDeliveryActive := hasCatalog && FileDeliveryActive(p, catalog)
+	for _, name := range names {
+		dest, err := templateDestination(p, name)
+		if err != nil {
 			return err
 		}
-		raw, err := fetch(tmpl.name)
+		existing, readErr := os.ReadFile(dest)
+		if readErr != nil && !os.IsNotExist(readErr) {
+			return readErr
+		}
+		if readErr == nil && !hasCatalog {
+			continue
+		}
+		raw, err := fetch(name)
 		if err != nil {
-			return fmt.Errorf("fetch env template %s from deploy release: %w", tmpl.name, err)
+			return fmt.Errorf("fetch env template %s from deploy release: %w", name, err)
 		}
 		body := RenderTemplate(string(raw), b, domains, p.ConfigDir)
-		if err := os.WriteFile(dest, []byte(body), 0o600); err != nil {
+		if hasCatalog {
+			body = RenderCatalogTemplateFile(string(raw), b, catalog, domains, p.ConfigDir, filepath.Base(dest))
+		}
+		if fileDeliveryActive {
+			body = stripFileDeliveryBody(body, catalog, filepath.Base(dest))
+		}
+		for _, line := range strings.Split(body, "\n") {
+			line = strings.TrimSpace(line)
+			if line == "" || strings.HasPrefix(line, "#") {
+				continue
+			}
+			key, value, ok := strings.Cut(line, "=")
+			if ok && strings.Contains(value, "REPLACE_") && key != "JSREPORT_ADMIN_PASSWORD" && key != "JSREPORT_COOKIE_SECRET" {
+				return fmt.Errorf("env template %s has unresolved secret %s", name, key)
+			}
+		}
+		if readErr == nil {
+			originalExisting := existing
+			if fileDeliveryActive {
+				existing = []byte(stripFileDeliveryBody(string(existing), catalog, filepath.Base(dest)))
+			}
+			current := nodestack.ParseEnv(existing)
+			rendered := nodestack.ParseEnv([]byte(body))
+			missing := map[string]string{}
+			for _, secret := range catalog {
+				if !secretUsesFile(secret, dest) {
+					continue
+				}
+				if fileDeliveryActive && secret.Delivery == "file" {
+					continue
+				}
+				for _, key := range append([]string{secret.Key}, secret.EnvKeys...) {
+					if (current[key] == "" || strings.HasPrefix(current[key], "REPLACE_")) && rendered[key] != "" {
+						missing[key] = rendered[key]
+					}
+				}
+			}
+			updated := existing
+			if len(missing) > 0 {
+				updated = nodestack.SetEnv(updated, missing)
+			}
+			if string(updated) != string(originalExisting) {
+				if err := writeAtomic(dest, updated); err != nil {
+					return err
+				}
+			}
+		} else if err := os.WriteFile(dest, []byte(body), 0o600); err != nil {
 			return err
 		}
 	}
@@ -513,6 +640,13 @@ func parse(raw string) Bundle {
 			b.TwoFactorKey = v
 		case "SERVICE_ACCOUNT_API_KEY_PEPPER":
 			b.ServiceAccountAPIKeyPepper = v
+		default:
+			if envIdentifier.MatchString(k) {
+				if b.Extra == nil {
+					b.Extra = map[string]string{}
+				}
+				b.Extra[k] = v
+			}
 		}
 	}
 	return b
