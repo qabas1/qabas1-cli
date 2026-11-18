@@ -134,6 +134,16 @@ func (c *Client) FetchComposeFile(name string) ([]byte, error) {
 	return c.fetchRaw("compose/" + name)
 }
 
+// FetchOptionalComposeFile allows older deploy refs to omit a newly introduced
+// Compose companion file. Other fetch failures still stop the deployment.
+func (c *Client) FetchOptionalComposeFile(name string) ([]byte, error) {
+	raw, err := c.FetchComposeFile(name)
+	if err != nil && exitcode.CodeOf(err) == exitcode.InvalidInput && err.Error() == "not found: compose/"+name {
+		return nil, nil
+	}
+	return raw, err
+}
+
 func (c *Client) FetchTemplate(name string) ([]byte, error) {
 	return c.fetchRaw("compose/templates/" + name)
 }

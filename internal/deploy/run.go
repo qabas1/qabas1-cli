@@ -69,21 +69,23 @@ func (e *Engine) Run(opt Options, backupFn func() (string, error)) error {
 	}
 	var catalogRaw []byte
 	if plan.Service == "" {
-		catalogRaw, err = e.Client.FetchComposeFile("secrets.yaml")
+		catalogRaw, err = e.Client.FetchOptionalComposeFile("secrets.yaml")
 		if err != nil {
 			return fmt.Errorf("fetch compose/secrets.yaml: %w", err)
 		}
-		catalog, err := secrets.ParseCatalog(catalogRaw)
-		if err != nil {
-			return err
-		}
-		for _, secret := range catalog {
-			if secret.Delivery == "file" && !plan.Target.Capabilities.SecretFileConfig {
-				return fmt.Errorf("release %s API image has not declared secretFileConfig support; publish a compatible API release before using file-delivered secrets", plan.Target.Release.Version)
+		if len(catalogRaw) > 0 {
+			catalog, err := secrets.ParseCatalog(catalogRaw)
+			if err != nil {
+				return err
 			}
-		}
-		if err := secrets.ValidateCatalogCompose(bundle, catalog); err != nil {
-			return err
+			for _, secret := range catalog {
+				if secret.Delivery == "file" && !plan.Target.Capabilities.SecretFileConfig {
+					return fmt.Errorf("release %s API image has not declared secretFileConfig support; publish a compatible API release before using file-delivered secrets", plan.Target.Release.Version)
+				}
+			}
+			if err := secrets.ValidateCatalogCompose(bundle, catalog); err != nil {
+				return err
+			}
 		}
 	}
 	templateNames, err := secrets.ComposeTemplates(bundle)

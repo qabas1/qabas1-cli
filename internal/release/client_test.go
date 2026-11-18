@@ -85,6 +85,28 @@ func TestListAndLatest(t *testing.T) {
 	}
 }
 
+func TestFetchOptionalComposeFile(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/qabas1/qabas1-deploy/main/compose/secrets.yaml" {
+			http.NotFound(w, r)
+			return
+		}
+		_, _ = w.Write([]byte("schemaVersion: 1\n"))
+	}))
+	t.Cleanup(srv.Close)
+	c := release.New("qabas1/qabas1-deploy", "main")
+	c.HTTP = srv.Client()
+	c.RawBase = srv.URL
+	missing, err := c.FetchOptionalComposeFile("secrets.yaml")
+	if err != nil || missing != nil {
+		t.Fatalf("missing optional file: %q %v", missing, err)
+	}
+	got, err := c.FetchOptionalComposeFile("other.yaml")
+	if err != nil || string(got) != "schemaVersion: 1\n" {
+		t.Fatalf("present optional file: %q %v", got, err)
+	}
+}
+
 func TestLatestDevChannelMissing(t *testing.T) {
 	_, file, _, _ := runtime.Caller(0)
 	dir := filepath.Join(filepath.Dir(file), "testdata", "releases")
