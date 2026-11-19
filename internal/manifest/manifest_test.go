@@ -62,6 +62,34 @@ func TestCompatMismatch(t *testing.T) {
 	}
 }
 
+func TestDevAPICompatibilityUsesCoreVersion(t *testing.T) {
+	rel, err := manifest.Parse(fixture(t, "2.8.0.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rel.Release.Channel = "dev"
+	rel.Components.API.Version = "2.0.6-dev.1795047607"
+	rel.Compatibility.App.API = ">=2.0.3 <2.1.0"
+	rel.Compatibility.Dash.API = ">=2.0.3 <2.1.0"
+	rel.Compatibility.Siraj.API = ">=2.0.3 <2.1.0"
+	if err := rel.CheckCompatibility(); err != nil {
+		t.Fatal(err)
+	}
+	rel.Components.API.Version = "2.1.0-dev.1795047607"
+	if err := rel.CheckCompatibility(); err == nil {
+		t.Fatal("expected upper bound to reject dev API")
+	}
+	rel.Components.API.Version = "2.0.2-dev.1795047607"
+	if err := rel.CheckCompatibility(); err == nil {
+		t.Fatal("expected lower bound to reject dev API")
+	}
+	rel.Release.Channel = "stable"
+	rel.Components.API.Version = "2.0.6-dev.1795047607"
+	if err := rel.CheckCompatibility(); err == nil {
+		t.Fatal("expected stable channel to retain prerelease semantics")
+	}
+}
+
 func TestCLIRequirement(t *testing.T) {
 	rel, err := manifest.Parse(fixture(t, "2.9.0.yaml"))
 	if err != nil {

@@ -8,6 +8,7 @@
 *.msi
 *.wixpdb
 *.syso
+.tmp-go-cache/
 
 # Go
 *.test

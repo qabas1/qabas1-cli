@@ -151,6 +151,15 @@ func (r *Release) CheckCompatibility() error {
 	if err != nil {
 		return exitcode.New(exitcode.InvalidInput, "api version: %w", err)
 	}
+	// Dev images carry a prerelease suffix for identification. Compatibility
+	// ranges describe the API's major/minor/patch contract, so check that
+	// contract for dev channel images as well.
+	if r.Release.Channel == "dev" && api.Prerelease() != "" {
+		api, err = semver.NewVersion(fmt.Sprintf("%d.%d.%d", api.Major(), api.Minor(), api.Patch()))
+		if err != nil {
+			return exitcode.New(exitcode.InvalidInput, "api version: %w", err)
+		}
+	}
 	if err := constraintOK(r.Compatibility.App.API, api); err != nil {
 		return exitcode.New(exitcode.Compatibility, "app requires API %s; this release has %s", r.Compatibility.App.API, r.Components.API.Version)
 	}
