@@ -11,6 +11,7 @@ import (
 
 	"github.com/qabas1/qabas1-cli/internal/cluster"
 	"github.com/qabas1/qabas1-cli/internal/nodeexec"
+	"github.com/qabas1/qabas1-cli/internal/nodestack"
 	"github.com/qabas1/qabas1-cli/internal/paths"
 )
 
@@ -162,6 +163,23 @@ func TestAddProvisionsReadOnlyReplica(t *testing.T) {
 					t.Fatalf("secret leaked into a %s script argument:\n%s", fk.Name, s)
 				}
 			}
+		}
+	}
+}
+
+func TestConfigureNodePreservesGatewayOverlay(t *testing.T) {
+	fx := newFixture(t, preflightOK)
+	fx.eng.Cluster.Nodes = append(fx.eng.Cluster.Nodes, cluster.Node{Name: "dr1", Role: cluster.RoleStandby, Host: "203.0.113.10"})
+	l := fx.eng.Layout("dr1")
+	fx.replica.OnOut("cat "+nodeexec.Quote(l.ComposeDir+"/"+nodestack.OverlaysFile),
+		"file:compose.replica-ro.yaml\nfile:compose.gateway.yaml\nenv-file:"+l.ConfigDir+"/gateway.env\n")
+	if err := fx.eng.ConfigureNode(context.Background(), "dr1", StackOptions{Profile: nodestack.ProfileReplicaRO}); err != nil {
+		t.Fatal(err)
+	}
+	overlays := fx.replica.Files[l.ComposeDir+"/"+nodestack.OverlaysFile]
+	for _, directive := range []string{"file:compose.replica-ro.yaml", "file:compose.gateway.yaml", "env-file:" + l.ConfigDir + "/gateway.env"} {
+		if !strings.Contains(overlays, directive+"\n") {
+			t.Fatalf("missing %q from overlays:\n%s", directive, overlays)
 		}
 	}
 }

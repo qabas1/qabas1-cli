@@ -63,7 +63,19 @@ func (e *Engine) ConfigureNode(ctx context.Context, name string, opt StackOption
 			return err
 		}
 	}
-	if err := write(ctx, x, l.ComposeDir+"/"+nodestack.OverlaysFile, []byte(nodestack.LocalOverlays(l, opt.Profile, opt.PITR)), 0o644); err != nil {
+	// The gateway is installed locally on each node. Keep its directives when
+	// refreshing role overlays, otherwise the next compose up removes it as an orphan.
+	existing, err := run(ctx, x, "cat "+nodeexec.Quote(l.ComposeDir+"/"+nodestack.OverlaysFile)+" 2>/dev/null || true")
+	if err != nil {
+		return err
+	}
+	overlays := nodestack.LocalOverlays(l, opt.Profile, opt.PITR)
+	for _, directive := range []string{"file:compose.gateway.yaml", "env-file:" + l.ConfigDir + "/gateway.env"} {
+		if strings.Contains("\n"+existing, "\n"+directive+"\n") || strings.HasSuffix(existing, "\n"+directive) {
+			overlays += directive + "\n"
+		}
+	}
+	if err := write(ctx, x, l.ComposeDir+"/"+nodestack.OverlaysFile, []byte(overlays), 0o644); err != nil {
 		return err
 	}
 
