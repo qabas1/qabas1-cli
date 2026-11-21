@@ -184,6 +184,24 @@ func TestConfigureNodePreservesGatewayOverlay(t *testing.T) {
 	}
 }
 
+func TestComposeIncludesInstalledGatewayOverlay(t *testing.T) {
+	fx := newFixture(t, preflightOK)
+	fx.eng.Cluster.Nodes = append(fx.eng.Cluster.Nodes, cluster.Node{Name: "dr1", Role: cluster.RoleStandby, Host: "203.0.113.10"})
+	l := fx.eng.Layout("dr1")
+	if err := os.MkdirAll(l.ComposeDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(l.ComposeDir, nodestack.OverlaysFile), []byte("file:compose.replica-ro.yaml\nfile:compose.gateway.yaml\nenv-file:"+l.ConfigDir+"/gateway.env\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := fx.eng.Compose(context.Background(), "dr1", StackOptions{Profile: nodestack.ProfileReplicaRO}, "up -d --remove-orphans"); err != nil {
+		t.Fatal(err)
+	}
+	if !fx.replica.Ran("-f /var/lib/qabasone/compose/compose.gateway.yaml") {
+		t.Fatal("Compose invocation omitted installed gateway overlay")
+	}
+}
+
 func TestAddResumeRefreshesStorageLink(t *testing.T) {
 	fx := newFixture(t, preflightOK)
 	node := cluster.Node{Name: "dr1", Host: "203.0.113.10", SSHHostKey: "SHA256:x", Site: "branch"}

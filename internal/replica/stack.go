@@ -341,5 +341,15 @@ func (e *Engine) Compose(ctx context.Context, name string, opt StackOptions, arg
 	if err != nil {
 		return "", err
 	}
-	return run(ctx, x, nodestack.ComposeCommand(e.Layout(name), opt.Profile, opt.PITR, args))
+	command := nodestack.ComposeCommand(e.Layout(name), opt.Profile, opt.PITR, args)
+	// Replica-local overlays such as the independently managed gateway are kept
+	// in the node's overlays file. Include them in Compose invocations so stack
+	// recreation does not remove those services as orphans.
+	directives := nodestack.ReadDirectives(e.Layout(name).ComposeDir)
+	for _, file := range directives.Files {
+		if filepath.Base(file) == "compose.gateway.yaml" {
+			command = strings.Replace(command, " --env-file ", " -f "+nodeexec.Quote(file)+" --env-file ", 1)
+		}
+	}
+	return run(ctx, x, command)
 }
