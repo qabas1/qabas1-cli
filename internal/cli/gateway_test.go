@@ -44,9 +44,9 @@ func TestGatewayCORPOverrideIsScopedToS3Route(t *testing.T) {
 	var s3, api, console string
 	for _, server := range servers {
 		switch {
-		case strings.HasPrefix(server, "s3.qabas.one\n"):
+		case strings.HasPrefix(server, "s3.qabas.one;\n"):
 			s3 = server
-		case strings.HasPrefix(server, "api.qabas.one\n"):
+		case strings.HasPrefix(server, "api.qabas.one;\n"):
 			api = server
 		case strings.HasPrefix(server, "s3c.qabas.one;\n"):
 			console = server
