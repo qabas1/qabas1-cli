@@ -194,8 +194,8 @@ func TestComposeIncludesInstalledGatewayOverlay(t *testing.T) {
 	if _, err := fx.eng.Compose(context.Background(), "dr1", StackOptions{Profile: nodestack.ProfileReplicaRO}, "up -d --remove-orphans"); err != nil {
 		t.Fatal(err)
 	}
-	if !fx.replica.Ran("-f /var/lib/qabasone/compose/compose.gateway.yaml") {
-		t.Fatal("Compose invocation omitted installed gateway overlay")
+	if !fx.replica.Ran("-f '/var/lib/qabasone/compose/compose.gateway.yaml'") {
+		t.Fatalf("Compose invocation omitted installed gateway overlay; scripts: %q", fx.replica.Scripts)
 	}
 	if !fx.replica.Ran("--env-file '/etc/qabasone/gateway.env'") {
 		t.Fatal("Compose invocation omitted gateway interpolation env file")

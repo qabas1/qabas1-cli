@@ -361,7 +361,8 @@ func (e *Engine) Compose(ctx context.Context, name string, opt StackOptions, arg
 	directives := nodestack.ParseDirectives(l.ComposeDir, contents)
 	for _, file := range directives.Files {
 		if filepath.Base(file) == "compose.gateway.yaml" {
-			command = strings.Replace(command, " --env-file ", " -f "+nodeexec.Quote(file)+" --env-file ", 1)
+			remoteFile := strings.TrimRight(l.ComposeDir, "/") + "/compose.gateway.yaml"
+			command = strings.Replace(command, " --env-file ", " -f "+nodeexec.Quote(remoteFile)+" --env-file ", 1)
 			for _, envFile := range directives.EnvFiles {
 				if filepath.Base(envFile) == "gateway.env" {
 					needle := " --env-file " + l.NodeEnvFile()
