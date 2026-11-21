@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"os"
 	"strings"
 
@@ -34,6 +35,25 @@ func newUpCmd(f *flags) *cobra.Command {
 	cmd.Flags().BoolVarP(&detach, "detach", "d", true, "run containers in the background")
 	cmd.Flags().BoolVar(&build, "build", false, "build images before starting containers")
 	return cmd
+}
+
+// refreshPrimaryHBA regenerates the primary's generated pg_hba.conf from the
+// current Docker data network after a full stack up, then reloads PostgreSQL.
+func refreshPrimaryHBA(e *env) error {
+	c, err := e.cluster()
+	if err != nil {
+		return err
+	}
+	re, err := e.newReplicaEngine(c, engineOpts{offline: true})
+	if err != nil {
+		return err
+	}
+	defer re.Close()
+	primary := c.Primary()
+	if primary == nil || primary.Name != re.Self {
+		return nil
+	}
+	return re.WriteHBA(context.Background(), primary.Name)
 }
 
 func newDownCmd(f *flags) *cobra.Command {
@@ -160,6 +180,11 @@ func runServiceControl(f *flags, opt serviceControl) error {
 			}
 			if err := rt.EnsureEdgeNetwork(env); err != nil {
 				return err
+			}
+			if opt.service == "" && opt.detach && !replicaStack {
+				if err := refreshPrimaryHBA(e); err != nil {
+					return err
+				}
 			}
 		case "down":
 			if err := rt.DownService(e.Paths, env, opt.service); err != nil {

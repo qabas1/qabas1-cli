@@ -274,7 +274,12 @@ func (e *Engine) WriteHBA(ctx context.Context, name string) error {
 	nets, _ := run(ctx, x, "docker network inspect qabasone_qabasone_data --format '{{range .IPAM.Config}}{{.Subnet}} {{end}}' 2>/dev/null || true")
 	subnets := strings.Fields(nets)
 	if len(subnets) == 0 {
-		subnets = []string{"172.16.0.0/12"}
+		return fmt.Errorf("cannot determine Docker data network subnet on %s; refusing to write a guessed pg_hba.conf (ensure qabasone_qabasone_data exists, then retry)", name)
+	}
+	for _, subnet := range subnets {
+		if _, _, err := net.ParseCIDR(subnet); err != nil {
+			return fmt.Errorf("Docker data network on %s returned invalid subnet %q", name, subnet)
+		}
 	}
 	var gateways []string
 	containerGateways, _ := run(ctx, x, "docker inspect --format '{{range .NetworkSettings.Networks}}{{.Gateway}} {{end}}' "+nodeexec.Quote(pgctl.Container)+" 2>/dev/null || true")
@@ -284,7 +289,10 @@ func (e *Engine) WriteHBA(ctx context.Context, name string) error {
 		}
 	}
 	if len(gateways) == 0 {
-		gatewaysRaw, _ := run(ctx, x, "docker network inspect qabasone_qabasone_data --format '{{range .IPAM.Config}}{{.Gateway}} {{end}}' 2>/dev/null || true")
+		gatewaysRaw, err := run(ctx, x, "docker network inspect qabasone_qabasone_data --format '{{range .IPAM.Config}}{{.Gateway}} {{end}}' 2>/dev/null || true")
+		if err != nil {
+			return fmt.Errorf("inspect Docker data network gateway on %s: %w", name, err)
+		}
 		for _, gateway := range strings.Fields(gatewaysRaw) {
 			ip := net.ParseIP(gateway)
 			if ip == nil || ip.To4() == nil {

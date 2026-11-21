@@ -364,6 +364,30 @@ func TestWriteHBAUsesPostgresContainerGateway(t *testing.T) {
 	t.Fatal("pg_hba.conf does not allow replication through the PostgreSQL container gateway")
 }
 
+func TestWriteHBARefusesFallbackWhenDockerNetworkMissing(t *testing.T) {
+	fx := newFixture(t, preflightOK)
+	w := &hookExec{Fake: fx.writer}
+	w.hook = func(script string) (nodeexec.Result, bool) {
+		if strings.Contains(script, ".IPAM.Config") {
+			return nodeexec.Result{}, true
+		}
+		return nodeexec.Result{}, false
+	}
+	fx.eng.Connect = func(_ context.Context, n cluster.Node) (nodeexec.Executor, error) {
+		if n.Name == "hq" {
+			return w, nil
+		}
+		return fx.replica, nil
+	}
+	err := fx.eng.WriteHBA(context.Background(), "hq")
+	if err == nil || !strings.Contains(err.Error(), "cannot determine Docker data network subnet") {
+		t.Fatalf("expected a clear network inspection failure, got %v", err)
+	}
+	if len(fx.writer.Files) != 0 {
+		t.Fatal("must not write a guessed HBA file when Docker network inspection fails")
+	}
+}
+
 func TestLinkStorageFailsFastWhenSourceMinIONetworkIsBlocked(t *testing.T) {
 	fx := newFixture(t, preflightOK)
 	fx.eng.Cluster.Upsert(cluster.Node{Name: "dr1", Role: cluster.RoleStandby, WGIP: "10.66.0.2"})
