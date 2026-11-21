@@ -52,6 +52,7 @@ func newFixture(t *testing.T, preflight string) *fixture {
 	must(err)
 
 	w := nodeexec.NewFake("hq").
+		OnOut("{{range .IPAM.Config}}{{.Subnet}} {{end}}", "172.21.0.0/16 ").
 		OnOut("nsenter -t", "10.66.0.2 via 172.21.0.1 dev eth0 src 172.21.0.2\nconnected=172.21.0.2\n").
 		On("CREATE TABLE qabas_verify_write_probe", nodeexec.Result{}).
 		OnOut("_prisma_migrations", "12|abc").
@@ -62,6 +63,7 @@ func newFixture(t *testing.T, preflight string) *fixture {
 		OnOut("{{if .State.Health}}", "healthy").
 		OnOut("docker ps -a --format '{{.Names}}'", "qabas1-api\n")
 	r := nodeexec.NewFake("dr1").
+		OnOut("{{range .IPAM.Config}}{{.Subnet}} {{end}}", "172.21.0.0/16 ").
 		OnOut("diskfree_kb", preflight).
 		On("CREATE TABLE qabas_verify_write_probe", nodeexec.Result{ExitCode: 1, Stderr: "ERROR:  cannot execute CREATE TABLE in a read-only transaction"}).
 		OnOut("_prisma_migrations", "12|abc").
@@ -188,17 +190,15 @@ func TestComposeIncludesInstalledGatewayOverlay(t *testing.T) {
 	fx := newFixture(t, preflightOK)
 	fx.eng.Cluster.Nodes = append(fx.eng.Cluster.Nodes, cluster.Node{Name: "dr1", Role: cluster.RoleStandby, Host: "203.0.113.10"})
 	l := fx.eng.Layout("dr1")
-	if err := os.MkdirAll(l.ComposeDir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(l.ComposeDir, nodestack.OverlaysFile), []byte("file:compose.replica-ro.yaml\nfile:compose.gateway.yaml\nenv-file:"+l.ConfigDir+"/gateway.env\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	fx.replica.OnOut("cat "+nodeexec.Quote(l.ComposeDir+"/"+nodestack.OverlaysFile), "file:compose.replica-ro.yaml\nfile:compose.gateway.yaml\nenv-file:"+l.ConfigDir+"/gateway.env\n")
 	if _, err := fx.eng.Compose(context.Background(), "dr1", StackOptions{Profile: nodestack.ProfileReplicaRO}, "up -d --remove-orphans"); err != nil {
 		t.Fatal(err)
 	}
 	if !fx.replica.Ran("-f /var/lib/qabasone/compose/compose.gateway.yaml") {
 		t.Fatal("Compose invocation omitted installed gateway overlay")
+	}
+	if !fx.replica.Ran("--env-file '/etc/qabasone/gateway.env'") {
+		t.Fatal("Compose invocation omitted gateway interpolation env file")
 	}
 }
 

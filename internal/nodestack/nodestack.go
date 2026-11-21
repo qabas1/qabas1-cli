@@ -234,12 +234,18 @@ type Directives struct {
 
 // ReadDirectives parses composeDir/overlays. Missing file = no directives.
 func ReadDirectives(composeDir string) Directives {
-	var d Directives
 	b, err := os.ReadFile(filepath.Join(composeDir, OverlaysFile))
 	if err != nil {
-		return d
+		return Directives{}
 	}
-	for _, line := range strings.Split(string(b), "\n") {
+	return ParseDirectives(composeDir, string(b))
+}
+
+// ParseDirectives parses overlay directives from a supplied contents string.
+// composeDir is used to resolve managed compose files for the selected node.
+func ParseDirectives(composeDir, contents string) Directives {
+	var d Directives
+	for _, line := range strings.Split(contents, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
