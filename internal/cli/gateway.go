@@ -88,12 +88,12 @@ func gatewayConfig(domains config.Domains) (string, error) {
 		fmt.Fprintf(&b, "  server { listen 8080; server_name %s;\n", r.host)
 		b.WriteString("    client_max_body_size 0;\n")
 		if r.host == domains.S3 {
-			writeGatewayLocation(&b, "/", upstream)
-			b.WriteString("      proxy_hide_header Cross-Origin-Resource-Policy;\n      add_header Cross-Origin-Resource-Policy cross-origin always;\n")
+			writeGatewayLocationWithCORP(&b, "/", upstream)
 		} else {
 			writeGatewayLocation(&b, "/", upstream)
 		}
 		if r.host == domains.API {
+			writeGatewayLocationWithCORP(&b, "^~ /api/v1/f/", "http://qabas_api")
 			writeGatewayLocation(&b, "= /socket.io", "http://qabas_api_socket")
 			writeGatewayLocation(&b, "^~ /socket.io/", "http://qabas_api_socket")
 		}
@@ -104,8 +104,21 @@ func gatewayConfig(domains config.Domains) (string, error) {
 }
 
 func writeGatewayLocation(b *strings.Builder, location, upstream string) {
+	writeGatewayLocationHeaders(b, location, upstream, false)
+}
+
+func writeGatewayLocationWithCORP(b *strings.Builder, location, upstream string) {
+	writeGatewayLocationHeaders(b, location, upstream, true)
+}
+
+func writeGatewayLocationHeaders(b *strings.Builder, location, upstream string, crossOriginResourcePolicy bool) {
 	fmt.Fprintf(b, "    location %s {\n      proxy_pass %s;\n", location, upstream)
-	b.WriteString("      proxy_http_version 1.1;\n      proxy_set_header Host $host;\n      proxy_set_header X-Real-IP $audit_client_ip;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;\n      proxy_set_header X-Request-ID $request_id;\n      proxy_set_header Upgrade $http_upgrade;\n      proxy_set_header Connection $connection_upgrade;\n      proxy_read_timeout 3600s;\n      proxy_request_buffering off;\n    }\n")
+	b.WriteString("      proxy_http_version 1.1;\n      proxy_set_header Host $host;\n      proxy_set_header X-Real-IP $audit_client_ip;\n      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n      proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;\n      proxy_set_header X-Request-ID $request_id;\n      proxy_set_header Upgrade $http_upgrade;\n      proxy_set_header Connection $connection_upgrade;\n      proxy_read_timeout 3600s;\n      proxy_request_buffering off;\n")
+	if crossOriginResourcePolicy {
+		// Keep the exception on this location only; the API default is same-origin.
+		b.WriteString("      proxy_hide_header Cross-Origin-Resource-Policy;\n      add_header Cross-Origin-Resource-Policy cross-origin always;\n")
+	}
+	b.WriteString("    }\n")
 }
 
 func ensureGatewayOverlay(e *env) error {

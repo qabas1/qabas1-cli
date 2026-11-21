@@ -64,8 +64,13 @@ func TestGatewayCORPOverrideIsScopedToS3Route(t *testing.T) {
 		if !strings.Contains(s3, directive) {
 			t.Errorf("S3 route missing %q", directive)
 		}
-		if strings.Contains(api, directive) || strings.Contains(console, directive) {
-			t.Errorf("%q must be limited to the S3 object route", directive)
+		apiFileLocation := strings.SplitN(api, "location ^~ /api/v1/f/ {", 2)
+		if len(apiFileLocation) != 2 || !strings.Contains(strings.SplitN(apiFileLocation[1], "\n    }", 2)[0], directive) {
+			t.Errorf("API file-share redirect route missing %q", directive)
+		}
+		apiRootLocation := strings.SplitN(api, "location / {", 2)
+		if len(apiRootLocation) != 2 || strings.Contains(strings.SplitN(apiRootLocation[1], "\n    }", 2)[0], directive) || strings.Contains(console, directive) {
+			t.Errorf("%q must not affect API root or MinIO Console routes", directive)
 		}
 	}
 }
