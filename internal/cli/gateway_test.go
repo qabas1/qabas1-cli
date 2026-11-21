@@ -33,6 +33,43 @@ func TestGatewayConfigRoutesDomainsAndScaledAPI(t *testing.T) {
 	}
 }
 
+func TestGatewayCORPOverrideIsScopedToS3Route(t *testing.T) {
+	cfg := config.Default()
+	cfg.Domain = "qabas.one"
+	got, err := gatewayConfig(cfg.EffectiveDomains())
+	if err != nil {
+		t.Fatal(err)
+	}
+	servers := strings.Split(got, "  server { listen 8080; server_name ")
+	var s3, api, console string
+	for _, server := range servers {
+		switch {
+		case strings.HasPrefix(server, "s3.qabas.one\n"):
+			s3 = server
+		case strings.HasPrefix(server, "api.qabas.one\n"):
+			api = server
+		case strings.HasPrefix(server, "s3c.qabas.one;\n"):
+			console = server
+		}
+	}
+	for name, server := range map[string]string{"S3": s3, "API": api, "console": console} {
+		if server == "" {
+			t.Fatalf("generated %s server block not found", name)
+		}
+	}
+	for _, directive := range []string{
+		"proxy_hide_header Cross-Origin-Resource-Policy;",
+		"add_header Cross-Origin-Resource-Policy cross-origin always;",
+	} {
+		if !strings.Contains(s3, directive) {
+			t.Errorf("S3 route missing %q", directive)
+		}
+		if strings.Contains(api, directive) || strings.Contains(console, directive) {
+			t.Errorf("%q must be limited to the S3 object route", directive)
+		}
+	}
+}
+
 func TestGatewaySeparatesRESTFromSocketAffinity(t *testing.T) {
 	cfg := config.Default()
 	cfg.Domain = "qabas.one"

@@ -87,7 +87,12 @@ func gatewayConfig(domains config.Domains) (string, error) {
 		}
 		fmt.Fprintf(&b, "  server { listen 8080; server_name %s;\n", r.host)
 		b.WriteString("    client_max_body_size 0;\n")
-		writeGatewayLocation(&b, "/", upstream)
+		if r.host == domains.S3 {
+			writeGatewayLocation(&b, "/", upstream)
+			b.WriteString("      proxy_hide_header Cross-Origin-Resource-Policy;\n      add_header Cross-Origin-Resource-Policy cross-origin always;\n")
+		} else {
+			writeGatewayLocation(&b, "/", upstream)
+		}
 		if r.host == domains.API {
 			writeGatewayLocation(&b, "= /socket.io", "http://qabas_api_socket")
 			writeGatewayLocation(&b, "^~ /socket.io/", "http://qabas_api_socket")
